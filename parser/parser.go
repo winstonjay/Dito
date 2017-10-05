@@ -142,7 +142,7 @@ func (p *Parser) statement() ast.Statement {
 		}
 		return p.expressionStatement()
 	case token.IF:
-		return p.ifelseStatement()
+		return p.ifElseStatement()
 	case token.FOR:
 		return p.forStatement()
 	default:
@@ -169,7 +169,7 @@ func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
-func (p *Parser) ifelseStatement() ast.Statement {
+func (p *Parser) ifElseStatement() ast.Statement {
 	expression := &ast.IfStatement{Token: p.currentToken}
 	p.nextToken()
 	expression.Condition = p.expression(token.LOWEST)
@@ -216,19 +216,6 @@ func (p *Parser) blockStatement() *ast.BlockStatement {
 	Expressions.
 */
 
-// // ifelseExpression : <expr> if <expr> else <expr>
-// func (p *Parser) ifelseExpression() ast.Expression {
-// 	expression := &ast.IfelseExpression{}
-// 	expression.Result = p.expression(token.LOWEST)
-// 	p.nextToken()
-// 	expression.Condition = p.expression(token.LOWEST)
-// 	if p.peekTokenIs(token.ELSE) {
-// 		p.nextToken()
-// 		expression.Alternative = p.expression(token.LOWEST)
-// 	}
-// 	return expression
-// }
-
 func (p *Parser) expressionList(delimiter token.Token) []ast.Expression {
 	list := []ast.Expression{}
 	if p.peekTokenIs(delimiter) {
@@ -264,6 +251,28 @@ func (p *Parser) expression(precedence uint) ast.Expression {
 		p.nextToken()
 		expr = infix(expr)
 	}
+	// this causing bugs right here.
+	if lineno == p.scanner.Lineno {
+		if p.peekTokenIs(token.IF) {
+			p.nextToken()
+			return p.ifElseExpression(expr)
+		}
+	}
+	return expr
+}
+
+func (p *Parser) ifElseExpression(inital ast.Expression) ast.Expression {
+	expr := &ast.IfElseExpression{
+		Initial: inital,
+		Token:   p.currentToken,
+	}
+	p.nextToken()
+	expr.Condition = p.expression(token.LOWEST)
+	if !p.expectPeek(token.ELSE) {
+		return nil
+	}
+	p.nextToken()
+	expr.Alternative = p.expression(token.LOWEST)
 	return expr
 }
 

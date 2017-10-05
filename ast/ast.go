@@ -186,22 +186,22 @@ func (ie *InfixExpression) String() string {
 	return out.String()
 }
 
-// IfelseExpression :
-type IfelseExpression struct {
+// IfElseExpression :
+type IfElseExpression struct {
 	Token       token.Token // 'if'
-	Result      Expression
+	Initial     Expression
 	Condition   Expression
 	Alternative Expression
 }
 
-func (ie *IfelseExpression) expressionNode()      {}
-func (ie *IfelseExpression) tokenLiteral() string { return ie.Token.String() }
-func (ie *IfelseExpression) String() string {
+func (ie *IfElseExpression) expressionNode()      {}
+func (ie *IfElseExpression) tokenLiteral() string { return ie.Token.String() }
+func (ie *IfElseExpression) String() string {
 	var out bytes.Buffer
 	out.WriteString("if ")
 	out.WriteString(ie.Condition.String())
 	out.WriteString(" ")
-	out.WriteString(ie.Result.String())
+	out.WriteString(ie.Initial.String())
 	if ie.Alternative != nil {
 		out.WriteString(" else ")
 		out.WriteString(ie.Alternative.String())

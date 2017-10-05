@@ -6,6 +6,19 @@ import (
 	"math"
 )
 
+/*
+	Expressions:
+
+		prefixExpression
+
+		infixExpression
+			integerInfixExpression
+			floatInfixExpression
+			stringInfixExpression
+
+		ifelseExpression
+*/
+
 func evalPrefixExpression(operator string, right object.Object) object.Object {
 	switch operator {
 	case "!":
@@ -185,6 +198,10 @@ func evalStringExpression(operator string, left, right object.Object) object.Obj
 	switch operator {
 	case "+":
 		return &object.DitoString{Value: leftVal + rightVal}
+	case "==":
+		return nativeBoolToBooleanObject(leftVal == rightVal)
+	case "!=":
+		return nativeBoolToBooleanObject(leftVal != rightVal)
 	default:
 		return newError("Unknown operator: %s %s %s",
 			left.Type(), operator, right.Type())
@@ -196,4 +213,15 @@ func nativeBoolToBooleanObject(input bool) *object.Boolean {
 		return object.TRUE
 	}
 	return object.FALSE
+}
+
+func evalIfElseExpression(node *ast.IfElseExpression, env *object.Environment) object.Object {
+	condition := Eval(node.Condition, env)
+	if isError(condition) {
+		return condition
+	}
+	if isTrue(condition) {
+		return Eval(node.Initial, env)
+	}
+	return Eval(node.Alternative, env)
 }
