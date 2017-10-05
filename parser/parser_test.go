@@ -2,7 +2,7 @@ package parser
 
 import (
 	"dito/ast"
-	"dito/scanner"
+	"dito/lexer"
 	"fmt"
 	"testing"
 )

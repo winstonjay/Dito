@@ -60,34 +60,28 @@ func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) obje
 		return right
 	}
 	switch {
-	case left.Type() == object.FloatObj || right.Type() == object.FloatObj:
-		if operator == "/" || operator == "%" {
-			if right.(*object.Float).Value == float64(0) {
-				goto ZeroDivisionError
-			}
+	case left.Type() == object.FloatObj || left.Type() == object.IntergerObj &&
+		right.Type() == object.FloatObj || right.Type() == object.IntergerObj:
+
+		if left.Type() == object.IntergerObj && right.Type() == object.IntergerObj {
+			return evalIntegerInfixExpression(operator, left, right)
 		}
 		return evalFloatInfixExpression(operator, left, right)
 
 	case left.Type() != right.Type():
-		return newError("Type mismatch: %s %s %s",
-			left.Type(), operator, right.Type())
+		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
 
 	case left.Type() == object.StringObj && right.Type() == object.StringObj:
 		return evalStringExpression(operator, left, right)
 
-	case left.Type() == object.IntergerObj && right.Type() == object.IntergerObj:
-		if operator == "/" || operator == "%" {
-			if right.(*object.Integer).Value == 0 {
-				goto ZeroDivisionError
-			}
-		}
-		return evalIntegerInfixExpression(operator, left, right)
+	case operator == "==":
+		return nativeBoolToBooleanObject(left == right)
+	case operator == "!=":
+		return nativeBoolToBooleanObject(left != right)
+
 	default:
-		return newError("Unknown operator: %s %s %s",
-			left.Type(), operator, right.Type())
+		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
-ZeroDivisionError:
-	return newError("Zero division error: %s %s %s", left.Inspect(), operator, right.Inspect())
 }
 
 func evalIntegerInfixExpression(operator string, left, right object.Object) object.Object {
@@ -95,54 +89,51 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	rightVal := right.(*object.Integer).Value
 	switch operator {
 	case "+":
-		if Int64SumOverflows(leftVal, rightVal) {
-			goto OverflowError
-		}
 		return &object.Integer{Value: leftVal + rightVal}
 	case "-":
-		if Int64DiffOverflows(leftVal, rightVal) {
-			goto OverflowError
-		}
 		return &object.Integer{Value: leftVal - rightVal}
 	case "*":
-		if Int64MulOverflows(leftVal, rightVal) {
-			goto OverflowError
-		}
 		return &object.Integer{Value: leftVal * rightVal}
 	case "**":
-		// overflow handled inside function.
 		return IntegerObjPow(leftVal, rightVal)
+
 	case "/":
+		if rightVal == 0 {
+			return newError("Zero division error: %s %s %s",
+				left.Inspect(), operator, right.Inspect())
+		}
 		if leftVal%rightVal == 0 {
 			return &object.Integer{Value: leftVal / rightVal}
 		}
 		return &object.Float{Value: float64(leftVal) / float64(rightVal)}
 	case "%":
+		if rightVal == 0 {
+			return newError("Zero division error: %s %s %s",
+				left.Inspect(), operator, right.Inspect())
+		}
 		return &object.Integer{Value: leftVal % rightVal}
-	case "<":
-		return nativeBoolToBooleanObject(leftVal <= rightVal)
-	case "<=":
-		return nativeBoolToBooleanObject(leftVal < rightVal)
-	case ">":
-		return nativeBoolToBooleanObject(leftVal > rightVal)
-	case ">=":
-		return nativeBoolToBooleanObject(leftVal >= rightVal)
 	case "==":
 		return nativeBoolToBooleanObject(leftVal == rightVal)
 	case "!=":
 		return nativeBoolToBooleanObject(leftVal != rightVal)
+	case "<":
+		return nativeBoolToBooleanObject(leftVal < rightVal)
+	case "<=":
+		return nativeBoolToBooleanObject(leftVal <= rightVal)
+	case ">":
+		return nativeBoolToBooleanObject(leftVal > rightVal)
+	case ">=":
+		return nativeBoolToBooleanObject(leftVal >= rightVal)
 	default:
 		return newError("Unknown operator: %s %s %s",
 			left.Type(), operator, right.Type())
 	}
-
-OverflowError:
-	return newError("Overlow/Underlow in operation: %d %s %d",
-		leftVal, operator, rightVal)
 }
 
 func evalFloatInfixExpression(operator string, left, right object.Object) object.Object {
 	var leftVal, rightVal float64
+
+	// Handle the type promotion if there is oone.
 	if left.Type() == object.FloatObj {
 		leftVal = left.(*object.Float).Value
 	} else {
@@ -153,6 +144,7 @@ func evalFloatInfixExpression(operator string, left, right object.Object) object
 	} else {
 		rightVal = float64(right.(*object.Integer).Value)
 	}
+
 	switch operator {
 	case "+":
 		return &object.Float{Value: leftVal + rightVal}
@@ -162,20 +154,25 @@ func evalFloatInfixExpression(operator string, left, right object.Object) object
 		return &object.Float{Value: leftVal * rightVal}
 	case "**":
 		return &object.Float{Value: math.Pow(leftVal, rightVal)}
+
 	case "/":
+		if rightVal == 0 {
+			return newError("Zero division error: %s %s %s",
+				left.Inspect(), operator, right.Inspect())
+		}
 		return &object.Float{Value: leftVal / rightVal}
-	case "<":
-		return nativeBoolToBooleanObject(leftVal <= rightVal)
-	case "<=":
-		return nativeBoolToBooleanObject(leftVal < rightVal)
-	case ">":
-		return nativeBoolToBooleanObject(leftVal > rightVal)
-	case ">=":
-		return nativeBoolToBooleanObject(leftVal >= rightVal)
 	case "==":
 		return nativeBoolToBooleanObject(leftVal == rightVal)
 	case "!=":
 		return nativeBoolToBooleanObject(leftVal != rightVal)
+	case "<":
+		return nativeBoolToBooleanObject(leftVal < rightVal)
+	case "<=":
+		return nativeBoolToBooleanObject(leftVal <= rightVal)
+	case ">":
+		return nativeBoolToBooleanObject(leftVal > rightVal)
+	case ">=":
+		return nativeBoolToBooleanObject(leftVal >= rightVal)
 	default:
 		return newError("Unknown operator: %s %s %s",
 			left.Type(), operator, right.Type())
@@ -188,15 +185,10 @@ func evalStringExpression(operator string, left, right object.Object) object.Obj
 	switch operator {
 	case "+":
 		return &object.DitoString{Value: leftVal + rightVal}
-	case "!=":
-		return nativeBoolToBooleanObject(leftVal == rightVal)
-	case "==":
-		return nativeBoolToBooleanObject(leftVal == rightVal)
 	default:
 		return newError("Unknown operator: %s %s %s",
 			left.Type(), operator, right.Type())
 	}
-
 }
 
 func nativeBoolToBooleanObject(input bool) *object.Boolean {

@@ -80,6 +80,10 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 		tok = token.SEMI
 	case ',':
 		tok = token.COMMA
+	case '{':
+		tok = token.LBRACE
+	case '}':
+		tok = token.RBRACE
 	case '[':
 		tok = token.LBRACKET
 	case ']':

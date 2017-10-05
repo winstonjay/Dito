@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-
 	args := os.Args[1:] // args without program.
 	// https://gobyexample.com/command-line-flags
 	if len(args) > 0 {

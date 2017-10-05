@@ -57,6 +57,22 @@ Statements
 
 */
 
+// BlockStatement : a group of one or more statments inside curly brackets.
+type BlockStatement struct {
+	Token      token.Token // "{"
+	Statements []Statement
+}
+
+func (bs *BlockStatement) statementNode()       {}
+func (bs *BlockStatement) tokenLiteral() string { return bs.Token.String() }
+func (bs *BlockStatement) String() string {
+	var out bytes.Buffer
+	for _, s := range bs.Statements {
+		out.WriteString(s.String())
+	}
+	return out.String()
+}
+
 // AssignmentStatement : Identifier = expr | Identifier := expr
 type AssignmentStatement struct {
 	Token token.Token // either := or =
@@ -65,7 +81,7 @@ type AssignmentStatement struct {
 }
 
 func (as *AssignmentStatement) statementNode()       {}
-func (as *AssignmentStatement) tokenLiteral() string { return as.String() }
+func (as *AssignmentStatement) tokenLiteral() string { return as.Token.String() }
 func (as *AssignmentStatement) String() string {
 	var out bytes.Buffer
 	out.WriteString(as.Name.String())
@@ -87,6 +103,42 @@ func (es *ExpressionStatement) String() string {
 		return es.Expression.String()
 	}
 	return ""
+}
+
+// IfStatement :
+type IfStatement struct {
+	Token       token.Token // 'if'
+	Condition   Expression
+	Consequence *BlockStatement
+	Alternative *BlockStatement
+}
+
+func (ie *IfStatement) statementNode()       {}
+func (ie *IfStatement) tokenLiteral() string { return ie.Token.String() }
+func (ie *IfStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString("if ")
+	out.WriteString(ie.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(ie.Consequence.String())
+	if ie.Alternative != nil {
+		out.WriteString(" else ")
+		out.WriteString(ie.Alternative.String())
+	}
+	return out.String()
+}
+
+// ForStatement :
+type ForStatement struct {
+	Token     token.Token // 'for'
+	Condition Expression
+	LoopBody  *BlockStatement
+}
+
+func (fs *ForStatement) statementNode()       {}
+func (fs *ForStatement) tokenLiteral() string { return fs.Token.String() }
+func (fs *ForStatement) String() string {
+	return "for statement"
 }
 
 /* -----------------------------------------------------------------------
@@ -131,6 +183,29 @@ func (ie *InfixExpression) String() string {
 	out.WriteString(ie.Right.String())
 	out.WriteString(")")
 
+	return out.String()
+}
+
+// IfelseExpression :
+type IfelseExpression struct {
+	Token       token.Token // 'if'
+	Result      Expression
+	Condition   Expression
+	Alternative Expression
+}
+
+func (ie *IfelseExpression) expressionNode()      {}
+func (ie *IfelseExpression) tokenLiteral() string { return ie.Token.String() }
+func (ie *IfelseExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString("if ")
+	out.WriteString(ie.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(ie.Result.String())
+	if ie.Alternative != nil {
+		out.WriteString(" else ")
+		out.WriteString(ie.Alternative.String())
+	}
 	return out.String()
 }
 

@@ -58,7 +58,10 @@ const (
 	beginKeyword
 	TRUE   // true
 	FALSE  // false
-	LET    // let
+	IF     // if
+	ELSE   // else
+	PRINT  // print
+	FOR    // for
 	FUNC   // func
 	RETURN // return
 	endKeyword
@@ -98,8 +101,8 @@ var tokensLiterals = [...]string{
 
 	LPAREN:   "(",
 	RPAREN:   ")",
-	RBRACE:   "{",
-	LBRACE:   "}",
+	LBRACE:   "{",
+	RBRACE:   "}",
 	LBRACKET: "[",
 	RBRACKET: "]",
 
@@ -112,7 +115,10 @@ var tokensLiterals = [...]string{
 	TRUE:  "true",
 	FALSE: "false",
 
-	LET:    "let",
+	IF:     "if",
+	ELSE:   "else",
+	PRINT:  "print",
+	FOR:    "for",
 	FUNC:   "func",
 	RETURN: "return",
 }

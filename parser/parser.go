@@ -141,6 +141,10 @@ func (p *Parser) statement() ast.Statement {
 			return p.assignmentStatement()
 		}
 		return p.expressionStatement()
+	case token.IF:
+		return p.ifelseStatement()
+	case token.FOR:
+		return p.forStatement()
 	default:
 		return p.expressionStatement()
 	}
@@ -165,9 +169,65 @@ func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
+func (p *Parser) ifelseStatement() ast.Statement {
+	expression := &ast.IfStatement{Token: p.currentToken}
+	p.nextToken()
+	expression.Condition = p.expression(token.LOWEST)
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	expression.Consequence = p.blockStatement()
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken()
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+		expression.Alternative = p.blockStatement()
+	}
+	return expression
+}
+
+func (p *Parser) forStatement() ast.Statement {
+	stmt := &ast.ForStatement{Token: p.currentToken}
+	p.nextToken()
+	stmt.Condition = p.expression(token.LOWEST)
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	stmt.LoopBody = p.blockStatement()
+	return stmt
+}
+
+func (p *Parser) blockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.currentToken}
+	block.Statements = []ast.Statement{}
+	p.nextToken()
+	for !p.currentTokenIs(token.RBRACE) && !p.currentTokenIs(token.EOF) {
+		stmt := p.statement()
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+	return block
+}
+
 /*
 	Expressions.
 */
+
+// // ifelseExpression : <expr> if <expr> else <expr>
+// func (p *Parser) ifelseExpression() ast.Expression {
+// 	expression := &ast.IfelseExpression{}
+// 	expression.Result = p.expression(token.LOWEST)
+// 	p.nextToken()
+// 	expression.Condition = p.expression(token.LOWEST)
+// 	if p.peekTokenIs(token.ELSE) {
+// 		p.nextToken()
+// 		expression.Alternative = p.expression(token.LOWEST)
+// 	}
+// 	return expression
+// }
 
 func (p *Parser) expressionList(delimiter token.Token) []ast.Expression {
 	list := []ast.Expression{}
