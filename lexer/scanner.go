@@ -70,8 +70,6 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 		tok = token.ADD
 	case '-':
 		tok = token.SUB
-	case '/':
-		tok = token.DIV
 	case '%':
 		tok = token.MOD
 	case '(':
@@ -136,6 +134,7 @@ func (s *Scanner) readIdentifer() (token.Token, string) {
 	return token.LookUpIDVal(literal), literal
 }
 
+// readNumber : Return either an integer or a float.
 func (s *Scanner) readNumber() (token.Token, string) {
 	start := s.pos
 	for isDigit(s.char) {
@@ -151,12 +150,6 @@ func (s *Scanner) readNumber() (token.Token, string) {
 	return token.FLOAT, s.input[start:s.pos]
 }
 
-// advance : progresses the scanners current position, peek position,
-// current char being examined and the column position. If we reach the
-// end of the input file this method will return 0 which is designated
-// as our EOF indicator. This interacts with the NextToken so that once
-// this end of input is reached it forever more just return EOF tokens.
-// at which point you should cut it off.
 func (s *Scanner) advance() {
 	if s.peekPos >= len(s.input) {
 		s.char = 0

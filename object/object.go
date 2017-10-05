@@ -88,7 +88,7 @@ type Float struct{ Value float64 }
 
 // Type :
 func (f *Float) Type() string    { return FloatObj }
-func (f *Float) Inspect() string { return strconv.FormatFloat(f.Value, 'f', -1, 64) }
+func (f *Float) Inspect() string { return strconv.FormatFloat(f.Value, 'f', -2, 64) }
 
 func NewFloatObj(value float64) *Float { return &Float{Value: value} }
 

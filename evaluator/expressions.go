@@ -37,11 +37,15 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 }
 
 func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
-	if right.Type() != object.IntergerObj {
-		return newError("Unknown operator: -%s", right.Type())
+	if right.Type() == object.IntergerObj {
+		value := right.(*object.Integer).Value
+		return &object.Integer{Value: -value}
 	}
-	value := right.(*object.Integer).Value
-	return &object.Integer{Value: -value}
+	if right.Type() == object.FloatObj {
+		value := right.(*object.Float).Value
+		return &object.Float{Value: -value}
+	}
+	return newError("Unknown operator: -%s", right.Type())
 }
 
 // Infix expressions.
@@ -56,18 +60,21 @@ func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) obje
 		return right
 	}
 	switch {
-	case left.Type() != right.Type():
-		return newError("Type mismatch: %s %s %s",
-			left.Type(), operator, right.Type())
-	case left.Type() == object.StringObj && right.Type() == object.StringObj:
-		return evalStringExpression(operator, left, right)
-	case left.Type() == object.FloatObj && right.Type() == object.FloatObj:
+	case left.Type() == object.FloatObj || right.Type() == object.FloatObj:
 		if operator == "/" || operator == "%" {
 			if right.(*object.Float).Value == float64(0) {
 				goto ZeroDivisionError
 			}
 		}
 		return evalFloatInfixExpression(operator, left, right)
+
+	case left.Type() != right.Type():
+		return newError("Type mismatch: %s %s %s",
+			left.Type(), operator, right.Type())
+
+	case left.Type() == object.StringObj && right.Type() == object.StringObj:
+		return evalStringExpression(operator, left, right)
+
 	case left.Type() == object.IntergerObj && right.Type() == object.IntergerObj:
 		if operator == "/" || operator == "%" {
 			if right.(*object.Integer).Value == 0 {
@@ -106,7 +113,10 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 		// overflow handled inside function.
 		return IntegerObjPow(leftVal, rightVal)
 	case "/":
-		return &object.Integer{Value: leftVal / rightVal}
+		if leftVal%rightVal == 0 {
+			return &object.Integer{Value: leftVal / rightVal}
+		}
+		return &object.Float{Value: float64(leftVal) / float64(rightVal)}
 	case "%":
 		return &object.Integer{Value: leftVal % rightVal}
 	case "<":
@@ -132,8 +142,17 @@ OverflowError:
 }
 
 func evalFloatInfixExpression(operator string, left, right object.Object) object.Object {
-	leftVal := left.(*object.Float).Value
-	rightVal := right.(*object.Float).Value
+	var leftVal, rightVal float64
+	if left.Type() == object.FloatObj {
+		leftVal = left.(*object.Float).Value
+	} else {
+		leftVal = float64(left.(*object.Integer).Value)
+	}
+	if right.Type() == object.FloatObj {
+		rightVal = right.(*object.Float).Value
+	} else {
+		rightVal = float64(right.(*object.Integer).Value)
+	}
 	switch operator {
 	case "+":
 		return &object.Float{Value: leftVal + rightVal}
@@ -142,7 +161,7 @@ func evalFloatInfixExpression(operator string, left, right object.Object) object
 	case "*":
 		return &object.Float{Value: leftVal * rightVal}
 	case "**":
-		return &object.Float{Value: math.Pow(float64(leftVal), float64(rightVal))}
+		return &object.Float{Value: math.Pow(leftVal, rightVal)}
 	case "/":
 		return &object.Float{Value: leftVal / rightVal}
 	case "<":
