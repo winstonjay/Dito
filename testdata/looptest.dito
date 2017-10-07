@@ -1,0 +1,11 @@
+# Example of loop implementaion.
+# Program finds square root of x to an accuracy of delta.
+delta := 1/128 
+z := delta 
+x := 144
+
+for (x - z**2) >= delta {
+    z = z - (z**2 - x) / (2 * x)
+}
+
+print("sqrt of", x, "=", z)

@@ -1,0 +1,38 @@
+# ---------------------------------------------
+# These capabilities are not implemented yet.
+# ---------------------------------------------
+
+# Full dito function. type specifier is arbitary
+# but coerces the results to me the critera.
+
+
+func sqrt(x, delta: 1/128) -> (z) {
+    "calculate the sqrt of a number to an acuracy of delta."
+    z := delta
+    for (x - z**2) >= delta {
+        z = z - (z**2 - x) / (2 * x)
+    }
+}
+
+# Shorthand functinons / lambda functions.
+
+fn sqrt(x) -> (x**0.5)
+
+func hello(x_ray: int, yankee: String, zebra: Float) 
+    -> (alpha: int, beta: int, charlie: int, delta: int) 
+    {
+    "return some crazy shite or eat shite"
+    print("hello")
+}
+
+sqrt(25) + sqrt2(25)
+
+
+class Point(x, y) {
+    'x = x
+    'y = x
+
+    'func hypot(') {
+       return ('x**2 + 'y**2)**0.5
+    } 
+}

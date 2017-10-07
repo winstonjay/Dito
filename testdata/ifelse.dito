@@ -1,0 +1,16 @@
+alpha  := 100 / 5 + 100
+person := "dave "
+
+beta := ""; # need this semi until we sort out linebreaks
+
+if alpha == 120 {
+    beta = "is cool"
+} else {
+    beta = "is not cool"
+}
+print(beta)
+
+res := (person + beta if "is not cool" == beta else 
+        "summer time" if "dave is cool" else 
+        "satan")
+print(res)
