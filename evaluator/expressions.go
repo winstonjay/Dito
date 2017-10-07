@@ -52,11 +52,11 @@ func evalBangOperatorExpression(right object.Object) object.Object {
 func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	if right.Type() == object.IntergerObj {
 		value := right.(*object.Integer).Value
-		return &object.Integer{Value: -value}
+		return object.NewDitoInteger(-value)
 	}
 	if right.Type() == object.FloatObj {
 		value := right.(*object.Float).Value
-		return &object.Float{Value: -value}
+		return object.NewDitoFloat(-value)
 	}
 	return newError("Unknown operator: -%s", right.Type())
 }
@@ -73,13 +73,17 @@ func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) obje
 		return right
 	}
 	switch {
-	case left.Type() == object.FloatObj || left.Type() == object.IntergerObj &&
-		right.Type() == object.FloatObj || right.Type() == object.IntergerObj:
-
+	case isNumericType(left) && isNumericType(right):
 		if left.Type() == object.IntergerObj && right.Type() == object.IntergerObj {
 			return evalIntegerInfixExpression(operator, left, right)
 		}
 		return evalFloatInfixExpression(operator, left, right)
+
+	case left.Type() == object.ArrayObj && isNumericType(right):
+		return evalArrayInfixNumExpr(operator, left, right)
+
+	case isNumericType(left) && right.Type() == object.ArrayObj:
+		return evalArrayInfixNumExpr(operator, right, left)
 
 	case left.Type() != right.Type():
 		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
@@ -88,9 +92,9 @@ func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) obje
 		return evalStringExpression(operator, left, right)
 
 	case operator == "==":
-		return nativeBoolToBooleanObject(left == right)
+		return object.NewDitoBoolean(left == right)
 	case operator == "!=":
-		return nativeBoolToBooleanObject(left != right)
+		return object.NewDitoBoolean(left != right)
 
 	default:
 		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
@@ -102,11 +106,11 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 	rightVal := right.(*object.Integer).Value
 	switch operator {
 	case "+":
-		return &object.Integer{Value: leftVal + rightVal}
+		return object.NewDitoInteger(leftVal + rightVal)
 	case "-":
-		return &object.Integer{Value: leftVal - rightVal}
+		return object.NewDitoInteger(leftVal - rightVal)
 	case "*":
-		return &object.Integer{Value: leftVal * rightVal}
+		return object.NewDitoInteger(leftVal * rightVal)
 	case "**":
 		return IntegerObjPow(leftVal, rightVal)
 
@@ -116,27 +120,27 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 				left.Inspect(), operator, right.Inspect())
 		}
 		if leftVal%rightVal == 0 {
-			return &object.Integer{Value: leftVal / rightVal}
+			return object.NewDitoInteger(leftVal / rightVal)
 		}
-		return &object.Float{Value: float64(leftVal) / float64(rightVal)}
+		return object.NewDitoFloat(float64(leftVal) / float64(rightVal))
 	case "%":
 		if rightVal == 0 {
 			return newError("Zero division error: %s %s %s",
 				left.Inspect(), operator, right.Inspect())
 		}
-		return &object.Integer{Value: leftVal % rightVal}
+		return object.NewDitoInteger(leftVal % rightVal)
 	case "==":
-		return nativeBoolToBooleanObject(leftVal == rightVal)
+		return object.NewDitoBoolean(leftVal == rightVal)
 	case "!=":
-		return nativeBoolToBooleanObject(leftVal != rightVal)
+		return object.NewDitoBoolean(leftVal != rightVal)
 	case "<":
-		return nativeBoolToBooleanObject(leftVal < rightVal)
+		return object.NewDitoBoolean(leftVal < rightVal)
 	case "<=":
-		return nativeBoolToBooleanObject(leftVal <= rightVal)
+		return object.NewDitoBoolean(leftVal <= rightVal)
 	case ">":
-		return nativeBoolToBooleanObject(leftVal > rightVal)
+		return object.NewDitoBoolean(leftVal > rightVal)
 	case ">=":
-		return nativeBoolToBooleanObject(leftVal >= rightVal)
+		return object.NewDitoBoolean(leftVal >= rightVal)
 	default:
 		return newError("Unknown operator: %s %s %s",
 			left.Type(), operator, right.Type())
@@ -160,32 +164,32 @@ func evalFloatInfixExpression(operator string, left, right object.Object) object
 
 	switch operator {
 	case "+":
-		return &object.Float{Value: leftVal + rightVal}
+		return object.NewDitoFloat(leftVal + rightVal)
 	case "-":
-		return &object.Float{Value: leftVal - rightVal}
+		return object.NewDitoFloat(leftVal - rightVal)
 	case "*":
-		return &object.Float{Value: leftVal * rightVal}
+		return object.NewDitoFloat(leftVal * rightVal)
 	case "**":
-		return &object.Float{Value: math.Pow(leftVal, rightVal)}
+		return object.NewDitoFloat(math.Pow(leftVal, rightVal))
 
 	case "/":
 		if rightVal == 0 {
 			return newError("Zero division error: %s %s %s",
 				left.Inspect(), operator, right.Inspect())
 		}
-		return &object.Float{Value: leftVal / rightVal}
+		return object.NewDitoFloat(leftVal / rightVal)
 	case "==":
-		return nativeBoolToBooleanObject(leftVal == rightVal)
+		return object.NewDitoBoolean(leftVal == rightVal)
 	case "!=":
-		return nativeBoolToBooleanObject(leftVal != rightVal)
+		return object.NewDitoBoolean(leftVal != rightVal)
 	case "<":
-		return nativeBoolToBooleanObject(leftVal < rightVal)
+		return object.NewDitoBoolean(leftVal < rightVal)
 	case "<=":
-		return nativeBoolToBooleanObject(leftVal <= rightVal)
+		return object.NewDitoBoolean(leftVal <= rightVal)
 	case ">":
-		return nativeBoolToBooleanObject(leftVal > rightVal)
+		return object.NewDitoBoolean(leftVal > rightVal)
 	case ">=":
-		return nativeBoolToBooleanObject(leftVal >= rightVal)
+		return object.NewDitoBoolean(leftVal >= rightVal)
 	default:
 		return newError("Unknown operator: %s %s %s",
 			left.Type(), operator, right.Type())
@@ -199,20 +203,13 @@ func evalStringExpression(operator string, left, right object.Object) object.Obj
 	case "+":
 		return &object.DitoString{Value: leftVal + rightVal}
 	case "==":
-		return nativeBoolToBooleanObject(leftVal == rightVal)
+		return object.NewDitoBoolean(leftVal == rightVal)
 	case "!=":
-		return nativeBoolToBooleanObject(leftVal != rightVal)
+		return object.NewDitoBoolean(leftVal != rightVal)
 	default:
 		return newError("Unknown operator: %s %s %s",
 			left.Type(), operator, right.Type())
 	}
-}
-
-func nativeBoolToBooleanObject(input bool) *object.Boolean {
-	if input {
-		return object.TRUE
-	}
-	return object.FALSE
 }
 
 func evalIfElseExpression(node *ast.IfElseExpression, env *object.Environment) object.Object {
@@ -224,4 +221,39 @@ func evalIfElseExpression(node *ast.IfElseExpression, env *object.Environment) o
 		return Eval(node.Initial, env)
 	}
 	return Eval(node.Alternative, env)
+}
+
+func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Object {
+	var result []object.Object
+	for _, e := range exps {
+		evaluated := Eval(e, env)
+		if isError(evaluated) {
+			return []object.Object{evaluated}
+		}
+		result = append(result, evaluated)
+	}
+	return result
+}
+
+func evalArrayInfixNumExpr(operator string, left, right object.Object) object.Object {
+	leftVals := left.(*object.Array)
+	newArray := object.NewDitoArray([]object.Object{}, leftVals.Len)
+	var newItem object.Object
+	for _, left := range leftVals.Elements {
+		if isNumericType(left) && isNumericType(right) {
+			if left.Type() == object.IntergerObj && right.Type() == object.IntergerObj {
+				newItem = evalIntegerInfixExpression(operator, left, right)
+			} else {
+				newItem = evalFloatInfixExpression(operator, left, right)
+			}
+		} else if left.Type() == object.ArrayObj {
+			newItem = evalArrayInfixNumExpr(operator, left, right)
+		}
+		newArray.Elements = append(newArray.Elements, newItem)
+	}
+	return newArray
+}
+
+func isNumericType(obj object.Object) bool {
+	return obj.Type() == object.FloatObj || obj.Type() == object.IntergerObj
 }

@@ -2,6 +2,7 @@ package object
 
 import (
 	"bytes"
+	"dito/ast"
 	"fmt"
 	"strconv"
 )
@@ -28,8 +29,8 @@ const (
 	ErrorObj    = "Error"
 	ReturnObj   = "Return"   // not implemented
 	FunctionObj = "Function" // not implemented
-	LambdaObj   = "Lambda"   // not implemented
-	BultinObj   = "Builtin"  // not implemented
+	LambdaObj   = "Lambda"
+	BultinObj   = "Builtin" // not implemented
 )
 
 // singleton objects.
@@ -56,8 +57,27 @@ type Array struct {
 	Len      int64
 }
 
-func (a *Array) Type() string    { return ArrayObj }
-func (a *Array) Inspect() string { return arrayString(a) }
+func (a *Array) Type() string { return ArrayObj }
+func (a *Array) Inspect() string {
+	var out bytes.Buffer
+	out.WriteString("[")
+	for i, el := range a.Elements {
+		out.WriteString(el.Inspect())
+		if i < len(a.Elements)-1 {
+			out.WriteString(", ")
+		}
+	}
+	out.WriteString("]")
+	return out.String()
+}
+
+// NewDitoArray :
+func NewDitoArray(elements []Object, length int64) *Array {
+	if length == -1 {
+		length = int64(len(elements))
+	}
+	return &Array{Elements: elements, Len: length}
+}
 
 //
 
@@ -79,7 +99,7 @@ type Integer struct{ Value int64 }
 func (i *Integer) Type() string    { return IntergerObj }
 func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
 
-func NewIntegerObj(value int64) *Integer { return &Integer{Value: value} }
+func NewDitoInteger(value int64) *Integer { return &Integer{Value: value} }
 
 //
 
@@ -88,9 +108,9 @@ type Float struct{ Value float64 }
 
 // Type :
 func (f *Float) Type() string    { return FloatObj }
-func (f *Float) Inspect() string { return strconv.FormatFloat(f.Value, 'f', -2, 64) }
+func (f *Float) Inspect() string { return strconv.FormatFloat(f.Value, 'f', -1, 64) }
 
-func NewFloatObj(value float64) *Float { return &Float{Value: value} }
+func NewDitoFloat(value float64) *Float { return &Float{Value: value} }
 
 //
 
@@ -99,6 +119,13 @@ type Boolean struct{ Value bool }
 
 func (b *Boolean) Type() string    { return BooleanObj }
 func (b *Boolean) Inspect() string { return fmt.Sprintf("%v", b.Value) }
+
+func NewDitoBoolean(input bool) *Boolean {
+	if input {
+		return TRUE
+	}
+	return FALSE
+}
 
 //
 
@@ -118,6 +145,22 @@ func (e *Error) Inspect() string { return ErrorObj + ": " + e.Message }
 
 //
 
+// LambdaFunction :
+type LambdaFn struct {
+	Parameters []*ast.Identifier
+	Expr       ast.Expression
+	Env        *Environment
+}
+
+func (lf *LambdaFn) Type() string    { return LambdaObj }
+func (lf *LambdaFn) Inspect() string { return "<Lambda function>" }
+
+func NewDitoLambdaFn(params []*ast.Identifier, expr ast.Expression, env *Environment) *LambdaFn {
+	return &LambdaFn{Parameters: params, Env: env, Expr: expr}
+}
+
+//
+
 // BuiltinFunction :
 type BuiltinFunction func(args ...Object) Object
 
@@ -128,18 +171,3 @@ func (b *Builtin) Type() string    { return BultinObj }
 func (b *Builtin) Inspect() string { return "<builtin function>" }
 
 //
-
-/*
-	Helper functions.
-*/
-
-func arrayString(a *Array) string {
-	var out bytes.Buffer
-	out.WriteString("[")
-	for _, el := range a.Elements {
-		out.WriteString(el.Inspect())
-		out.WriteString(", ")
-	}
-	out.WriteString("]")
-	return out.String()
-}

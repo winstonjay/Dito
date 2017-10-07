@@ -14,7 +14,7 @@ const (
 
 // FloatObjPow : Just use go's math power function.
 func FloatObjPow(base, exponent float64) *object.Float {
-	return object.NewFloatObj(math.Pow(base, exponent))
+	return object.NewDitoFloat(math.Pow(base, exponent))
 }
 
 // IntegerObjPow :
@@ -34,7 +34,7 @@ func IntegerObjPow(a, b int64) object.Object {
 		}
 		base *= base
 	}
-	return object.NewIntegerObj(result)
+	return object.NewDitoInteger(result)
 
 OverlowError:
 	return newError("OverlowError in operation: %d ** %d", a, b)

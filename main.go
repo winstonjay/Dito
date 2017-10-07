@@ -42,11 +42,7 @@ func execFile(file string, out io.Writer) {
 		repl.PrintParserErrors(out, p.Errors())
 		return
 	}
-	evaluated := evaluator.Eval(program, env)
-	if evaluated != nil {
-		io.WriteString(out, evaluated.Inspect())
-		io.WriteString(out, "\n")
-	}
+	evaluator.Eval(program, env)
 }
 
 func welcomeMsg(username, quit string) {

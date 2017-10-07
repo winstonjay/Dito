@@ -5,6 +5,8 @@ package token
 type Token uint
 
 // Token constants defined by the dito programming language.
+// Tokens that are included but not currently implemented are
+// marked with a 'n.a.'
 const (
 	EOF     Token = iota // end of file 0
 	ILLEGAL              // non recognised tokens.
@@ -33,8 +35,8 @@ const (
 	GTHAN   // >
 	NOT     // !
 
-	LARROW // <-
-	RARROW // ->
+	LARROW // <- n.a.
+	RARROW // -> n.a.
 
 	LPAREN   // (
 	RPAREN   // )
@@ -63,7 +65,9 @@ const (
 	PRINT  // print
 	FOR    // for
 	FUNC   // func
-	RETURN // return
+	RETURN // return n.a.
+	IMPORT // import n.a.
+	FROM   // from n.a.
 	endKeyword
 )
 
@@ -96,8 +100,8 @@ var tokensLiterals = [...]string{
 	NEWASSIGN: ":=",
 	REASSIGN:  "=",
 
-	LARROW: "<-",
-	RARROW: "->",
+	LARROW: "<-", // n.a.
+	RARROW: "->", // n.a.
 
 	LPAREN:   "(",
 	RPAREN:   ")",
@@ -117,9 +121,10 @@ var tokensLiterals = [...]string{
 
 	IF:     "if",
 	ELSE:   "else",
-	PRINT:  "print",
 	FOR:    "for",
 	FUNC:   "func",
+	FROM:   "from",
+	IMPORT: "import",
 	RETURN: "return",
 }
 
@@ -162,7 +167,7 @@ const (
 	EXPONENT         // **
 	PREFIX           // unary operators; eg. + - !
 	CALL             // Bracketed expressions, function calls; eg. foobar()
-	HIGHEST          // Is extranous... pretty much there just in case.
+	HIGHEST          // Is extranous... pretty much there just in case. n.a.
 )
 
 // Precedence : get tokens precedence to help parse it later.

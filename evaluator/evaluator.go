@@ -2,7 +2,11 @@ package evaluator
 
 import (
 	"dito/ast"
+	"dito/lexer"
 	"dito/object"
+	"dito/parser"
+	"fmt"
+	"io/ioutil"
 )
 
 // Eval :
@@ -22,9 +26,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalForStatement(node, env)
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
+	case *ast.ImportStatement:
+		return evalImportStatement(node, env)
 
 	// Expressions
-
 	case *ast.PrefixExpression:
 		right := Eval(node.Right, env)
 		return evalPrefixExpression(node.Operator, right)
@@ -33,17 +38,25 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.IfElseExpression:
 		return evalIfElseExpression(node, env)
 
+	// Functions
+	case *ast.LambdaFunction:
+		return object.NewDitoLambdaFn(node.Parameters, node.Expr, env)
+	case *ast.CallExpression:
+		return evalFunctionCall(node.Function, node.Arguments, env)
+
 	// Atoms
 	case *ast.Identifier:
 		return evalIdentifier(node, env)
+	case *ast.ArrayLiteral:
+		return evalArray(node, env)
 	case *ast.StringLiteral:
 		return &object.DitoString{Value: node.Value}
 	case *ast.IntegerLiteral:
-		return &object.Integer{Value: node.Value}
+		return object.NewDitoInteger(node.Value)
 	case *ast.FloatLiteral:
-		return &object.Float{Value: node.Value}
+		return object.NewDitoFloat(node.Value)
 	case *ast.BooleanLiteral:
-		return nativeBoolToBooleanObject(node.Value)
+		return object.NewDitoBoolean(node.Value)
 	}
 	return nil
 }
@@ -62,13 +75,35 @@ func evalProgram(stmts []ast.Statement, env *object.Environment) object.Object {
 	return result
 }
 
-/*
-	Atoms:
-*/
-
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
 	if val, ok := env.Get(node.Value); ok {
 		return val
 	}
+	if builtin, ok := Builtins[node.Value]; ok {
+		return builtin
+	}
 	return newError("Identifier not found: '%s'", node.Value)
+}
+
+func evalArray(node *ast.ArrayLiteral, env *object.Environment) object.Object {
+	elements := evalExpressions(node.Elements, env)
+	return object.NewDitoArray(elements, -1)
+}
+
+func evalImportStatement(node *ast.ImportStatement, env *object.Environment) object.Object {
+	filename := node.Value
+	filepath := "testdata/" + filename + ".dito"
+	file, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		fmt.Println(filepath)
+		return newError("Import File could not be opened.")
+	}
+	il := lexer.New(string(file))
+	ip := parser.New(il)
+	iprogram := ip.ParseProgram()
+	if len(ip.Errors()) != 0 {
+		return newError("Could not import file due to parse errors.")
+	}
+	Eval(iprogram, env)
+	return nil
 }

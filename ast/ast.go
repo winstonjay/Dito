@@ -141,6 +141,59 @@ func (fs *ForStatement) String() string {
 	return "for statement"
 }
 
+// ImportStatement :
+type ImportStatement struct {
+	Token token.Token // 'import'
+	Value string
+}
+
+func (is *ImportStatement) statementNode()       {}
+func (is *ImportStatement) tokenLiteral() string { return is.Token.String() }
+func (is *ImportStatement) String() string {
+	return "Import statement"
+}
+
+/* -----------------------------------------------------------------------
+Function Types
+
+
+*/
+
+// LambdaFunction : single expression function.
+// fn(args) -> expr
+type LambdaFunction struct {
+	Token      token.Token // token.FUNC
+	Parameters []*Identifier
+	Expr       Expression
+}
+
+func (lf *LambdaFunction) expressionNode()      {}
+func (lf *LambdaFunction) tokenLiteral() string { return lf.Token.String() }
+func (lf *LambdaFunction) String() string       { return "<LambdaFunction>" }
+
+// CallExpression :
+type CallExpression struct {
+	Token     token.Token
+	Function  Expression
+	Arguments []Expression
+}
+
+func (ce *CallExpression) expressionNode()      {}
+func (ce *CallExpression) tokenLiteral() string { return ce.Token.String() }
+
+func (ce *CallExpression) String() string {
+	var out bytes.Buffer
+	args := []string{}
+	for _, a := range ce.Arguments {
+		args = append(args, a.String())
+	}
+	out.WriteString(ce.Function.String())
+	out.WriteString("(")
+	out.WriteString(strings.Join(args, ", "))
+	out.WriteString(")")
+	return out.String()
+}
+
 /* -----------------------------------------------------------------------
 Expressions
 

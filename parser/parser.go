@@ -39,6 +39,9 @@ func New(s *lexer.Scanner) *Parser {
 		token.ADD: p.prefixExpression,
 		token.NOT: p.prefixExpression,
 
+		//
+		token.FUNC: p.lambdaFunction,
+
 		// Token Literals.
 		token.IDVAL:    p.identifier,
 		token.INT:      p.integerLiteral,
@@ -64,6 +67,7 @@ func New(s *lexer.Scanner) *Parser {
 		token.GEQUALS: p.infixExpression,
 		token.LTHAN:   p.infixExpression,
 		token.GTHAN:   p.infixExpression,
+		token.LPAREN:  p.callExpression,
 	}
 
 	// twice to fill current and peek token.
@@ -136,6 +140,8 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) statement() ast.Statement {
 
 	switch p.currentToken {
+	case token.IMPORT:
+		return p.importStatement()
 	case token.IDVAL:
 		if p.peekTokenIs(token.NEWASSIGN) || p.peekTokenIs(token.REASSIGN) {
 			return p.assignmentStatement()
@@ -169,7 +175,7 @@ func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
-func (p *Parser) ifElseStatement() ast.Statement {
+func (p *Parser) ifElseStatement() *ast.IfStatement {
 	expression := &ast.IfStatement{Token: p.currentToken}
 	p.nextToken()
 	expression.Condition = p.expression(token.LOWEST)
@@ -187,7 +193,7 @@ func (p *Parser) ifElseStatement() ast.Statement {
 	return expression
 }
 
-func (p *Parser) forStatement() ast.Statement {
+func (p *Parser) forStatement() *ast.ForStatement {
 	stmt := &ast.ForStatement{Token: p.currentToken}
 	p.nextToken()
 	stmt.Condition = p.expression(token.LOWEST)
@@ -210,6 +216,61 @@ func (p *Parser) blockStatement() *ast.BlockStatement {
 		p.nextToken()
 	}
 	return block
+}
+
+func (p *Parser) importStatement() *ast.ImportStatement {
+	is := &ast.ImportStatement{Token: p.currentToken}
+	if !p.expectPeek(token.IDVAL) {
+		return nil
+	}
+	is.Value = p.identifier().(*ast.Identifier).Value
+	return is
+}
+
+/*
+	Functions.
+*/
+
+// lambdaFunction: fn(<parameters>) -> <expr>
+func (p *Parser) lambdaFunction() ast.Expression {
+	lambda := &ast.LambdaFunction{Token: p.currentToken}
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	lambda.Parameters = p.functionParameters()
+	if !p.expectPeek(token.RARROW) {
+		return nil
+	}
+	p.nextToken()
+	lambda.Expr = p.expression(token.LOWEST)
+	return lambda
+}
+
+func (p *Parser) functionParameters() []*ast.Identifier {
+	identifiers := []*ast.Identifier{}
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return identifiers
+	}
+	p.nextToken()
+	idVal := &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
+	identifiers = append(identifiers, idVal)
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		idVal := &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
+		identifiers = append(identifiers, idVal)
+	}
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	return identifiers
+}
+
+func (p *Parser) callExpression(function ast.Expression) ast.Expression {
+	exp := &ast.CallExpression{Token: p.currentToken, Function: function}
+	exp.Arguments = p.expressionList(token.RPAREN)
+	return exp
 }
 
 /*

@@ -5,18 +5,19 @@ import (
 )
 
 /*
-==================================
 	Dito's Lexical Scanner.
-==================================
 
+	Scanner scans file for tokens and passes them to parser.
+	This is implemented by the NextToken function, which the
+	parser will call till it reaches an token.EOF.
 
-
+	TODO:
+		* Implement pattern for reading newlines without bugs.
 
 */
 
 // Scanner : Lexical scanner analises a given program string.
-// It must be created/initalised by using the 'New' function
-//
+// It must be created/initalised by using the 'New' function.
 type Scanner struct {
 	// Fixed state from new.
 	input string
@@ -52,24 +53,27 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 	// Run through all the possible operators and delimeters that are
 	// included in dito's grammar.
 	switch s.char {
-	case ':': // :, :=
+
+	// Tokens that can be one of 2 values.
+	case ':': // ':', ':='
 		tok = s.switch2(token.COLON, token.REASSIGN, token.NEWASSIGN)
-	case '=': // =, ==
+	case '=': // '=', '=='
 		tok = s.switch2(token.REASSIGN, token.REASSIGN, token.EQUALS)
-	case '*': // *, **
+	case '*': // '*', '**'
 		tok = s.switch2(token.MUL, token.MUL, token.POW)
-	case '!': // !, !=
+	case '!': // '!', '!='
 		tok = s.switch2(token.NOT, token.REASSIGN, token.NEQUALS)
-	case '>': // >, >=
+	case '>': // '>', '>='
 		tok = s.switch2(token.GTHAN, token.REASSIGN, token.GEQUALS)
-	case '<': // <, <=
+	case '<': // '<', '<='
 		tok = s.switch2(token.LTHAN, token.REASSIGN, token.LEQUALS)
-	case '/': // /, //
+	case '/': // '/', '//'
 		tok = s.switch2(token.DIV, token.DIV, token.IDIV)
+	case '-': // '-', '->'
+		tok = s.switch2(token.SUB, token.GTHAN, token.RARROW)
+
 	case '+':
 		tok = token.ADD
-	case '-':
-		tok = token.SUB
 	case '%':
 		tok = token.MOD
 	case '(':
@@ -88,7 +92,7 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 		tok = token.LBRACKET
 	case ']':
 		tok = token.RBRACKET
-	case '"', '\'':
+	case '"':
 		return s.readString()
 	case 0:
 		tok = token.EOF
@@ -100,8 +104,7 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 			return s.readIdentifer()
 		}
 		// We shouldnt have got to this point irl. Error is currently
-		// handed on to the parser and will show up as a no parse function
-		// found error.
+		// handed by the parser as a no parse function found error.
 		tok = token.ILLEGAL
 	}
 	s.advance() // Always advance.
@@ -139,6 +142,7 @@ func (s *Scanner) readIdentifer() (token.Token, string) {
 }
 
 // readNumber : Return either an integer or a float.
+// TODO: Add support for hex and mabye binary.
 func (s *Scanner) readNumber() (token.Token, string) {
 	start := s.pos
 	for isDigit(s.char) {
@@ -165,6 +169,12 @@ func (s *Scanner) advance() {
 	s.Column++
 }
 
+// TODO: currently the line position is passed on
+// the parser and then differences in lines are used
+// to determine the end of expressions and staments.
+// this is not working right and in some cases semi
+// colons need to be used to stop errors. main example
+// is if statements geting confused with if experessions.
 func (s *Scanner) advanceLine() {
 	s.advance()
 	s.linePos = s.pos
