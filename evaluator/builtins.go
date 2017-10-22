@@ -14,7 +14,97 @@ var Builtins = map[string]*object.Builtin{
 	"sqrt":  &object.Builtin{Fn: ditoSqrt},
 	"iota":  &object.Builtin{Fn: ditoIota},
 	"int":   &object.Builtin{Fn: ditoInt},
+	"log":   &object.Builtin{Fn: ditoLog},
+	"log2":  &object.Builtin{Fn: ditoLog2},
+	"log10": &object.Builtin{Fn: ditoLog10},
+	"cos":   &object.Builtin{Fn: ditoCos},
+	"sin":   &object.Builtin{Fn: ditoSin},
+	"Tan":   &object.Builtin{Fn: ditoTan},
 	// "abs": &object.Builtin{Fn: validDitoAbs},
+}
+
+func ditoTan(args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return newError("Wrong   number of arguments. got=%d, want=1", len(args))
+	}
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		return object.NewDitoFloat(math.Tan(float64(arg.Value)))
+	case *object.Float:
+		return object.NewDitoFloat(math.Tan(arg.Value))
+	default:
+		return newError("Argument to `Tan` not supported, got %s", args[0].Type())
+	}
+}
+
+func ditoSin(args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. got=%d, want=1", len(args))
+	}
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		return object.NewDitoFloat(math.Sin(float64(arg.Value)))
+	case *object.Float:
+		return object.NewDitoFloat(math.Sin(arg.Value))
+	default:
+		return newError("Argument to `Sin` not supported, got %s", args[0].Type())
+	}
+}
+
+func ditoCos(args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. got=%d, want=1", len(args))
+	}
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		return object.NewDitoFloat(math.Cos(float64(arg.Value)))
+	case *object.Float:
+		return object.NewDitoFloat(math.Cos(arg.Value))
+	default:
+		return newError("Argument to `Cos` not supported, got %s", args[0].Type())
+	}
+}
+
+func ditoLog(args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. got=%d, want=1", len(args))
+	}
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		return object.NewDitoFloat(math.Log(float64(arg.Value)))
+	case *object.Float:
+		return object.NewDitoFloat(math.Log(arg.Value))
+	default:
+		return newError("Argument to `log` not supported, got %s", args[0].Type())
+	}
+}
+
+func ditoLog10(args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. got=%d, want=1", len(args))
+	}
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		return object.NewDitoFloat(math.Log10(float64(arg.Value)))
+	case *object.Float:
+		return object.NewDitoFloat(math.Log10(arg.Value))
+	default:
+		return newError("Argument to `log10` not supported, got %s", args[0].Type())
+	}
+}
+
+func ditoLog2(args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return newError("Wrong number of arguments. got=%d, want=1", len(args))
+	}
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		return object.NewDitoFloat(math.Log2(float64(arg.Value)))
+	case *object.Float:
+		return object.NewDitoFloat(math.Log2(arg.Value))
+	default:
+		return newError("Argument to `log2` not supported, got %s", args[0].Type())
+	}
 }
 
 func ditoInt(args ...object.Object) object.Object {

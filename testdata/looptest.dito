@@ -1,7 +1,7 @@
 # Example of loop implementaion.
 # Program finds square root of x to an accuracy of delta.
-delta := 1/128 
-z := delta 
+delta := 1/128
+z := delta
 x := 144
 
 for (x - z**2) >= delta {
@@ -9,3 +9,14 @@ for (x - z**2) >= delta {
 }
 
 print("sqrt of", x, "=", z)
+
+
+i := 0
+for i := 0 | i < 10 | i += 1 {
+    if i % 2 == 1 {
+        print("i =", iota(i*2) * 0)
+    }
+
+}
+
+

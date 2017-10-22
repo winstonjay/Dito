@@ -6,9 +6,9 @@
 # but coerces the results to me the critera.
 
 
-func sqrt(x, delta: 1/128) -> (z) {
+func sqrt(x: float, delta: 1/128) -> (z: float) {
     "calculate the sqrt of a number to an acuracy of delta."
-    z := delta
+    z = delta
     for (x - z**2) >= delta {
         z = z - (z**2 - x) / (2 * x)
     }
@@ -18,9 +18,8 @@ func sqrt(x, delta: 1/128) -> (z) {
 
 fn sqrt(x) -> (x**0.5)
 
-func hello(x_ray: int, yankee: String, zebra: Float) 
-    -> (alpha: int, beta: int, charlie: int, delta: int) 
-    {
+func hello(x_ray: int, yankee: str, zebra: float)
+    -> (alpha: int, beta: int, charlie: int, delta: int) {
     "return some crazy shite or eat shite"
     print("hello")
 }
@@ -29,10 +28,8 @@ sqrt(25) + sqrt2(25)
 
 
 class Point(x, y) {
-    'x = x
-    'y = x
-
-    'func hypot(') {
-       return ('x**2 + 'y**2)**0.5
-    } 
+    x := x
+    y := x
+public:
+    hypot := func() -> (('x**2 + 'y**2)**0.5)
 }
