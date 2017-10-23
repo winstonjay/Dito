@@ -1,0 +1,65 @@
+; -------------------------------------------------------------------------
+;   This file aims to define the grammar of the dito programing language
+;   for documentation and referencing purposes.
+;   Most definitions loosely correlate with parser functions/structure
+;   except for non-terminals within the expr definition. Expressions are
+;   parsed in a top-down operator precedence mannor within prefix an infix
+;   expression functions.
+;
+;   On notation:
+;
+;   There are so many variations of EBNF, ABNF, BNF, its seems
+;   hard to define a consitent style. So here are some notes:
+;
+;   Any character is denoted by a period mark.
+;   Trailing ? means an optional item
+;   Trailing + and * means repeat 1 or more times or 0 or more times.
+;   Items in single quotes are terminals / token literals,
+;   termials that are character sets such as A-Z are denoted in regular
+;   expressions.
+;
+;   TODO: Add comparison exprssions.
+;
+; -------------------------------------------------------------------------
+
+program ::= stmt_list EOF
+
+stmt_list ::= stmt EOL stmt_list | stmt ';' stmt_list | stmt
+stmt ::= assign_stmt | expr_stmt | for_stmt | if_stmt | import_stmt
+
+comment ::= '#' .* EOL
+
+assign_stmt ::= id ':=' expr | id '=' expr
+expr_stmt   ::= expr
+if_stmt     ::= 'if' expr block_stmt | 'if' expr block_stmt 'else' block_stmt
+for_stmt    ::= 'for' expr block_stmt
+import_stmt ::= 'import' id
+block_stmt  ::= '{' stmt_list '}'
+
+
+expr        ::= lambda_expr | ifelse_expr | arith_expr
+
+lambda_expr ::= 'func' '(' params? ')' '->' expr
+params      ::= id ',' params | id
+
+ifelse_expr ::= expr 'if' expr 'else' ifelse_expr | expr 'if' expr 'else' expr
+
+arith_expr  ::= term '+' expr | term '-' expr
+term        ::= power '*' term | power '/' term | power '%' term
+power       ::= factor '**' power
+factor      ::= '(' expr ')' | '-' atom | '+' atom | '!' atom
+atom        ::= fn_call | array | id | number | string | bool | 'None'
+
+fn_call ::= id '(' expr_list? ')'
+array   ::= '[' expr_list? ']'
+id      ::= aplha alphanumeric | aplha
+number  ::= int | float
+string  ::= '"' .* '"'
+bool    ::= 'true' | 'false'
+
+expr_list ::= expr ',' expr_list | expr
+aplha ::= [_a-zA-Z]*
+alphanumeric ::= [_0-9a-zA-Z]*
+
+int   ::= [0-9]*
+float ::= [0-9]* '.' [0-9]*

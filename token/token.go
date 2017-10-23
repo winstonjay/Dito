@@ -16,6 +16,7 @@ const (
 	INT    // Generic Integers.
 	FLOAT  // Generic float token.
 	STRING // Strings.
+	BOOL   // generic bool
 	endLiteral
 
 	beginOperator
@@ -62,12 +63,10 @@ const (
 	FALSE  // false
 	IF     // if
 	ELSE   // else
-	PRINT  // print
 	FOR    // for
 	FUNC   // func
 	RETURN // return n.a.
 	IMPORT // import n.a.
-	FROM   // from n.a.
 	endKeyword
 )
 
@@ -80,6 +79,7 @@ var tokensLiterals = [...]string{
 	INT:    "Int",
 	FLOAT:  "Float",
 	STRING: "String",
+	BOOL:   "Bool",
 
 	ADD:  "+",
 	SUB:  "-",
@@ -123,7 +123,6 @@ var tokensLiterals = [...]string{
 	ELSE:   "else",
 	FOR:    "for",
 	FUNC:   "func",
-	FROM:   "from",
 	IMPORT: "import",
 	RETURN: "return",
 }
@@ -137,6 +136,9 @@ func (t Token) String() string {
 }
 
 var keywords = make(map[string]Token)
+
+// Keywords : just expose sor this out later.
+var Keywords = keywords
 
 // init : creates fills the map when the program is inited.
 func init() {
