@@ -1,10 +1,4 @@
-# ---------------------------------------------
-#   Dito hello world example.
-#   * make it so we need print stmt.
-# ---------------------------------------------
 
-hello := "hello"
-world := "world"
-
-hello + " " + world
+# Dito hello world example.
+print("Hello, World")
 

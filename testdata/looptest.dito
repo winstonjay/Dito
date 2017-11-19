@@ -11,12 +11,12 @@ for (x - z**2) >= delta {
 print("sqrt of", x, "=", z)
 
 
-i := 0
-for i := 0 | i < 10 | i += 1 {
-    if i % 2 == 1 {
-        print("i =", iota(i*2) * 0)
-    }
+# i := 0
+# for i := 0 | i < 10 | i += 1 {
+#     if i % 2 == 1 {
+#         print("i =", iota(i*2) * 0)
+#     }
 
-}
+# }
 
 
