@@ -9,6 +9,12 @@ import (
 	"io/ioutil"
 )
 
+// Interpeter :
+type Interpeter struct {
+	env    object.Environment
+	errors []string
+}
+
 // Eval :
 func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
@@ -98,7 +104,7 @@ func evalImportStatement(node *ast.ImportStatement, env *object.Environment) obj
 		fmt.Println(filepath)
 		return newError("Import File could not be opened.")
 	}
-	il := lexer.New(string(file))
+	il := lexer.Init(string(file))
 	ip := parser.New(il)
 	iprogram := ip.ParseProgram()
 	if len(ip.Errors()) != 0 {

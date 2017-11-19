@@ -7,11 +7,11 @@ import (
 
 // PrintScan : print out the entire lexical analysis of an input
 // in one go.
-func (s *Scanner) PrintScan() {
+func (s *Scanner) printScan() {
 
 	tok, literal := s.NextToken()
 	tokenCount := 0
-	fmt.Printf("Input:\n\n%s\n\n", s.input)
+	fmt.Printf("Input:\n\n%s\n\n", s.Input)
 	fmt.Printf("| line | col  | Token        | Literal     |\n")
 	fmt.Printf("-----------------------------------------\n")
 	for tok != token.EOF {
@@ -28,5 +28,5 @@ func (s *Scanner) PrintScan() {
 // TraceLine : Returns last line up to current column.
 // eg. at index 8 of "alpha := 100" we would get: 'alpha :=' <-.
 func (s *Scanner) TraceLine() string {
-	return s.input[s.linePos : s.linePos+s.Column]
+	return s.Input[s.linePos : s.linePos+s.Column]
 }

@@ -36,7 +36,7 @@ func TestAssignmentStatement(t *testing.T) {
 
 	for i, tt := range tests {
 
-		scanner := lexer.New(tt.input)
+		scanner := lexer.Init(tt.input)
 		parser := New(scanner)
 		program := parser.ParseProgram()
 		checkParserErrors(t, parser)
@@ -74,7 +74,7 @@ func TestExpressionStatement(t *testing.T) {
 
 	for i, tt := range tests {
 
-		scanner := lexer.New(tt.input)
+		scanner := lexer.Init(tt.input)
 		parser := New(scanner)
 		program := parser.ParseProgram()
 		checkParserErrors(t, parser)
@@ -102,7 +102,7 @@ func TestInfixExpression(t *testing.T) {
 		{"+5", "+", 5},
 	}
 	for i, tt := range tests {
-		scanner := lexer.New(tt.input)
+		scanner := lexer.Init(tt.input)
 		parser := New(scanner)
 		program := parser.ParseProgram()
 		checkParserErrors(t, parser)
@@ -159,7 +159,7 @@ func TestInfixExpressions(t *testing.T) {
 	}
 
 	for _, tt := range infixTests {
-		l := lexer.New(tt.input)
+		l := lexer.Init(tt.input)
 		p := New(l)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)

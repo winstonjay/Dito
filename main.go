@@ -1,3 +1,5 @@
+// Dito is a Toy interpreted programming language for fun.
+// : )
 package main
 
 import (
@@ -35,7 +37,7 @@ func main() {
 
 func execFile(file string, out io.Writer) {
 	env := object.NewEnvironment()
-	l := lexer.New(file)
+	l := lexer.Init(file)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	if len(p.Errors()) != 0 {

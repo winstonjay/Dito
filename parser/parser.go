@@ -38,10 +38,8 @@ func New(s *lexer.Scanner) *Parser {
 		token.SUB: p.prefixExpression,
 		token.ADD: p.prefixExpression,
 		token.NOT: p.prefixExpression,
-
 		//
 		token.FUNC: p.lambdaFunction,
-
 		// Token Literals.
 		token.IDVAL:    p.identifier,
 		token.INT:      p.integerLiteral,
@@ -69,11 +67,18 @@ func New(s *lexer.Scanner) *Parser {
 		token.GTHAN:   p.infixExpression,
 		token.LPAREN:  p.callExpression,
 	}
-
 	// twice to fill current and peek token.
 	p.nextToken()
 	p.nextToken()
 	return p
+}
+
+// Refresh :
+func (p *Parser) Refresh(s *lexer.Scanner) {
+	p.scanner = s
+	p.errors = []*ParseError{}
+	p.nextToken()
+	p.nextToken()
 }
 
 func (p *Parser) expectPeek(t token.Token) bool {
@@ -113,11 +118,6 @@ func (p *Parser) endExpression(lineno int) bool {
 	return false
 }
 
-/*
-
-
- */
-
 // ParseProgram : creates ast of the inputed text incrementally
 // working with the scanner.
 func (p *Parser) ParseProgram() *ast.Program {
@@ -134,11 +134,10 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 /*
-	Statements.
+######## Statements.
 */
 
 func (p *Parser) statement() ast.Statement {
-
 	switch p.currentToken {
 	case token.IMPORT:
 		return p.importStatement()
@@ -163,14 +162,22 @@ func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 	stmt.Token = p.currentToken
 	p.nextToken() // this could be anything tbh.
 	stmt.Value = p.expression(token.LOWEST)
+
+	// inforce semicolons till we find sort a newline strategy.
+	if !p.currentTokenIs(token.SEMI) {
+		p.peekError(token.SEMI)
+		return nil
+	}
 	return stmt
 }
 
 func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.currentToken}
 	stmt.Expression = p.expression(token.LOWEST)
-	if p.peekTokenIs(token.SEMI) {
-		p.nextToken()
+	// inforce semicolons till we find sort a newline strategy.
+	if !p.currentTokenIs(token.SEMI) {
+		p.peekError(token.SEMI)
+		return nil
 	}
 	return stmt
 }
@@ -362,7 +369,6 @@ func (p *Parser) infixExpression(left ast.Expression) ast.Expression {
 func (p *Parser) groupedExpression() ast.Expression {
 	p.nextToken()
 	expr := p.expression(token.LOWEST)
-
 	if !p.expectPeek(token.RPAREN) {
 		return nil
 	}
@@ -370,7 +376,7 @@ func (p *Parser) groupedExpression() ast.Expression {
 }
 
 /*
-	Atoms / Type Literals
+######## Atoms / Type Literals
 */
 
 func (p *Parser) arrayLiteral() ast.Expression {

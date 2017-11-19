@@ -1,42 +1,37 @@
+// Package lexer implements Dito's Lexical Scanner.
+// Scanner scans file for tokens and passes them to parser.
+// This is implemented by the NextToken function, which the
+// parser will call till it reaches an token.EOF.
 package lexer
+
+/*
+TODO:
+	* Implement pattern for reading newlines without bugs.
+*/
 
 import (
 	"dito/token"
 )
 
-/*
-	Dito's Lexical Scanner.
-
-	Scanner scans file for tokens and passes them to parser.
-	This is implemented by the NextToken function, which the
-	parser will call till it reaches an token.EOF.
-
-	TODO:
-		* Implement pattern for reading newlines without bugs.
-
-*/
-
-// Scanner : Lexical scanner analises a given program string.
+// Scanner is Lexical scanner analises a given program string.
 // It must be created/initalised by using the 'New' function.
 type Scanner struct {
 	// Fixed state from new.
-	input string
-
-	// Scanning state.
-	char    byte // current char under examination
-	pos     int  // current char in input
+	Input   string
+	char    rune // current char under examination
+	pos     int  // current char in Input
 	peekPos int  // current next position (index of peek char)
 	linePos int  // index of the start of the current line.
 	Lineno  int  // current line under examination
 	Column  int  // current Column position.
 }
 
-// New : return an intialised lexical scanner. values not
+// Init return an intialised lexical scanner. values not
 // initalised are set to go's default type values. so 0 for
 // all integers.
-func New(input string) *Scanner {
+func Init(input string) *Scanner {
 	input += " " // add a buffer space at the end.
-	s := &Scanner{input: input}
+	s := &Scanner{Input: input}
 	s.advance()
 	return s
 }
@@ -53,7 +48,6 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 	// Run through all the possible operators and delimeters that are
 	// included in dito's grammar.
 	switch s.char {
-
 	// Tokens that can be one of 2 values.
 	case ':': // ':', ':='
 		tok = s.switch2(token.COLON, token.REASSIGN, token.NEWASSIGN)
@@ -71,7 +65,6 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 		tok = s.switch2(token.DIV, token.DIV, token.IDIV)
 	case '-': // '-', '->'
 		tok = s.switch2(token.SUB, token.GTHAN, token.RARROW)
-
 	case '+':
 		tok = token.ADD
 	case '%':
@@ -127,7 +120,7 @@ func (s *Scanner) readString() (token.Token, string) {
 			break
 		}
 	}
-	literal := s.input[start:s.pos]
+	literal := s.Input[start:s.pos]
 	s.advance()
 	return token.STRING, literal
 }
@@ -137,7 +130,7 @@ func (s *Scanner) readIdentifer() (token.Token, string) {
 	for isLetter(s.char) || isDigit(s.char) {
 		s.advance()
 	}
-	literal := s.input[start:s.pos]
+	literal := s.Input[start:s.pos]
 	return token.LookUpIDVal(literal), literal
 }
 
@@ -149,21 +142,21 @@ func (s *Scanner) readNumber() (token.Token, string) {
 		s.advance()
 	}
 	if s.char != '.' {
-		return token.INT, s.input[start:s.pos]
+		return token.INT, s.Input[start:s.pos]
 	}
 	s.advance()
 	for isDigit(s.char) {
 		s.advance()
 	}
-	return token.FLOAT, s.input[start:s.pos]
+	return token.FLOAT, s.Input[start:s.pos]
 }
 
 func (s *Scanner) advance() {
-	if s.peekPos >= len(s.input) {
+	if s.peekPos >= len(s.Input) {
 		s.char = 0
 		return
 	}
-	s.char = s.input[s.peekPos]
+	s.char = rune(s.Input[s.peekPos])
 	s.pos = s.peekPos
 	s.peekPos++
 	s.Column++
@@ -182,11 +175,11 @@ func (s *Scanner) advanceLine() {
 	s.Lineno++
 }
 
-func (s *Scanner) peek() byte {
-	if s.peekPos >= len(s.input) {
+func (s *Scanner) peek() rune {
+	if s.peekPos >= len(s.Input) {
 		return 0
 	}
-	return s.input[s.peekPos]
+	return rune(s.Input[s.peekPos])
 }
 
 func (s *Scanner) skipWhitespace() {
@@ -206,16 +199,16 @@ func (s *Scanner) skipComment() {
 	s.advanceLine()
 }
 
-func isDigit(char byte) bool {
+func isDigit(char rune) bool {
 	return '0' <= char && char <= '9'
 }
 
-func isLetter(char byte) bool {
+func isLetter(char rune) bool {
 	return ('a' <= char && char <= 'z' ||
 		'A' <= char && char <= 'Z' || char == '_')
 }
 
-func isSpace(char byte) bool {
+func isSpace(char rune) bool {
 	return (char == ' ' || char == '\t' ||
 		char == '\n' || char == '\r')
 }

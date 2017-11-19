@@ -13,7 +13,7 @@ import (
 
 // command prompt constants
 const (
-	PROMPT = ">        "
+	PROMPT = "(dito)> "
 	QUIT   = "QQ"
 )
 
@@ -31,7 +31,7 @@ func Start(in io.Reader, out io.Writer) {
 		if line == QUIT {
 			return
 		}
-		l := lexer.New(line)
+		l := lexer.Init(line)
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
@@ -46,6 +46,7 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
+// PrintParserErrors :
 func PrintParserErrors(out io.Writer, errors []*parser.ParseError) {
 	io.WriteString(out, "PARSE ERROR:\n")
 	for _, msg := range errors {
