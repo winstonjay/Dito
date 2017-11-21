@@ -11,6 +11,7 @@ TODO:
 
 import (
 	"dito/token"
+	"fmt"
 )
 
 // Scanner is Lexical scanner analises a given program string.
@@ -102,6 +103,12 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 	}
 	s.advance() // Always advance.
 	return tok, tok.String()
+}
+
+// TraceLine : Returns last line up to current column.
+// eg. at index 8 of "alpha := 100" we would get: 'alpha :=' <-.
+func (s *Scanner) TraceLine() string {
+	return s.Input[s.linePos : s.linePos+s.Column]
 }
 
 func (s *Scanner) switch2(current, expected, alt token.Token) token.Token {
@@ -211,4 +218,24 @@ func isLetter(char rune) bool {
 func isSpace(char rune) bool {
 	return (char == ' ' || char == '\t' ||
 		char == '\n' || char == '\r')
+}
+
+// PrintScan : print out the entire lexical analysis of an input
+// in one go.
+func (s *Scanner) printScan() {
+
+	tok, literal := s.NextToken()
+	tokenCount := 0
+	fmt.Printf("Input:\n\n%s\n\n", s.Input)
+	fmt.Printf("| line | col  | Token        | Literal     |\n")
+	fmt.Printf("-----------------------------------------\n")
+	for tok != token.EOF {
+		fmt.Printf("| %4d | %4d | %12s | %12s |\n",
+			s.Lineno+1, s.Column-len(literal), tok.String(), literal)
+		tokenCount++
+		tok, literal = s.NextToken()
+	}
+	fmt.Printf("\nTotal Tokens: %d, \n", tokenCount)
+	fmt.Printf("Total Chars: %d, \n", s.pos)
+	fmt.Printf("Total Lines: %d, \n", s.Lineno+1)
 }
