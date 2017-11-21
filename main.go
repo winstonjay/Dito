@@ -3,11 +3,11 @@
 package main
 
 import (
-	"dito/evaluator"
-	"dito/lexer"
-	"dito/object"
-	"dito/parser"
-	"dito/repl"
+	"dito/src/evaluator"
+	"dito/src/lexer"
+	"dito/src/object"
+	"dito/src/parser"
+	"dito/src/repl"
 	"fmt"
 	"io"
 	"io/ioutil"

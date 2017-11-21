@@ -4,9 +4,9 @@
 package parser
 
 import (
-	"dito/ast"
-	"dito/lexer"
-	"dito/token"
+	"dito/src/ast"
+	"dito/src/lexer"
+	"dito/src/token"
 	"strconv"
 )
 

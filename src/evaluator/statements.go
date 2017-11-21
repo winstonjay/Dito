@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"dito/ast"
-	"dito/object"
-	"dito/token"
+	"dito/src/ast"
+	"dito/src/object"
+	"dito/src/token"
 )
 
 /*

@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"dito/lexer"
-	"dito/object"
-	"dito/parser"
+	"dito/src/lexer"
+	"dito/src/object"
+	"dito/src/parser"
 	"testing"
 )
 

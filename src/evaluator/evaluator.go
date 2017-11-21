@@ -1,10 +1,10 @@
 package evaluator
 
 import (
-	"dito/ast"
-	"dito/lexer"
-	"dito/object"
-	"dito/parser"
+	"dito/src/ast"
+	"dito/src/lexer"
+	"dito/src/object"
+	"dito/src/parser"
 	"fmt"
 	"io/ioutil"
 )

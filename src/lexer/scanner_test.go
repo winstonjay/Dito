@@ -1,8 +1,8 @@
 package lexer
 
 import (
-	"dito/lexer"
-	"dito/token"
+	"dito/src/lexer"
+	"dito/src/token"
 	"testing"
 )
 

@@ -2,11 +2,11 @@ package repl
 
 import (
 	"bufio"
-	"dito/evaluator"
-	"dito/lexer"
-	"dito/object"
-	"dito/parser"
-	"dito/token"
+	"dito/src/evaluator"
+	"dito/src/lexer"
+	"dito/src/object"
+	"dito/src/parser"
+	"dito/src/token"
 	"fmt"
 	"io"
 )

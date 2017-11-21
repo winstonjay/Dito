@@ -2,7 +2,7 @@ package object
 
 import (
 	"bytes"
-	"dito/ast"
+	"dito/src/ast"
 	"fmt"
 	"strconv"
 )

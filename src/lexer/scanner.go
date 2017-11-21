@@ -10,7 +10,7 @@ TODO:
 */
 
 import (
-	"dito/token"
+	"dito/src/token"
 	"fmt"
 )
 

@@ -1,8 +1,8 @@
 package evaluator
 
 import (
-	"dito/ast"
-	"dito/object"
+	"dito/src/ast"
+	"dito/src/object"
 )
 
 func evalFunctionCall(fn ast.Expression, fnArgs []ast.Expression, env *object.Environment) object.Object {

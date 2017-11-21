@@ -1,8 +1,8 @@
 package parser
 
 import (
-	"dito/ast"
-	"dito/lexer"
+	"dito/src/ast"
+	"dito/src/lexer"
 	"fmt"
 	"testing"
 )

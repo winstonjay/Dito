@@ -1,7 +1,7 @@
 package evaluator
 
 import (
-	"dito/object"
+	"dito/src/object"
 	"fmt"
 )
 
