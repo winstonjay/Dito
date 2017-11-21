@@ -3,21 +3,9 @@ package evaluator
 import (
 	"dito/src/ast"
 	"dito/src/object"
+	"fmt"
 	"math"
 )
-
-/*
-	Expressions:
-
-		prefixExpression
-
-		infixExpression
-			integerInfixExpression
-			floatInfixExpression
-			stringInfixExpression
-
-		ifelseExpression
-*/
 
 func evalPrefixExpression(operator string, right object.Object) object.Object {
 	switch operator {
@@ -78,24 +66,14 @@ func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) obje
 			return evalIntegerInfixExpression(operator, left, right)
 		}
 		return evalFloatInfixExpression(operator, left, right)
-
-	case left.Type() == object.ArrayObj && isNumericType(right):
-		return evalArrayInfixNumExpr(operator, left, right)
-
-	case isNumericType(left) && right.Type() == object.ArrayObj:
-		return evalArrayInfixNumExpr(operator, right, left)
-
 	case left.Type() != right.Type():
 		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
-
 	case left.Type() == object.StringObj && right.Type() == object.StringObj:
 		return evalStringExpression(operator, left, right)
-
 	case operator == "==":
 		return object.NewDitoBoolean(left == right)
 	case operator == "!=":
 		return object.NewDitoBoolean(left != right)
-
 	default:
 		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
@@ -113,7 +91,6 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 		return object.NewDitoInteger(leftVal * rightVal)
 	case "**":
 		return IntegerObjPow(leftVal, rightVal)
-
 	case "/":
 		if rightVal == 0 {
 			return newError("Zero division error: %s %s %s",
@@ -149,7 +126,6 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 
 func evalFloatInfixExpression(operator string, left, right object.Object) object.Object {
 	var leftVal, rightVal float64
-
 	// Handle the type promotion if there is oone.
 	if left.Type() == object.FloatObj {
 		leftVal = left.(*object.Float).Value
@@ -171,7 +147,6 @@ func evalFloatInfixExpression(operator string, left, right object.Object) object
 		return object.NewDitoFloat(leftVal * rightVal)
 	case "**":
 		return object.NewDitoFloat(math.Pow(leftVal, rightVal))
-
 	case "/":
 		if rightVal == 0 {
 			return newError("Zero division error: %s %s %s",
@@ -235,25 +210,33 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 	return result
 }
 
-func evalArrayInfixNumExpr(operator string, left, right object.Object) object.Object {
-	leftVals := left.(*object.Array)
-	newArray := object.NewDitoArray([]object.Object{}, leftVals.Len)
-	var newItem object.Object
-	for _, left := range leftVals.Elements {
-		if isNumericType(left) && isNumericType(right) {
-			if left.Type() == object.IntergerObj && right.Type() == object.IntergerObj {
-				newItem = evalIntegerInfixExpression(operator, left, right)
-			} else {
-				newItem = evalFloatInfixExpression(operator, left, right)
-			}
-		} else if left.Type() == object.ArrayObj {
-			newItem = evalArrayInfixNumExpr(operator, left, right)
-		}
-		newArray.Elements = append(newArray.Elements, newItem)
-	}
-	return newArray
-}
-
 func isNumericType(obj object.Object) bool {
 	return obj.Type() == object.FloatObj || obj.Type() == object.IntergerObj
 }
+
+func evalIndexExpression(node *ast.IndexExpression, env *object.Environment) object.Object {
+	left := Eval(node.Left, env)
+	if isError(left) {
+		return left
+	}
+	index := Eval(node.Index, env)
+	if isError(index) {
+		return left
+	}
+	if left.Type() != object.ArrayObj || index.Type() != object.IntergerObj {
+		return newError("Index operator not supported: %s[%s].", left.Type(), index.Type())
+	}
+	arrayObject := left.(*object.Array)
+	idx := index.(*object.Integer).Value
+	size := arrayObject.Len - 1
+	if idx < 0 {
+		idx += (size + 1)
+	}
+	fmt.Printf("len=%d, index=%d\n", size, idx)
+	if idx < 0 || idx > size {
+		return newError("Index out of range: len=%d, index=%d.", size, idx)
+	}
+	return arrayObject.Elements[idx]
+}
+
+// x := iota(10)

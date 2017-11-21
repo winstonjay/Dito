@@ -9,9 +9,9 @@ import (
 	"io/ioutil"
 )
 
-// Interpeter :
-type Interpeter struct {
-	env    object.Environment
+// Evaluator :
+type Evaluator struct {
+	env    *object.Environment
 	errors []string
 }
 
@@ -43,6 +43,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalInfixEpression(node, env)
 	case *ast.IfElseExpression:
 		return evalIfElseExpression(node, env)
+	case *ast.IndexExpression:
+		return evalIndexExpression(node, env)
 
 	// Functions
 	case *ast.LambdaFunction:

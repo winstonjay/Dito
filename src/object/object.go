@@ -145,7 +145,7 @@ func (e *Error) Inspect() string { return ErrorObj + ": " + e.Message }
 
 //
 
-// LambdaFunction :
+// LambdaFn :
 type LambdaFn struct {
 	Parameters []*ast.Identifier
 	Expr       ast.Expression
@@ -159,15 +159,21 @@ func NewDitoLambdaFn(params []*ast.Identifier, expr ast.Expression, env *Environ
 	return &LambdaFn{Parameters: params, Env: env, Expr: expr}
 }
 
-//
-
 // BuiltinFunction :
 type BuiltinFunction func(args ...Object) Object
 
 // Builtin :
-type Builtin struct{ Fn func(args ...Object) Object }
+type Builtin struct {
+	Fn         func(args ...Object) Object
+	ArgsMax    int
+	ArgsMin    int
+	ArgType    []string
+	ReturnType string
+}
 
 func (b *Builtin) Type() string    { return BultinObj }
 func (b *Builtin) Inspect() string { return "<builtin function>" }
 
-//
+func NewBuiltinFn(fn BuiltinFunction, argsMax, argsMin int, argType []string) *Builtin {
+	return &Builtin{Fn: fn, ArgsMax: argsMax, ArgsMin: argsMin, ArgType: argType}
+}

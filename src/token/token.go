@@ -189,6 +189,8 @@ func (t Token) Precedence() uint {
 		return EXPONENT
 	case LPAREN:
 		return CALL
+	case LBRACKET:
+		return HIGHEST
 	}
 	return LOWEST
 }

@@ -56,19 +56,20 @@ func New(s *lexer.Scanner) *Parser {
 
 	p.infixParseFns = map[token.Token]infixParseFn{
 		// infix / binary Expressions.
-		token.SUB:     p.infixExpression,
-		token.ADD:     p.infixExpression,
-		token.MUL:     p.infixExpression,
-		token.DIV:     p.infixExpression,
-		token.MOD:     p.infixExpression,
-		token.POW:     p.infixExpression,
-		token.EQUALS:  p.infixExpression,
-		token.NEQUALS: p.infixExpression,
-		token.LEQUALS: p.infixExpression,
-		token.GEQUALS: p.infixExpression,
-		token.LTHAN:   p.infixExpression,
-		token.GTHAN:   p.infixExpression,
-		token.LPAREN:  p.callExpression,
+		token.SUB:      p.infixExpression,
+		token.ADD:      p.infixExpression,
+		token.MUL:      p.infixExpression,
+		token.DIV:      p.infixExpression,
+		token.MOD:      p.infixExpression,
+		token.POW:      p.infixExpression,
+		token.EQUALS:   p.infixExpression,
+		token.NEQUALS:  p.infixExpression,
+		token.LEQUALS:  p.infixExpression,
+		token.GEQUALS:  p.infixExpression,
+		token.LTHAN:    p.infixExpression,
+		token.GTHAN:    p.infixExpression,
+		token.LPAREN:   p.callExpression,
+		token.LBRACKET: p.indexExpression,
 	}
 	// twice to fill current and peek token.
 	p.nextToken()
@@ -376,6 +377,16 @@ func (p *Parser) groupedExpression() ast.Expression {
 		return nil
 	}
 	return expr
+}
+
+func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
+	exp := &ast.IndexExpression{Token: p.currentToken, Left: item}
+	p.nextToken()
+	exp.Index = p.expression(token.LOWEST)
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+	return exp
 }
 
 /*

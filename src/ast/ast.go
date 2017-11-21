@@ -3,6 +3,7 @@ package ast
 import (
 	"bytes"
 	"dito/src/token"
+	"fmt"
 	"strings"
 )
 
@@ -194,11 +195,22 @@ func (ce *CallExpression) String() string {
 	return out.String()
 }
 
-/* -----------------------------------------------------------------------
-Expressions
-
-
+/*
+######## Expressions
 */
+
+// IndexExpression is
+type IndexExpression struct {
+	Token token.Token // [
+	Left  Expression
+	Index Expression
+}
+
+func (ie *IndexExpression) expressionNode()      {}
+func (ie *IndexExpression) tokenLiteral() string { return ie.Token.String() }
+func (ie *IndexExpression) String() string {
+	return fmt.Sprintf("(%s[%s])", ie.Left.String(), ie.Index.String())
+}
 
 // PrefixExpression :
 type PrefixExpression struct {

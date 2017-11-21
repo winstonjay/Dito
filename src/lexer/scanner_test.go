@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"dito/src/lexer"
 	"dito/src/token"
 	"testing"
 )
@@ -77,10 +76,10 @@ fun := false`
 		{token.EOF, "EOF", 9, 12},
 	}
 
-	scanner := lexer.Init(input)
+	scanner := Init(input) // init scanner.
 
 	for i, tt := range tests {
-		tok, literal := scanner.NextToken()
+		tok, literal, lineno := scanner.NextToken()
 
 		if tok != tt.token {
 			t.Fatalf("test[%d] - Invalid Token. expected=%q, got=%q",
@@ -90,9 +89,9 @@ fun := false`
 			t.Fatalf("test[%d] - Invalid Literal. expected=%q, got=%q",
 				i, tt.literal, literal)
 		}
-		if scanner.lineno != tt.line {
+		if lineno != tt.line {
 			t.Fatalf("test[%d] - Invalid line index. expected=%d, got=%d",
-				i, tt.line, scanner.lineno)
+				i, tt.line, lineno)
 		}
 		// messed up column set up. cba to fix and sort a new test right now.
 		// if scanner.column != tt.column+1 {

@@ -23,10 +23,15 @@ var Builtins = map[string]*object.Builtin{
 	// "abs": &object.Builtin{Fn: validDitoAbs},
 }
 
+// func EvalBuiltinFn(fn *object.Builtin, args ...Object) Object {
+// 	if argLen := len(args); argLen > fn.ArgsMax || argLen < fn.ArgsMin {
+// 		return newError("Wrong   number of arguments. got=%d, want=1", len(args))
+// 	}
+
+// 	return fn.Fn(args...)
+// }
+
 func ditoTan(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong   number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return object.NewDitoFloat(math.Tan(float64(arg.Value)))
@@ -38,9 +43,6 @@ func ditoTan(args ...object.Object) object.Object {
 }
 
 func ditoSin(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return object.NewDitoFloat(math.Sin(float64(arg.Value)))
@@ -52,9 +54,6 @@ func ditoSin(args ...object.Object) object.Object {
 }
 
 func ditoCos(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return object.NewDitoFloat(math.Cos(float64(arg.Value)))
@@ -66,9 +65,6 @@ func ditoCos(args ...object.Object) object.Object {
 }
 
 func ditoLog(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return object.NewDitoFloat(math.Log(float64(arg.Value)))
@@ -80,9 +76,6 @@ func ditoLog(args ...object.Object) object.Object {
 }
 
 func ditoLog10(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return object.NewDitoFloat(math.Log10(float64(arg.Value)))
@@ -94,9 +87,6 @@ func ditoLog10(args ...object.Object) object.Object {
 }
 
 func ditoLog2(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return object.NewDitoFloat(math.Log2(float64(arg.Value)))
@@ -108,9 +98,6 @@ func ditoLog2(args ...object.Object) object.Object {
 }
 
 func ditoInt(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return arg
@@ -165,9 +152,6 @@ func ditoIota(args ...object.Object) object.Object {
 }
 
 func ditoType(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	return &object.DitoString{Value: args[0].Type()}
 }
 
@@ -180,28 +164,17 @@ func ditoPrint(args ...object.Object) object.Object {
 }
 
 func ditoSqrt(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.Integer:
 		return object.NewDitoFloat(math.Sqrt(float64(arg.Value)))
 	case *object.Float:
 		return object.NewDitoFloat(math.Sqrt(arg.Value))
-	case *object.Array:
-		for i, item := range arg.Elements {
-			arg.Elements[i] = ditoSqrt(item)
-		}
-		return arg
 	default:
 		return newError("Argument to `sqrt` not supported, got %s", args[0].Type())
 	}
 }
 
 func ditoLen(args ...object.Object) object.Object {
-	if len(args) != 1 {
-		return newError("Wrong number of arguments. got=%d, want=1", len(args))
-	}
 	switch arg := args[0].(type) {
 	case *object.DitoString:
 		return object.NewDitoInteger(int64(len(arg.Value)))

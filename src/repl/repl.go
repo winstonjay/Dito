@@ -28,11 +28,11 @@ func Start(in io.Reader, out io.Writer) {
 			return
 		}
 		// semi colons are being put here just for now in the repl.
-		line := scanner.Text() + ";"
+		line := scanner.Text()
 		if line == QUIT {
 			return
 		}
-		l := lexer.Init(line)
+		l := lexer.Init(line + ";")
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {

@@ -26,6 +26,7 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		}
 		evaluated := Eval(fn.Expr, extendedEnv)
 		return unwrapReturnValue(evaluated)
+	// we can check out built in stuff here.
 	case *object.Builtin:
 		return fn.Fn(args...)
 	default:
