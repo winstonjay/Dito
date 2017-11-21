@@ -49,9 +49,10 @@ const (
 	NEWASSIGN // :=
 	REASSIGN  // =
 
-	SEMI  // ;
-	COLON // :
-	COMMA // ,
+	SEMI    // ;
+	COLON   // :
+	COMMA   // ,
+	NEWLINE // \n
 	endOperator
 
 	QUOTE // "
@@ -135,15 +136,13 @@ func (t Token) String() string {
 	return ILLEGAL.String()
 }
 
-var keywords = make(map[string]Token)
-
-// Keywords : just expose sor this out later.
-var Keywords = keywords
+// Keywords is a map connecting language keywords to their token values.
+var Keywords = make(map[string]Token)
 
 // init : creates fills the map when the program is inited.
 func init() {
 	for i := beginKeyword + 1; i < endKeyword; i++ {
-		keywords[tokensLiterals[i]] = Token(i)
+		Keywords[tokensLiterals[i]] = Token(i)
 	}
 }
 
@@ -151,14 +150,15 @@ func init() {
 // If it is, return the keyword if it isn't return the generic
 // IDVAL token.
 func LookUpIDVal(IDString string) Token {
-	if tok, isKeyword := keywords[IDString]; isKeyword {
+	if tok, isKeyword := Keywords[IDString]; isKeyword {
 		return tok
 	}
 	return IDVAL
 }
 
-// Set of constants denoting operator precedence values starting
-// from 1 to 9.
+// Operator Precdence values declared for implementing
+// Pratt-like parsing method. They are called in this package
+// by the .Precedence() method return.
 const (
 	_           uint = iota
 	LOWEST           // non operators / default.
@@ -172,7 +172,9 @@ const (
 	HIGHEST          // Is extranous... pretty much there just in case. n.a.
 )
 
-// Precedence : get tokens precedence to help parse it later.
+// Precedence Returns the parsing precedence of a given token.
+// values range from token.LOWEST to token.HIGHEST, constants
+// defined in this package.
 func (t Token) Precedence() uint {
 	switch t {
 	case EQUALS, NEQUALS:

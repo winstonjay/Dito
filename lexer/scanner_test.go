@@ -90,14 +90,14 @@ fun := false`
 			t.Fatalf("test[%d] - Invalid Literal. expected=%q, got=%q",
 				i, tt.literal, literal)
 		}
-		if scanner.Lineno != tt.line {
+		if scanner.lineno != tt.line {
 			t.Fatalf("test[%d] - Invalid line index. expected=%d, got=%d",
-				i, tt.line, scanner.Lineno)
+				i, tt.line, scanner.lineno)
 		}
 		// messed up column set up. cba to fix and sort a new test right now.
-		// if scanner.Column != tt.column+1 {
+		// if scanner.column != tt.column+1 {
 		// 	t.Fatalf("test[%d] - Invalid column index. line:\n%s<-\n expected=%d, got=%d",
-		// 		i, scanner.TraceLine(), tt.column+1, scanner.Column)
+		// 		i, scanner.TraceLine(), tt.column+1, scanner.column)
 		// }
 	}
 }

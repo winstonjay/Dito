@@ -67,8 +67,8 @@ func (pe *ParseError) String() string {
 func (p *Parser) newError(message string) *ParseError {
 	return &ParseError{
 		message:   message,
-		lineno:    p.scanner.Lineno,
-		column:    p.scanner.Column - len(p.currentLiteral),
+		lineno:    p.currentLine,
+		column:    len(p.currentLiteral) - len(p.currentLiteral),
 		lineTrace: p.scanner.TraceLine(),
 	}
 }

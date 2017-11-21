@@ -1,3 +1,6 @@
+// Package parser implements Dito's Parser.
+// Its is implemented blah blah blah...
+// Top Down Operator Precedence parsing. https://goo.gl/uoH6Ta
 package parser
 
 import (
@@ -101,14 +104,14 @@ func (p *Parser) currentTokenIs(t token.Token) bool {
 func (p *Parser) nextToken() {
 	p.currentToken = p.peekToken
 	p.currentLiteral = p.peekLiteral
-	p.peekToken, p.peekLiteral = p.scanner.NextToken()
+	p.peekToken, p.peekLiteral, p.currentLine = p.scanner.NextToken()
 }
 
-// expressions are ended by a semicolon or a newline.
-// there is no newline token, but we can see if the line number
-// has changed from the scanners positon.
+// // expressions are ended by a semicolon or a newline.
+// // there is no newline token, but we can see if the line number
+// // has changed from the scanners positon.
 func (p *Parser) endExpression(lineno int) bool {
-	if p.scanner.Lineno > lineno {
+	if p.currentLine > lineno {
 		return true
 	}
 	if p.peekTokenIs(token.SEMI) {
@@ -304,7 +307,7 @@ func (p *Parser) expressionList(delimiter token.Token) []ast.Expression {
 }
 
 func (p *Parser) expression(precedence uint) ast.Expression {
-	lineno := p.scanner.Lineno
+	lineno := p.currentLine
 	prefix := p.prefixParseFns[p.currentToken]
 	if prefix == nil {
 		p.noParseFnError(p.currentToken)
@@ -320,7 +323,7 @@ func (p *Parser) expression(precedence uint) ast.Expression {
 		expr = infix(expr)
 	}
 	// this causing bugs right here.
-	if lineno == p.scanner.Lineno {
+	if lineno == p.currentLine {
 		if p.peekTokenIs(token.IF) {
 			p.nextToken()
 			return p.ifElseExpression(expr)

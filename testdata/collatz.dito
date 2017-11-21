@@ -1,0 +1,20 @@
+
+
+# collatz : Given n return its next
+# number in a collatz sequence...
+collatz := func(n) -> (
+    n            if n <= 1 else
+    n / 2        if n % 2 == 0 else
+    3 * n + 1
+)
+
+# collatz := iota(n) -> (
+#     &end         if n <= 1 else
+#     n / 2        if n % 2 == 0 else
+#     3 * n + 1
+# )
+
+
+
+
+

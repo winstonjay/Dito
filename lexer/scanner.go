@@ -18,13 +18,14 @@ import (
 // It must be created/initalised by using the 'New' function.
 type Scanner struct {
 	// Fixed state from new.
-	Input   string
-	char    rune // current char under examination
-	pos     int  // current char in Input
-	peekPos int  // current next position (index of peek char)
-	linePos int  // index of the start of the current line.
-	Lineno  int  // current line under examination
-	Column  int  // current Column position.
+	input        string
+	char         rune // current char under examination
+	pos          int  // current char in input
+	peekPos      int  // current next position (index of peek char)
+	linePos      int  // index of the start of the current line.
+	lineno       int  // current line under examination
+	column       int  // current column position.
+	collectspace bool
 }
 
 // Init return an intialised lexical scanner. values not
@@ -32,14 +33,22 @@ type Scanner struct {
 // all integers.
 func Init(input string) *Scanner {
 	input += " " // add a buffer space at the end.
-	s := &Scanner{Input: input}
+	s := &Scanner{input: input}
 	s.advance()
 	return s
 }
 
 // NextToken : Returns the next token encountered by the lexical scanner.
-func (s *Scanner) NextToken() (tok token.Token, literal string) {
+func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 
+	// Sorting the issue of new lines.
+	// in repl there is a semi colon being added so we dont have to type it.
+	// tests and other things have not been set for this.
+
+	// if s.char == '\n' && !s.collectspace {
+	// 	s.collectspace = true
+	// 	tok = token.NEWLINE
+	// }
 	// First make sure all comments and spaces are skipped.
 	s.skipWhitespace()
 	for s.char == '#' {
@@ -102,13 +111,13 @@ func (s *Scanner) NextToken() (tok token.Token, literal string) {
 		tok = token.ILLEGAL
 	}
 	s.advance() // Always advance.
-	return tok, tok.String()
+	return tok, tok.String(), s.lineno
 }
 
 // TraceLine : Returns last line up to current column.
 // eg. at index 8 of "alpha := 100" we would get: 'alpha :=' <-.
 func (s *Scanner) TraceLine() string {
-	return s.Input[s.linePos : s.linePos+s.Column]
+	return s.input[s.linePos : s.linePos+s.column]
 }
 
 func (s *Scanner) switch2(current, expected, alt token.Token) token.Token {
@@ -119,7 +128,7 @@ func (s *Scanner) switch2(current, expected, alt token.Token) token.Token {
 	return current
 }
 
-func (s *Scanner) readString() (token.Token, string) {
+func (s *Scanner) readString() (token.Token, string, int) {
 	start := s.pos + 1
 	for {
 		s.advance()
@@ -127,66 +136,66 @@ func (s *Scanner) readString() (token.Token, string) {
 			break
 		}
 	}
-	literal := s.Input[start:s.pos]
+	literal := s.input[start:s.pos]
 	s.advance()
-	return token.STRING, literal
+	return token.STRING, literal, s.lineno
 }
 
-func (s *Scanner) readIdentifer() (token.Token, string) {
+func (s *Scanner) readIdentifer() (token.Token, string, int) {
 	start := s.pos
 	for isLetter(s.char) || isDigit(s.char) {
 		s.advance()
 	}
-	literal := s.Input[start:s.pos]
-	return token.LookUpIDVal(literal), literal
+	literal := s.input[start:s.pos]
+	return token.LookUpIDVal(literal), literal, s.lineno
 }
 
 // readNumber : Return either an integer or a float.
 // TODO: Add support for hex and mabye binary.
-func (s *Scanner) readNumber() (token.Token, string) {
+func (s *Scanner) readNumber() (token.Token, string, int) {
 	start := s.pos
 	for isDigit(s.char) {
 		s.advance()
 	}
 	if s.char != '.' {
-		return token.INT, s.Input[start:s.pos]
+		return token.INT, s.input[start:s.pos], s.lineno
 	}
 	s.advance()
 	for isDigit(s.char) {
 		s.advance()
 	}
-	return token.FLOAT, s.Input[start:s.pos]
+	return token.FLOAT, s.input[start:s.pos], s.lineno
 }
 
 func (s *Scanner) advance() {
-	if s.peekPos >= len(s.Input) {
+	if s.peekPos >= len(s.input) {
 		s.char = 0
 		return
 	}
-	s.char = rune(s.Input[s.peekPos])
+	s.char = rune(s.input[s.peekPos])
 	s.pos = s.peekPos
 	s.peekPos++
-	s.Column++
+	s.column++
 }
 
 // TODO: currently the line position is passed on
 // the parser and then differences in lines are used
-// to determine the end of expressions and staments.
+// to determine the end of expressions and statements.
 // this is not working right and in some cases semi
 // colons need to be used to stop errors. main example
 // is if statements geting confused with if experessions.
 func (s *Scanner) advanceLine() {
 	s.advance()
 	s.linePos = s.pos
-	s.Column = 0
-	s.Lineno++
+	s.column = 0
+	s.lineno++
 }
 
 func (s *Scanner) peek() rune {
-	if s.peekPos >= len(s.Input) {
+	if s.peekPos >= len(s.input) {
 		return 0
 	}
-	return rune(s.Input[s.peekPos])
+	return rune(s.input[s.peekPos])
 }
 
 func (s *Scanner) skipWhitespace() {
@@ -224,18 +233,18 @@ func isSpace(char rune) bool {
 // in one go.
 func (s *Scanner) printScan() {
 
-	tok, literal := s.NextToken()
+	tok, literal, _ := s.NextToken()
 	tokenCount := 0
-	fmt.Printf("Input:\n\n%s\n\n", s.Input)
+	fmt.Printf("input:\n\n%s\n\n", s.input)
 	fmt.Printf("| line | col  | Token        | Literal     |\n")
 	fmt.Printf("-----------------------------------------\n")
 	for tok != token.EOF {
 		fmt.Printf("| %4d | %4d | %12s | %12s |\n",
-			s.Lineno+1, s.Column-len(literal), tok.String(), literal)
+			s.lineno+1, s.column-len(literal), tok.String(), literal)
 		tokenCount++
-		tok, literal = s.NextToken()
+		tok, literal, _ = s.NextToken()
 	}
 	fmt.Printf("\nTotal Tokens: %d, \n", tokenCount)
 	fmt.Printf("Total Chars: %d, \n", s.pos)
-	fmt.Printf("Total Lines: %d, \n", s.Lineno+1)
+	fmt.Printf("Total Lines: %d, \n", s.lineno+1)
 }

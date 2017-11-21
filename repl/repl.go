@@ -27,7 +27,8 @@ func Start(in io.Reader, out io.Writer) {
 		if !scanned {
 			return
 		}
-		line := scanner.Text()
+		// semi colons are being put here just for now in the repl.
+		line := scanner.Text() + ";"
 		if line == QUIT {
 			return
 		}
@@ -56,9 +57,9 @@ func PrintParserErrors(out io.Writer, errors []*parser.ParseError) {
 
 // For running inspections of the lexical scanner.
 func printTokens(l *lexer.Scanner) {
-	toke, literal := l.NextToken()
+	toke, literal, _ := l.NextToken()
 	for toke != token.EOF {
 		fmt.Printf("Token(type='%s', literal='%s')\n", toke.String(), literal)
-		toke, literal = l.NextToken()
+		toke, literal, _ = l.NextToken()
 	}
 }
