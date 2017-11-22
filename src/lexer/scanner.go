@@ -19,7 +19,7 @@ import (
 type Scanner struct {
 	// Fixed state from new.
 	input        string
-	char         rune // current char under examination
+	char         byte // current char under examination
 	pos          int  // current char in input
 	peekPos      int  // current next position (index of peek char)
 	linePos      int  // index of the start of the current line.
@@ -95,6 +95,11 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		tok = token.LBRACKET
 	case ']':
 		tok = token.RBRACKET
+	case '.':
+		if isDigit(s.input[s.peekPos]) {
+			return s.readNumber()
+		}
+		tok = token.ILLEGAL
 	case '"':
 		return s.readString()
 	case 0:
@@ -151,14 +156,49 @@ func (s *Scanner) readIdentifer() (token.Token, string, int) {
 }
 
 // readNumber : Return either an integer or a float.
-// TODO: Add support for hex and mabye binary.
 func (s *Scanner) readNumber() (token.Token, string, int) {
 	start := s.pos
+	// loop though digits until we read the end of 0-9.
 	for isDigit(s.char) {
 		s.advance()
 	}
-	if s.char != '.' {
+	// Once we have the significand we can find out what kind of number
+	// we want to return. If we have only scaned one digit and its a 0
+	// and our next byte is a `x` we have a hexidcimal.
+	switch {
+	case (s.char == 'x' || s.char == 'X') && s.input[start:s.pos] == "0":
+		goto Hexadecimal
+	case s.char == '.':
+		goto Mantissa
+	case s.char == 'e' || s.char == 'E':
+		goto Exponent
+	default:
 		return token.INT, s.input[start:s.pos], s.lineno
+	}
+
+Hexadecimal:
+	// 0xffaf, 0X0032f, etc.
+	s.advance()
+	for isHex(s.char) {
+		s.advance()
+	}
+	return token.INT, s.input[start:s.pos], s.lineno
+
+Mantissa:
+	// 0.321, 312.123, 10e2, 8E-2, etc.
+	s.advance()
+	for isDigit(s.char) {
+		s.advance()
+	}
+	if s.char == 'e' || s.char == 'E' {
+		goto Exponent
+	}
+	return token.FLOAT, s.input[start:s.pos], s.lineno
+
+Exponent:
+	s.advance()
+	if s.char == '+' || s.char == '-' {
+		s.advance()
 	}
 	s.advance()
 	for isDigit(s.char) {
@@ -172,7 +212,7 @@ func (s *Scanner) advance() {
 		s.char = 0
 		return
 	}
-	s.char = rune(s.input[s.peekPos])
+	s.char = s.input[s.peekPos]
 	s.pos = s.peekPos
 	s.peekPos++
 	s.column++
@@ -191,11 +231,11 @@ func (s *Scanner) advanceLine() {
 	s.lineno++
 }
 
-func (s *Scanner) peek() rune {
+func (s *Scanner) peek() byte {
 	if s.peekPos >= len(s.input) {
 		return 0
 	}
-	return rune(s.input[s.peekPos])
+	return s.input[s.peekPos]
 }
 
 func (s *Scanner) skipWhitespace() {
@@ -215,18 +255,23 @@ func (s *Scanner) skipComment() {
 	s.advanceLine()
 }
 
-func isDigit(char rune) bool {
+func isDigit(char byte) bool {
 	return '0' <= char && char <= '9'
 }
 
-func isLetter(char rune) bool {
+func isLetter(char byte) bool {
 	return ('a' <= char && char <= 'z' ||
 		'A' <= char && char <= 'Z' || char == '_')
 }
 
-func isSpace(char rune) bool {
+func isSpace(char byte) bool {
 	return (char == ' ' || char == '\t' ||
 		char == '\n' || char == '\r')
+}
+
+func isHex(char byte) bool {
+	return (isDigit(char) || 'a' <= char && char <= 'z' ||
+		'A' <= char && char <= 'Z')
 }
 
 // PrintScan : print out the entire lexical analysis of an input
