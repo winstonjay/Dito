@@ -106,6 +106,10 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 				left.Inspect(), operator, right.Inspect())
 		}
 		return object.NewDitoInteger(leftVal % rightVal)
+	case "<<":
+		return object.NewDitoInteger(leftVal << uint(rightVal))
+	case ">>":
+		return object.NewDitoInteger(leftVal >> uint(rightVal))
 	case "==":
 		return object.NewDitoBoolean(leftVal == rightVal)
 	case "!=":

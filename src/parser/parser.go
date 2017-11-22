@@ -68,6 +68,8 @@ func New(s *lexer.Scanner) *Parser {
 		token.GEQUALS:  p.infixExpression,
 		token.LTHAN:    p.infixExpression,
 		token.GTHAN:    p.infixExpression,
+		token.SHIFTL:   p.infixExpression,
+		token.SHIFTR:   p.infixExpression,
 		token.LPAREN:   p.callExpression,
 		token.LBRACKET: p.indexExpression,
 	}

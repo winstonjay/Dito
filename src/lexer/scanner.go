@@ -60,21 +60,21 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	switch s.char {
 	// Tokens that can be one of 2 values.
 	case ':': // ':', ':='
-		tok = s.switch2(token.COLON, token.REASSIGN, token.NEWASSIGN)
+		tok = s.switch2(token.COLON, '=', token.NEWASSIGN)
 	case '=': // '=', '=='
-		tok = s.switch2(token.REASSIGN, token.REASSIGN, token.EQUALS)
+		tok = s.switch2(token.REASSIGN, '=', token.EQUALS)
 	case '*': // '*', '**'
-		tok = s.switch2(token.MUL, token.MUL, token.POW)
+		tok = s.switch2(token.MUL, '*', token.POW)
 	case '!': // '!', '!='
-		tok = s.switch2(token.NOT, token.REASSIGN, token.NEQUALS)
-	case '>': // '>', '>='
-		tok = s.switch2(token.GTHAN, token.REASSIGN, token.GEQUALS)
-	case '<': // '<', '<='
-		tok = s.switch2(token.LTHAN, token.REASSIGN, token.LEQUALS)
+		tok = s.switch2(token.NOT, '=', token.NEQUALS)
+	case '>': // '>', '>=', '>>'
+		tok = s.switch3(token.GTHAN, '=', token.LEQUALS, '>', token.SHIFTR)
+	case '<': // '<', '<=', '<<'
+		tok = s.switch3(token.LTHAN, '=', token.LEQUALS, '<', token.SHIFTL)
 	case '/': // '/', '//'
-		tok = s.switch2(token.DIV, token.DIV, token.IDIV)
+		tok = s.switch2(token.DIV, '/', token.IDIV)
 	case '-': // '-', '->'
-		tok = s.switch2(token.SUB, token.GTHAN, token.RARROW)
+		tok = s.switch2(token.SUB, '>', token.RARROW)
 	case '+':
 		tok = token.ADD
 	case '%':
@@ -96,7 +96,7 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	case ']':
 		tok = token.RBRACKET
 	case '.':
-		if isDigit(s.input[s.peekPos]) {
+		if isDigit(s.peek()) {
 			return s.readNumber()
 		}
 		tok = token.ILLEGAL
@@ -125,12 +125,29 @@ func (s *Scanner) TraceLine() string {
 	return s.input[s.linePos : s.linePos+s.column]
 }
 
-func (s *Scanner) switch2(current, expected, alt token.Token) token.Token {
-	if string(s.peek()) == expected.String() {
+func (s *Scanner) switch2(current token.Token, expected byte, alt token.Token) token.Token {
+	if s.peek() == expected {
 		s.advance()
 		return alt
 	}
 	return current
+}
+
+func (s *Scanner) switch3(
+	current token.Token,
+	expected1 byte, alt1 token.Token,
+	expected2 byte, alt2 token.Token,
+) token.Token {
+	switch s.peek() {
+	case expected1:
+		s.advance()
+		return alt1
+	case expected2:
+		s.advance()
+		return alt2
+	default:
+		return current
+	}
 }
 
 func (s *Scanner) readString() (token.Token, string, int) {

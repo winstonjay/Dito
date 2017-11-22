@@ -36,6 +36,12 @@ const (
 	GTHAN   // >
 	NOT     // !
 
+	SHIFTL // <<
+	SHIFTR // >>
+	BITAND // &
+	BITOR  // \
+	BITXOR // ^
+
 	LARROW // <- n.a.
 	RARROW // -> n.a.
 
@@ -49,11 +55,12 @@ const (
 	NEWASSIGN // :=
 	REASSIGN  // =
 
-	SEMI    // ;
-	COLON   // :
-	COMMA   // ,
-	NEWLINE // \n
+	SEMI  // ;
+	COLON // :
+	COMMA // ,
 	endOperator
+
+	NEWLINE // \n
 
 	QUOTE // "
 
@@ -66,6 +73,10 @@ const (
 	ELSE   // else
 	FOR    // for
 	FUNC   // func
+	AND    // and
+	OR     // or
+	RHO    // rho
+	IOTA   // iota
 	RETURN // return n.a.
 	IMPORT // import n.a.
 	endKeyword
@@ -77,10 +88,10 @@ var tokensLiterals = [...]string{
 	EOF:     "EOF",
 
 	IDVAL:  "ID",
-	INT:    "Int",
-	FLOAT:  "Float",
-	STRING: "String",
-	BOOL:   "Bool",
+	INT:    "int",
+	FLOAT:  "float",
+	STRING: "string",
+	BOOL:   "bool",
 
 	ADD:  "+",
 	SUB:  "-",
@@ -97,6 +108,12 @@ var tokensLiterals = [...]string{
 	GEQUALS: ">=",
 	LTHAN:   "<",
 	GTHAN:   ">",
+
+	SHIFTL: "<<",
+	SHIFTR: ">>",
+	BITAND: "&",
+	BITOR:  "|",
+	BITXOR: "^",
 
 	NEWASSIGN: ":=",
 	REASSIGN:  "=",
@@ -120,10 +137,14 @@ var tokensLiterals = [...]string{
 	TRUE:  "true",
 	FALSE: "false",
 
-	IF:     "if",
-	ELSE:   "else",
-	FOR:    "for",
-	FUNC:   "func",
+	IF:   "if",
+	ELSE: "else",
+	FOR:  "for",
+	FUNC: "func",
+	AND:  "and",
+	OR:   "or",
+	// RHO:  "rho",
+	// IOTA:  "iota",
 	IMPORT: "import",
 	RETURN: "return",
 }
@@ -181,7 +202,7 @@ func (t Token) Precedence() uint {
 		return EQUALITY
 	case LEQUALS, GEQUALS, LTHAN, GTHAN:
 		return LESSGREATER
-	case ADD, SUB:
+	case ADD, SUB, SHIFTL, SHIFTR:
 		return ADDSUB
 	case MOD, DIV, MUL:
 		return TERM
