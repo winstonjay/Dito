@@ -3,7 +3,6 @@ package evaluator
 import (
 	"dito/src/ast"
 	"dito/src/object"
-	"dito/src/token"
 )
 
 /*
@@ -15,11 +14,13 @@ func evalAssignment(node *ast.AssignmentStatement, env *object.Environment) obje
 	if isError(val) {
 		return val
 	}
-	if node.Token == token.REASSIGN {
-		if ident := evalIdentifier(node.Name, env); isError(ident) {
-			return ident
-		}
-	}
+	// * Currently don't enforce scope initialation assignment `:=`
+	// * as we are only having single statement functions right now.
+	// if node.Token == token.REASSIGN {
+	// 	if ident := evalIdentifier(node.Name, env); isError(ident) {
+	// 		return ident
+	// 	}
+	// }
 	env.Set(node.Name.Value, val)
 	return nil
 }

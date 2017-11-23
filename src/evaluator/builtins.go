@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+// ######## TODO: enforce arg lens with a generic function.
+
 // Builtins : map of builtin functions
 var Builtins = map[string]*object.Builtin{
 	"len":    &object.Builtin{Fn: ditoLen},
@@ -24,6 +26,7 @@ var Builtins = map[string]*object.Builtin{
 	"sin":    &object.Builtin{Fn: ditoSin},
 	"tan":    &object.Builtin{Fn: ditoTan},
 	"sleep":  &object.Builtin{Fn: ditoSleep},
+	"abs":    &object.Builtin{Fn: ditoAbs},
 	// "abs": &object.Builtin{Fn: validDitoAbs},
 }
 
@@ -191,6 +194,22 @@ func ditoPrint(args ...object.Object) object.Object {
 	return nil
 }
 
+// This dosent work.
+// func ditoPrintf(args ...object.Object) object.Object {
+
+// 	switch arg := args[0].(type) {
+// 	case *object.DitoString:
+// 		a := make([]interface{}, len(args)-1)
+// 		for _, item := range args[1:] {
+// 			a = append(a, item.Inspect())
+// 		}
+// 		fmt.Fprintf(os.Stdout, arg.Inspect(), a...)
+// 	default:
+// 		return newError("Argument to `printf` not supported, got %s", args[0].Type())
+// 	}
+// 	return nil
+// }
+
 func ditoSqrt(args ...object.Object) object.Object {
 	switch arg := args[0].(type) {
 	case *object.Integer:
@@ -210,5 +229,16 @@ func ditoLen(args ...object.Object) object.Object {
 		return object.NewDitoInteger(arg.Len)
 	default:
 		return newError("Argument to `Len` not supported, got %s", args[0].Type())
+	}
+}
+
+func ditoAbs(args ...object.Object) object.Object {
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		return object.NewDitoInteger(int64(math.Abs(float64(arg.Value))))
+	case *object.Float:
+		return object.NewDitoFloat(math.Abs(arg.Value))
+	default:
+		return newError("Argument to `abs` not supported, got %s", args[0].Type())
 	}
 }

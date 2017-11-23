@@ -79,8 +79,6 @@ func NewDitoArray(elements []Object, length int64) *Array {
 	return &Array{Elements: elements, Len: length}
 }
 
-//
-
 // String : builtin integer type.
 type DitoString struct {
 	Value string

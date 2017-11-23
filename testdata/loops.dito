@@ -1,7 +1,6 @@
 
-# While style loop.
-i := 10
-for i > 0 {
+# Print a list of numbers
+for i in iota(10, 0, -1) {
     print(i)
     if i == 7 {
         print("Exiting loop 1")
@@ -11,7 +10,22 @@ for i > 0 {
     }
 }
 
-for i in iota(7) {
-    print(i)
+print("Printing an array of names...")
+names = ["dave", "dee", "dozy", "beaky", "mick", "tich"]
+for name in names {
+    print(name)
 }
+
+# Example of loop implementaion using while style for loop.
+# Finding square root of x to an accuracy of delta.
+print("While style loops...")
+delta = 1/128; z = delta; x = 25; c = 0
+for abs(x - z**2) > delta {
+    z = z - (z**2 - x) / (2 * x)
+    c = c + 1
+}
+print("It took ", c, " loops to calculate the sqrt of ", x, " as ", z)
+print("This can round to ", int(z + 0.5))
+
+# end this.
 print("End of File")
