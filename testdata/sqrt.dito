@@ -6,17 +6,20 @@
 # but coerces the results to me the critera.
 
 
-func sqrt(x: float, delta: 1/128) -> (z: float) {
-    "calculate the sqrt of a number to an acuracy of delta."
-    z = delta
+# Calculate the sqrt of a number to an acuracy of
+# delta using newtons method.
+func newton_sqrt(x: int, delta: 1/128) -> (float) {
+    z := delta
     for (x - z**2) >= delta {
         z = z - (z**2 - x) / (2 * x)
     }
+    return z
 }
+
 
 # Shorthand functinons / lambda functions.
 
-fn sqrt(x) -> (x**0.5)
+func sqrt(x) -> (x**0.5)
 
 func hello(x_ray: int, yankee: str, zebra: float)
     -> (alpha: int, beta: int, charlie: int, delta: int) {

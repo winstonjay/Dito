@@ -91,6 +91,21 @@ func (as *AssignmentStatement) String() string {
 	return out.String()
 }
 
+// ReturnStatement is this
+type ReturnStatement struct {
+	Token token.Token // return
+	Value Expression
+}
+
+func (rs *ReturnStatement) statementNode()       {}
+func (rs *ReturnStatement) tokenLiteral() string { return rs.Token.String() }
+func (rs *ReturnStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString(rs.tokenLiteral())
+	out.WriteString(rs.Value.String())
+	return out.String()
+}
+
 // ExpressionStatement :
 type ExpressionStatement struct {
 	Token      token.Token
@@ -133,6 +148,8 @@ func (ie *IfStatement) String() string {
 type ForStatement struct {
 	Token     token.Token // 'for'
 	Condition Expression
+	ID        *Identifier
+	Iter      Expression
 	LoopBody  *BlockStatement
 }
 

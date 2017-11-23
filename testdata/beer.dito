@@ -1,0 +1,16 @@
+
+
+n = 5
+
+bottle = func(n) -> (
+    string(n) + " Bottles of beer" if n > 1 else
+    "One Bottle of beer"           if n == 1 else
+    "No more bottles of beer")
+
+for i in iota(n, 0, -1) {
+    print(bottle(i), " on the wall,")
+    print(bottle(i) + ".")
+    print("Take one down, pass it around,")
+    print(bottle(i-1), " on the wall.")
+    sleep(2000)
+}

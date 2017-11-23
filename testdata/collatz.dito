@@ -2,19 +2,19 @@
 
 # collatz : Given n return its next
 # number in a collatz sequence...
-collatz := func(n) -> (
+func collatz(n) := (
     n            if n <= 1 else
     n / 2        if n % 2 == 0 else
-    3 * n + 1
-)
+    3 * n + 1)
 
-# collatz := iota(n) -> (
-#     &end         if n <= 1 else
-#     n / 2        if n % 2 == 0 else
-#     3 * n + 1
-# )
+# collatz_seq : Given a starting position n
+#
+func collatz_seq(n) <- (
+    collatz(iota) for n @ iota > 1)
 
+func print_seq(n) ... (
+    print(i) for i in collatz_seq(j)
+             for j in iota n)
 
-
-
+print_seq(n)
 

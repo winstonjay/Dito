@@ -141,7 +141,6 @@ func evalFloatInfixExpression(operator string, left, right object.Object) object
 	} else {
 		rightVal = float64(right.(*object.Integer).Value)
 	}
-
 	switch operator {
 	case "+":
 		return object.NewDitoFloat(leftVal + rightVal)

@@ -5,8 +5,8 @@ import (
 	"dito/src/lexer"
 	"dito/src/object"
 	"dito/src/parser"
-	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 // Evaluator :
@@ -24,6 +24,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	// Statements
 	case *ast.AssignmentStatement:
 		return evalAssignment(node, env)
+	case *ast.ReturnStatement:
+		return &object.ReturnValue{Value: Eval(node.Value, env)}
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
 	case *ast.IfStatement:
@@ -103,13 +105,14 @@ func evalImportStatement(node *ast.ImportStatement, env *object.Environment) obj
 	filepath := "testdata/" + filename + ".dito"
 	file, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		fmt.Println(filepath)
-		return newError("Import File could not be opened.")
+		return newError("Import File %s could not be opened.", filepath)
 	}
 	il := lexer.Init(string(file))
 	ip := parser.New(il)
 	iprogram := ip.ParseProgram()
+
 	if len(ip.Errors()) != 0 {
+		ip.PrintParseErrors(os.Stderr, ip.Errors())
 		return newError("Could not import file due to parse errors.")
 	}
 	Eval(iprogram, env)

@@ -32,11 +32,11 @@ func Start(in io.Reader, out io.Writer) {
 		if line == QUIT {
 			return
 		}
-		l := lexer.Init(line + ";")
+		l := lexer.Init(line + "\n")
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
-			PrintParserErrors(out, p.Errors())
+			p.PrintParseErrors(out, p.Errors())
 			continue
 		}
 		evaluated := evaluator.Eval(program, env)
@@ -44,14 +44,6 @@ func Start(in io.Reader, out io.Writer) {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
 		}
-	}
-}
-
-// PrintParserErrors :
-func PrintParserErrors(out io.Writer, errors []*parser.ParseError) {
-	io.WriteString(out, "PARSE ERROR:\n")
-	for _, msg := range errors {
-		io.WriteString(out, "\t"+msg.String()+"\n")
 	}
 }
 

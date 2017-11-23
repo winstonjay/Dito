@@ -1,0 +1,17 @@
+
+# While style loop.
+i := 10
+for i > 0 {
+    print(i)
+    if i == 7 {
+        print("Exiting loop 1")
+        i = 0
+    } else {
+        i = i - 1
+    }
+}
+
+for i in iota(7) {
+    print(i)
+}
+print("End of File")

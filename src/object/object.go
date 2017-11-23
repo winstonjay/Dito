@@ -29,7 +29,7 @@ const (
 	ErrorObj    = "Error"
 	ReturnObj   = "Return"   // not implemented
 	FunctionObj = "Function" // not implemented
-	LambdaObj   = "Lambda"
+	LambdaObj   = "Lambda function"
 	BultinObj   = "Builtin" // not implemented
 )
 
@@ -141,7 +141,7 @@ func (n *None) Inspect() string { return NoneObj }
 type Error struct{ Message string }
 
 func (e *Error) Type() string    { return ErrorObj }
-func (e *Error) Inspect() string { return ErrorObj + ": " + e.Message }
+func (e *Error) Inspect() string { return "Evaluation " + ErrorObj + ": " + e.Message }
 
 //
 
@@ -152,8 +152,23 @@ type LambdaFn struct {
 	Env        *Environment
 }
 
-func (lf *LambdaFn) Type() string    { return LambdaObj }
-func (lf *LambdaFn) Inspect() string { return "<Lambda function>" }
+func (lf *LambdaFn) Type() string { return LambdaObj }
+func (lf *LambdaFn) Inspect() string {
+	var out bytes.Buffer
+	out.WriteString("<")
+	out.WriteString(LambdaObj)
+	out.WriteString(": func(")
+	for i, param := range lf.Parameters {
+		out.WriteString(param.String())
+		if i < len(lf.Parameters)-1 {
+			out.WriteString(", ")
+		}
+	}
+	out.WriteString(")")
+	// out.WriteString(lf.Expr.String())
+	out.WriteString(">")
+	return out.String()
+}
 
 func NewDitoLambdaFn(params []*ast.Identifier, expr ast.Expression, env *Environment) *LambdaFn {
 	return &LambdaFn{Parameters: params, Env: env, Expr: expr}

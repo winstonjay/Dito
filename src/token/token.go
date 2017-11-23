@@ -72,6 +72,7 @@ const (
 	IF     // if
 	ELSE   // else
 	FOR    // for
+	IN     // in
 	FUNC   // func
 	AND    // and
 	OR     // or
@@ -86,6 +87,7 @@ var tokensLiterals = [...]string{
 
 	ILLEGAL: "Illegal Token!",
 	EOF:     "EOF",
+	NEWLINE: "newline",
 
 	IDVAL:  "ID",
 	INT:    "int",
@@ -140,6 +142,7 @@ var tokensLiterals = [...]string{
 	IF:   "if",
 	ELSE: "else",
 	FOR:  "for",
+	IN:   "in",
 	FUNC: "func",
 	AND:  "and",
 	OR:   "or",
@@ -183,6 +186,7 @@ func LookUpIDVal(IDString string) Token {
 const (
 	_           uint = iota
 	LOWEST           // non operators / default.
+	CONDITONS        // if, for
 	EQUALITY         // == !=
 	LESSGREATER      // <= >= < >
 	ADDSUB           // + -
@@ -198,6 +202,8 @@ const (
 // defined in this package.
 func (t Token) Precedence() uint {
 	switch t {
+	case IF:
+		return CONDITONS
 	case EQUALS, NEQUALS:
 		return EQUALITY
 	case LEQUALS, GEQUALS, LTHAN, GTHAN:

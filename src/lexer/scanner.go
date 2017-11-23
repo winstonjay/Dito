@@ -18,14 +18,14 @@ import (
 // It must be created/initalised by using the 'New' function.
 type Scanner struct {
 	// Fixed state from new.
-	input        string
-	char         byte // current char under examination
-	pos          int  // current char in input
-	peekPos      int  // current next position (index of peek char)
-	linePos      int  // index of the start of the current line.
-	lineno       int  // current line under examination
-	column       int  // current column position.
-	collectspace bool
+	input   string
+	char    byte // current char under examination
+	pos     int  // current char in input
+	peekPos int  // current next position (index of peek char)
+	linePos int  // index of the start of the current line.
+	lineno  int  // current line under examination
+	column  int  // current column position.
+	newline bool
 }
 
 // Init return an intialised lexical scanner. values not
@@ -45,10 +45,12 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	// in repl there is a semi colon being added so we dont have to type it.
 	// tests and other things have not been set for this.
 
-	// if s.char == '\n' && !s.collectspace {
-	// 	s.collectspace = true
-	// 	tok = token.NEWLINE
-	// }
+	if s.newline && (s.char == '\n' || s.char == '\r') {
+		s.newline = false
+		s.advanceLine()
+		return token.NEWLINE, token.NEWLINE.String(), s.lineno - 1
+	}
+	s.newline = true
 	// First make sure all comments and spaces are skipped.
 	s.skipWhitespace()
 	for s.char == '#' {
@@ -269,7 +271,9 @@ func (s *Scanner) skipComment() {
 	for s.char != 0 && !(s.char == '\n' || s.char == '\r') {
 		s.advance()
 	}
-	s.advanceLine()
+	if s.char != 0 {
+		s.advanceLine()
+	}
 }
 
 func isDigit(char byte) bool {

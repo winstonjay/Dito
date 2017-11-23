@@ -2,24 +2,28 @@ package evaluator
 
 import (
 	"dito/src/object"
-	"fmt"
+	"io"
 	"math"
+	"os"
+	"time"
 )
 
 // Builtins : map of builtin functions
 var Builtins = map[string]*object.Builtin{
-	"len":   &object.Builtin{Fn: ditoLen},
-	"type":  &object.Builtin{Fn: ditoType},
-	"print": &object.Builtin{Fn: ditoPrint},
-	"sqrt":  &object.Builtin{Fn: ditoSqrt},
-	"iota":  &object.Builtin{Fn: ditoIota},
-	"int":   &object.Builtin{Fn: ditoInt},
-	"log":   &object.Builtin{Fn: ditoLog},
-	"log2":  &object.Builtin{Fn: ditoLog2},
-	"log10": &object.Builtin{Fn: ditoLog10},
-	"cos":   &object.Builtin{Fn: ditoCos},
-	"sin":   &object.Builtin{Fn: ditoSin},
-	"Tan":   &object.Builtin{Fn: ditoTan},
+	"len":    &object.Builtin{Fn: ditoLen},
+	"type":   &object.Builtin{Fn: ditoType},
+	"print":  &object.Builtin{Fn: ditoPrint},
+	"sqrt":   &object.Builtin{Fn: ditoSqrt},
+	"iota":   &object.Builtin{Fn: ditoIota},
+	"int":    &object.Builtin{Fn: ditoInt},
+	"string": &object.Builtin{Fn: ditoString},
+	"log":    &object.Builtin{Fn: ditoLog},
+	"log2":   &object.Builtin{Fn: ditoLog2},
+	"log10":  &object.Builtin{Fn: ditoLog10},
+	"cos":    &object.Builtin{Fn: ditoCos},
+	"sin":    &object.Builtin{Fn: ditoSin},
+	"tan":    &object.Builtin{Fn: ditoTan},
+	"sleep":  &object.Builtin{Fn: ditoSleep},
 	// "abs": &object.Builtin{Fn: validDitoAbs},
 }
 
@@ -30,6 +34,20 @@ var Builtins = map[string]*object.Builtin{
 
 // 	return fn.Fn(args...)
 // }
+
+func ditoSleep(args ...object.Object) object.Object {
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
+		return object.NONE
+	case *object.Float:
+		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
+		return object.NONE
+	default:
+		return newError("Argument to `sleep` not supported, got %s", args[0].Type())
+	}
+
+}
 
 func ditoTan(args ...object.Object) object.Object {
 	switch arg := args[0].(type) {
@@ -108,6 +126,10 @@ func ditoInt(args ...object.Object) object.Object {
 	}
 }
 
+func ditoString(args ...object.Object) object.Object {
+	return &object.DitoString{Value: args[0].Inspect()}
+}
+
 func ditoIota(args ...object.Object) object.Object {
 	var arg1, arg2, arg3 int64
 	switch len(args) {
@@ -145,8 +167,14 @@ func ditoIota(args ...object.Object) object.Object {
 		return newError("`iota`: wrong number of args. want=(1-3) got=%d", len(args))
 	}
 	var result []object.Object
-	for i := arg1; i < arg2; i += arg3 {
-		result = append(result, object.NewDitoInteger(i))
+	if arg1 < arg2 {
+		for i := arg1; i < arg2; i += arg3 {
+			result = append(result, object.NewDitoInteger(i))
+		}
+	} else {
+		for i := arg1; i > arg2; i += arg3 {
+			result = append(result, object.NewDitoInteger(i))
+		}
 	}
 	return &object.Array{Len: (arg2 - arg1) / arg3, Elements: result}
 }
@@ -157,9 +185,9 @@ func ditoType(args ...object.Object) object.Object {
 
 func ditoPrint(args ...object.Object) object.Object {
 	for _, arg := range args {
-		fmt.Printf("%s ", arg.Inspect())
+		io.WriteString(os.Stdout, arg.Inspect())
 	}
-	fmt.Println()
+	io.WriteString(os.Stdout, "\n")
 	return nil
 }
 

@@ -41,6 +41,12 @@ func evalIfStatement(ie *ast.IfStatement, env *object.Environment) object.Object
 func evalForStatement(fs *ast.ForStatement, env *object.Environment) object.Object {
 	iterCount := 0
 	var body, condition object.Object
+	if fs.ID == nil {
+		goto whileStmt
+	}
+	goto forInStmt
+
+whileStmt:
 	for {
 		condition = Eval(fs.Condition, env)
 		if !isTrue(condition) {
@@ -54,6 +60,24 @@ func evalForStatement(fs *ast.ForStatement, env *object.Environment) object.Obje
 		}
 		iterCount++
 		body = Eval(fs.LoopBody, env)
+		if body != nil {
+			if body.Type() == object.ReturnObj {
+				return body
+			}
+		}
+	}
+	return body
+forInStmt:
+	iter := Eval(fs.Iter, env).(*object.Array)
+	for _, item := range iter.Elements {
+		env.Set(fs.ID.Value, item)
+		body = Eval(fs.LoopBody, env)
+		if body != nil {
+			// the surrounding if is duplicated in isError fn.
+			if body.Type() == object.ReturnObj || isError(body) {
+				return body
+			}
+		}
 	}
 	return body
 }
@@ -64,7 +88,7 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 		result = Eval(statement, env)
 		if result != nil {
 			rt := result.Type()
-			if rt == object.ErrorObj {
+			if rt == object.ErrorObj || rt == object.ReturnObj {
 				return result
 			}
 		}

@@ -41,7 +41,7 @@ func execFile(file string, out io.Writer) {
 	p := parser.New(l)
 	program := p.ParseProgram()
 	if len(p.Errors()) != 0 {
-		repl.PrintParserErrors(out, p.Errors())
+		p.PrintParseErrors(out, p.Errors())
 		return
 	}
 	evaluator.Eval(program, env)

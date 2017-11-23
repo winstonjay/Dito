@@ -34,7 +34,7 @@ func TestNumberParsing(t *testing.T) {
 	}
 	env := object.NewEnvironment()
 	for i, tt := range tests {
-		s := lexer.Init("x := " + tt.input + ";")
+		s := lexer.Init("x := " + tt.input)
 		p := parser.New(s)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)

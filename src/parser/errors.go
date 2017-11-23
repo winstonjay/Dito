@@ -3,7 +3,17 @@ package parser
 import (
 	"dito/src/token"
 	"fmt"
+	"io"
+	"strings"
 )
+
+// PrintParseErrors : output all parse errors.
+func (p *Parser) PrintParseErrors(out io.Writer, errors []*ParseError) {
+	io.WriteString(out, "PARSE ERROR:\n")
+	for _, msg := range p.Errors() {
+		io.WriteString(out, msg.String())
+	}
+}
 
 // Errors : return a array o all acculumated errors found when parsing.
 func (p *Parser) Errors() []*ParseError {
@@ -32,10 +42,10 @@ print all error messages then the last traceback.
 
 Parse Error: Expected next token is ':='. got '9' instead.
 Parse Error: Expected next token is '('. got '!' instead.
-Parse Error: Expected next token is ';'. got '=' instead.
 Last traceback @ line 3, col 20:
 	x := pasta * 2 / 3 =
 						  ^ your problem right there.
+Parse Error: Expected next token is ';'. got '=' instead.
 
 
 how error s are handeled here:
@@ -61,14 +71,18 @@ type ParseError struct {
 }
 
 func (pe *ParseError) String() string {
-	return pe.message
+	return fmt.Sprintf(
+		"Traceback line %d column %d:\n%*s%s\n%*s%s\n%s\n",
+		pe.lineno, pe.column, 4, " ", pe.lineTrace, 4+pe.column, " ", "^ Is your problem here?",
+		pe.message)
 }
 
 func (p *Parser) newError(message string) *ParseError {
+	linecontent := strings.TrimRight(p.scanner.TraceLine(), "\n\t ")
 	return &ParseError{
 		message:   message,
 		lineno:    p.currentLine,
-		column:    len(p.currentLiteral) - len(p.currentLiteral),
-		lineTrace: p.scanner.TraceLine(),
+		column:    len(linecontent) - len(p.currentLiteral),
+		lineTrace: linecontent,
 	}
 }

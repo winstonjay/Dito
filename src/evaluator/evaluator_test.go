@@ -8,7 +8,7 @@ import (
 )
 
 func testEval(t *testing.T, input string) object.Object {
-	l := lexer.Init(input + ";")
+	l := lexer.Init(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	checkParserErrors(t, p)
@@ -79,4 +79,19 @@ func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
 		return false
 	}
 	return true
+}
+
+func TestEvalIfElseExpression(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"35 if 35 <= 1 else 35 - 2", 33},
+		{"(35 / 2) if 35 % 2 == 0 else 35 * 3 + 1", 106},
+		{"35 / 2 if 35 % 2 == 0 else 35 * 3 + 1", 106},
+	}
+	for _, tt := range tests {
+		evaluated := testEval(t, tt.input)
+		testIntegerObject(t, evaluated, tt.expected)
+	}
 }
