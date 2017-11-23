@@ -17,6 +17,12 @@ func newton_sqrt(x: int, delta: 1/128) -> (float) {
 }
 
 
+newton_sqrt := func(z, x, delta) -> (
+    z if (x - z**2) < delta else
+    newton_sqrt((z - (z**2-x) / (2*x), x, delta)
+)
+
+
 # Shorthand functinons / lambda functions.
 
 func sqrt(x) -> (x**0.5)

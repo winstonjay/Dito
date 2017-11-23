@@ -1,0 +1,9 @@
+
+
+# newton_sqrt := func(z, x, delta) -> (
+#     z if (x - z**2) < delta else newton_sqrt(z - (z**2-x) / (2*x), x, delta))
+
+# # for i in itoa(10) {
+# #     print(newton_sqrt(i*i))
+# # }
+print("hey")

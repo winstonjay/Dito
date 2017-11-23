@@ -2,20 +2,16 @@
 # F0 F1	F2	F3	F4	F5	F6	F7	F8	F9	F10	F11	F12	F13	F14	F15
 # 0	1	1	2	3	5	8	13	21	34	55	89	144	233	377	610
 
-# Future imagined implementation.
-# func fibo(n) {
-#     "Recursively generate fibonacci sequence position."
-#     if n < 2 {
-#         return n
-#     }
-#     return fibo(n-1) + fibo(n-2)
-# }
-
 # calculate by formuala.
 cfibo := func(n) -> ((1 + r5)**n - (1 - r5)**n) / (r5 * 2**n)
 r5    := sqrt(5)
 
 # calculate by recursion.
-fibo := func(n) -> (n if n < 2 else fibo(n-1) + fibo(n-2))
+fibo := func(n) -> (
+    n if n < 2 else fibo(n-1) + fibo(n-2))
+
+
+fib := func(n) -> (
+    n if n < 2 else (n-1) + (n-1))
 
 print(cfibo(50.0))

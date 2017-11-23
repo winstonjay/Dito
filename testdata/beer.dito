@@ -1,8 +1,9 @@
+######### Bottles of Beer.
+# Implements classic bottles of beer program in dito.
 
+n := 5
 
-n = 5
-
-bottle = func(n) -> (
+bottle := func(n) -> (
     string(n) + " Bottles of beer" if n > 1 else
     "One Bottle of beer"           if n == 1 else
     "No more bottles of beer")
