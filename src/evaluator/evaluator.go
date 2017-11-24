@@ -118,3 +118,7 @@ func evalImportStatement(node *ast.ImportStatement, env *object.Environment) obj
 	Eval(iprogram, env)
 	return nil
 }
+
+// func matchType(left, right string) bool {
+
+// }

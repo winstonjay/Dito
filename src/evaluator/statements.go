@@ -3,6 +3,7 @@ package evaluator
 import (
 	"dito/src/ast"
 	"dito/src/object"
+	"dito/src/token"
 )
 
 /*
@@ -14,6 +15,11 @@ func evalAssignment(node *ast.AssignmentStatement, env *object.Environment) obje
 	if isError(val) {
 		return val
 	}
+	// just ordinary assignement
+	if node.Token == token.REASSIGN || node.Token == token.NEWASSIGN {
+		env.Set(node.Name.Value, val)
+		return nil
+	}
 	// * Currently don't enforce scope initialation assignment `:=`
 	// * as we are only having single statement functions right now.
 	// if node.Token == token.REASSIGN {
@@ -21,7 +27,32 @@ func evalAssignment(node *ast.AssignmentStatement, env *object.Environment) obje
 	// 		return ident
 	// 	}
 	// }
-	env.Set(node.Name.Value, val)
+	// ######### TODO.
+	// this should be changed in the future but for now just implement
+	// inplace operators like binary ones. This has just been copy and
+	// pasted from evalInfixEpression.
+	var newVal object.Object
+	operator := string(node.Token.String()[0])
+	right := val
+	left := evalIdentifier(node.Name, env)
+	if isError(left) {
+		return left
+	}
+	switch {
+	case isNumericType(left) && isNumericType(right):
+		if left.Type() == object.IntergerObj && right.Type() == object.IntergerObj {
+			newVal = evalIntegerInfixExpression(operator, left, right)
+		} else {
+			newVal = evalFloatInfixExpression(operator, left, right)
+		}
+	case left.Type() != right.Type():
+		newVal = newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
+	case left.Type() == object.StringObj:
+		newVal = evalStringExpression(operator, left, right)
+	default:
+		newVal = newError("Unknown operator: %s %s= %s", left.Type(), operator, right.Type())
+	}
+	env.Set(node.Name.Value, newVal)
 	return nil
 }
 

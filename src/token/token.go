@@ -52,8 +52,16 @@ const (
 	LBRACKET // [
 	RBRACKET // ]
 
+	beginAssignementOp
 	NEWASSIGN // :=
 	REASSIGN  // =
+
+	ADDEQUAL // +=
+	SUBEQUAL // -=
+	MULEQUAL // *=
+	DIVEQUAL // /=
+	MODEQUAL // %=
+	endAssignementOp
 
 	SEMI  // ;
 	COLON // :
@@ -95,8 +103,8 @@ var tokensLiterals = [...]string{
 	STRING: "string",
 	BOOL:   "bool",
 
-	ADD:  "+",
 	SUB:  "-",
+	ADD:  "+",
 	MUL:  "*",
 	DIV:  "/",
 	IDIV: "//",
@@ -119,6 +127,12 @@ var tokensLiterals = [...]string{
 
 	NEWASSIGN: ":=",
 	REASSIGN:  "=",
+
+	ADDEQUAL: "+=",
+	SUBEQUAL: "-=",
+	MULEQUAL: "*=",
+	DIVEQUAL: "/=",
+	MODEQUAL: "%=",
 
 	LARROW: "<-", // n.a.
 	RARROW: "->", // n.a.
@@ -220,4 +234,8 @@ func (t Token) Precedence() uint {
 		return HIGHEST
 	}
 	return LOWEST
+}
+
+func (t Token) IsAssignmentOp() bool {
+	return beginAssignementOp < t && t < endAssignementOp
 }

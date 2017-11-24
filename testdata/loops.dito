@@ -1,15 +1,17 @@
 
-# Print a list of numbers
+# Print a list of numbers in reverse.
+# bultin itoa function works like earlier
+# versions of pythons range, generating a
+# list of elements to cycle through.
 for i in iota(10, 0, -1) {
-    print(i)
-    if i == 7 {
-        print("Exiting loop 1")
-        i = 0
+    if i % 2 == 0 {
+        print(i, " is even")
     } else {
-        i = i - 1
+        print(i, " is odd")
     }
 }
 
+#
 print("Printing an array of names...")
 names = ["dave", "dee", "dozy", "beaky", "mick", "tich"]
 for name in names {
@@ -18,14 +20,21 @@ for name in names {
 
 # Example of loop implementaion using while style for loop.
 # Finding square root of x to an accuracy of delta.
+# Like go for is used instead of while becase cba to add
+# another keyword when for seems to make sense also.
 print("While style loops...")
 delta = 1/128; z = delta; x = 25; c = 0
 for abs(x - z**2) > delta {
-    z = z - (z**2 - x) / (2 * x)
-    c = c + 1
+    z -= (z**2 - x) / (2 * x)
+    c += 1
 }
 print("It took ", c, " loops to calculate the sqrt of ", x, " as ", z)
 print("This can round to ", int(z + 0.5))
 
-# end this.
-print("End of File")
+# atm returns can be placed anywhere and will
+# exit the current scope, meaning if done in main
+# this will exit the file.
+for true {
+    print("I should execute only once")
+    return 0
+}

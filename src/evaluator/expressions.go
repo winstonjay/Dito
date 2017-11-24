@@ -68,7 +68,7 @@ func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) obje
 		return evalFloatInfixExpression(operator, left, right)
 	case left.Type() != right.Type():
 		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
-	case left.Type() == object.StringObj && right.Type() == object.StringObj:
+	case left.Type() == object.StringObj:
 		return evalStringExpression(operator, left, right)
 	case operator == "==":
 		return object.NewDitoBoolean(left == right)

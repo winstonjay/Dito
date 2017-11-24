@@ -150,7 +150,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) statement() ast.Statement {
 	switch p.currentToken {
 	case token.IDVAL:
-		if p.peekTokenIs(token.NEWASSIGN) || p.peekTokenIs(token.REASSIGN) {
+		if p.peekToken.IsAssignmentOp() {
 			return p.assignmentStatement()
 		}
 		return p.expressionStatement()
@@ -222,6 +222,7 @@ func (p *Parser) forStatement() *ast.ForStatement {
 		stmt.Iter = p.expression(token.LOWEST)
 	} else {
 		stmt.ID = nil
+
 		stmt.Condition = p.expression(token.LOWEST)
 	}
 	if !p.expectPeek(token.LBRACE) {
