@@ -1,6 +1,8 @@
 ######### Bottles of Beer.
 # Implements classic bottles of beer program in dito.
+# https://github.com/python/cpython/tree/6f0eb93183519024cb360162bdd81b9faec97ba6/Tools/demo
 
+# Change n to the number of bottle of beer you want.
 n = 10
 
 bottle := func(n) -> (
@@ -13,5 +15,5 @@ for i in iota(n, 0, -1) {
     print(bottle(i) + ".")
     print("Take one down, pass it around,")
     print(bottle(i-1), " on the wall.")
-    sleep(2000)
+    sleep(1000)
 }

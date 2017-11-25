@@ -1,15 +1,4 @@
 
 # Test for imports.
-alpha := iota(1, 11)
-hypot := func(a, b) -> sqrt(a**2 + b**2)
-
-collatz := func(n) -> (
-    n           if n <= 1 else
-    n / 2       if n % 2 == 0 else
-    3 * n + 1)
-
-n := 35
-for n > 1 {
-    print(n)
-    n = collatz(n)
-}
+alpha = iota(1, 11)
+hypot = func(a, b) -> sqrt(a**2 + b**2)

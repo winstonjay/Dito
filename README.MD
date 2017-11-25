@@ -23,14 +23,14 @@ func newton_sqrt(x, delta=1/128) {
 
 ```go
 func coin_sums(coins, target) {
-	sack = [0] * len(coins)
-	sack[0] = 1
-	for coin in coins {
-		for i in iota(coin, target) {
-			sack[i] += sack[i-coin]
-		}
-	}
-	return sack[target]
+    sack = [0] * len(coins)
+    sack[0] = 1
+    for coin in coins {
+        for i in iota(coin, target) {
+            sack[i] += sack[i-coin]
+        }
+    }
+    return sack[target]
 }
 ```
 
