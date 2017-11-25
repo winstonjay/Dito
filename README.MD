@@ -4,12 +4,16 @@ Dito is a
 
 
 ### Examples:
+
+`greet` lambda function as you
 ```go
 greet = func(name) -> ("Hello, " + name)
+print(greet("Dito!"))
+# outputs Hello, Dito!
 ```
 
 ```go
-func newton_sqrt(x, delta) {
+func newton_sqrt(x, delta=1/128) {
     z = delta
     for abs(x - z**2) > delta {
         z -= (z**2 - x) / (2 * x)
