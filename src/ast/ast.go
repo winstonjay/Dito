@@ -69,7 +69,7 @@ func (bs *BlockStatement) tokenLiteral() string { return bs.Token.String() }
 func (bs *BlockStatement) String() string {
 	var out bytes.Buffer
 	for _, s := range bs.Statements {
-		out.WriteString(s.String())
+		out.WriteString(s.String() + "\n")
 	}
 	return out.String()
 }
@@ -101,7 +101,7 @@ func (rs *ReturnStatement) statementNode()       {}
 func (rs *ReturnStatement) tokenLiteral() string { return rs.Token.String() }
 func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
-	out.WriteString(rs.tokenLiteral())
+	out.WriteString(rs.tokenLiteral() + " ")
 	out.WriteString(rs.Value.String())
 	return out.String()
 }
@@ -171,14 +171,27 @@ func (is *ImportStatement) String() string {
 	return "Import statement"
 }
 
-/* -----------------------------------------------------------------------
-Function Types
-
-
+/*
+######## Function Types
 */
 
+// Function : single expression function.
+// func name(args) {
+//     body
+//}
+type Function struct {
+	Token      token.Token // token.FUNC
+	Parameters []*Identifier
+	Name       *Identifier
+	Body       *BlockStatement
+}
+
+func (f *Function) statementNode()       {}
+func (f *Function) tokenLiteral() string { return f.Token.String() }
+func (f *Function) String() string       { return fmt.Sprintf("<%s>", f.Name.Value) }
+
 // LambdaFunction : single expression function.
-// fn(args) -> expr
+// func(args) -> expr
 type LambdaFunction struct {
 	Token      token.Token // token.FUNC
 	Parameters []*Identifier
@@ -291,9 +304,8 @@ func (ie *IfElseExpression) String() string {
 	return out.String()
 }
 
-/* -----------------------------------------------------------------------
-Atoms
-
+/*
+######## Atoms
 
 */
 

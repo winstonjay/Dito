@@ -49,6 +49,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalIndexExpression(node, env)
 
 	// Functions
+	case *ast.Function:
+		return evalDefineFunction(node, env)
 	case *ast.LambdaFunction:
 		return object.NewDitoLambdaFn(node.Parameters, node.Expr, env)
 	case *ast.CallExpression:

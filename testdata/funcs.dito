@@ -1,9 +1,22 @@
-######## Collatz Sequence
-# Program defines a function that given a start
-# position will create a collatz sequence from start - 1
-# this value is returned as an array.
 
-func collatz_sequence(start) {
+
+# Hello world example using a Lambda function.
+greet = func(name) -> ("Hello, " + name)
+
+print(greet("Dito!"))
+
+func newton_sqrt(x, delta) {
+    z = delta
+    for abs(x - z**2) > delta {
+        z -= (z**2 - x) / (2 * x)
+    }
+    return z
+}
+
+print(newton_sqrt(25, 1/128))
+
+
+func collatz_seqence(start) {
     # define a lambda function that can only be a single expression.
     # here it uses a if else expression like what can be found in python.
     collatz = func(n) -> (
@@ -17,8 +30,10 @@ func collatz_sequence(start) {
     for sequence[-1] > 1 {
         # Get the next value in the sequence.
         newitem = collatz(sequence[-1])
-        # Append each new item to array.
+        # append each new item to array.
         sequence += [newitem]
     }
     return sequence
 }
+
+print(collatz_seqence(10))

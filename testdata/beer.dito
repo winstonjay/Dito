@@ -1,7 +1,7 @@
 ######### Bottles of Beer.
 # Implements classic bottles of beer program in dito.
 
-n := 5
+n = 10
 
 bottle := func(n) -> (
     string(n) + " Bottles of beer" if n > 1 else

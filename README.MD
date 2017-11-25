@@ -1,5 +1,13 @@
 # Dito Programming Language
 
+Dito is a
+
+
+### Examples:
+
+
+
+
 ### Known Bugs
 
 * improper ending of expressions.

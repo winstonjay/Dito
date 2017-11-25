@@ -154,6 +154,8 @@ func (p *Parser) statement() ast.Statement {
 			return p.assignmentStatement()
 		}
 		return p.expressionStatement()
+	case token.FUNC:
+		return p.functionStatement()
 	case token.RETURN:
 		return p.returnStatement()
 	case token.IF:
@@ -209,14 +211,28 @@ func (p *Parser) ifElseStatement() *ast.IfStatement {
 	return expression
 }
 
+func (p *Parser) functionStatement() *ast.Function {
+	fn := &ast.Function{Token: p.currentToken}
+	if !p.expectPeek(token.IDVAL) {
+		return nil
+	}
+	fn.Name = p.identifier().(*ast.Identifier)
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	fn.Parameters = p.functionParameters()
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+	fn.Body = p.blockStatement()
+	return fn
+}
+
 func (p *Parser) forStatement() *ast.ForStatement {
 	stmt := &ast.ForStatement{Token: p.currentToken}
 	p.nextToken()
 	if p.currentTokenIs(token.IDVAL) && p.peekTokenIs(token.IN) {
-		stmt.ID = &ast.Identifier{
-			Token: p.currentToken,
-			Value: p.currentLiteral,
-		}
+		stmt.ID = p.identifier().(*ast.Identifier)
 		p.nextToken()
 		p.nextToken()
 		stmt.Iter = p.expression(token.LOWEST)
@@ -290,12 +306,12 @@ func (p *Parser) functionParameters() []*ast.Identifier {
 		return identifiers
 	}
 	p.nextToken()
-	idVal := &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
+	idVal := p.identifier().(*ast.Identifier)
 	identifiers = append(identifiers, idVal)
 	for p.peekTokenIs(token.COMMA) {
 		p.nextToken()
 		p.nextToken()
-		idVal := &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
+		idVal := p.identifier().(*ast.Identifier)
 		identifiers = append(identifiers, idVal)
 	}
 	if !p.expectPeek(token.RPAREN) {

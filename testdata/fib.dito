@@ -14,4 +14,4 @@ fibo := func(n) -> (
 fib := func(n) -> (
     n if n < 2 else (n-1) + (n-1))
 
-print(cfibo(50.0))
+print(fibo(10))

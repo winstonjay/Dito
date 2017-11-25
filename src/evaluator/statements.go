@@ -49,8 +49,13 @@ func evalAssignment(node *ast.AssignmentStatement, env *object.Environment) obje
 		newVal = newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	case left.Type() == object.StringObj:
 		newVal = evalStringExpression(operator, left, right)
+	case left.Type() == object.ArrayObj:
+		newVal = evalArrayExpression(operator, left, right)
 	default:
 		newVal = newError("Unknown operator: %s %s= %s", left.Type(), operator, right.Type())
+	}
+	if isError(newVal) {
+		return newVal
 	}
 	env.Set(node.Name.Value, newVal)
 	return nil

@@ -19,103 +19,8 @@ var Builtins = map[string]*object.Builtin{
 	"iota":   &object.Builtin{Fn: ditoIota},
 	"int":    &object.Builtin{Fn: ditoInt},
 	"string": &object.Builtin{Fn: ditoString},
-	"log":    &object.Builtin{Fn: ditoLog},
-	"log2":   &object.Builtin{Fn: ditoLog2},
-	"log10":  &object.Builtin{Fn: ditoLog10},
-	"cos":    &object.Builtin{Fn: ditoCos},
-	"sin":    &object.Builtin{Fn: ditoSin},
-	"tan":    &object.Builtin{Fn: ditoTan},
 	"sleep":  &object.Builtin{Fn: ditoSleep},
 	"abs":    &object.Builtin{Fn: ditoAbs},
-	// "abs": &object.Builtin{Fn: validDitoAbs},
-}
-
-// func EvalBuiltinFn(fn *object.Builtin, args ...Object) Object {
-// 	if argLen := len(args); argLen > fn.ArgsMax || argLen < fn.ArgsMin {
-// 		return newError("Wrong   number of arguments. got=%d, want=1", len(args))
-// 	}
-
-// 	return fn.Fn(args...)
-// }
-
-func ditoSleep(args ...object.Object) object.Object {
-	switch arg := args[0].(type) {
-	case *object.Integer:
-		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
-		return object.NONE
-	case *object.Float:
-		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
-		return object.NONE
-	default:
-		return newError("Argument to `sleep` not supported, got %s", args[0].Type())
-	}
-
-}
-
-func ditoTan(args ...object.Object) object.Object {
-	switch arg := args[0].(type) {
-	case *object.Integer:
-		return object.NewDitoFloat(math.Tan(float64(arg.Value)))
-	case *object.Float:
-		return object.NewDitoFloat(math.Tan(arg.Value))
-	default:
-		return newError("Argument to `Tan` not supported, got %s", args[0].Type())
-	}
-}
-
-func ditoSin(args ...object.Object) object.Object {
-	switch arg := args[0].(type) {
-	case *object.Integer:
-		return object.NewDitoFloat(math.Sin(float64(arg.Value)))
-	case *object.Float:
-		return object.NewDitoFloat(math.Sin(arg.Value))
-	default:
-		return newError("Argument to `Sin` not supported, got %s", args[0].Type())
-	}
-}
-
-func ditoCos(args ...object.Object) object.Object {
-	switch arg := args[0].(type) {
-	case *object.Integer:
-		return object.NewDitoFloat(math.Cos(float64(arg.Value)))
-	case *object.Float:
-		return object.NewDitoFloat(math.Cos(arg.Value))
-	default:
-		return newError("Argument to `Cos` not supported, got %s", args[0].Type())
-	}
-}
-
-func ditoLog(args ...object.Object) object.Object {
-	switch arg := args[0].(type) {
-	case *object.Integer:
-		return object.NewDitoFloat(math.Log(float64(arg.Value)))
-	case *object.Float:
-		return object.NewDitoFloat(math.Log(arg.Value))
-	default:
-		return newError("Argument to `log` not supported, got %s", args[0].Type())
-	}
-}
-
-func ditoLog10(args ...object.Object) object.Object {
-	switch arg := args[0].(type) {
-	case *object.Integer:
-		return object.NewDitoFloat(math.Log10(float64(arg.Value)))
-	case *object.Float:
-		return object.NewDitoFloat(math.Log10(arg.Value))
-	default:
-		return newError("Argument to `log10` not supported, got %s", args[0].Type())
-	}
-}
-
-func ditoLog2(args ...object.Object) object.Object {
-	switch arg := args[0].(type) {
-	case *object.Integer:
-		return object.NewDitoFloat(math.Log2(float64(arg.Value)))
-	case *object.Float:
-		return object.NewDitoFloat(math.Log2(arg.Value))
-	default:
-		return newError("Argument to `log2` not supported, got %s", args[0].Type())
-	}
 }
 
 func ditoInt(args ...object.Object) object.Object {
@@ -171,10 +76,16 @@ func ditoIota(args ...object.Object) object.Object {
 	}
 	var result []object.Object
 	if arg1 < arg2 {
+		if arg3 <= 0 {
+			return newError("`iota`: Invalid loop increment. want= > 0. got=%d", arg3)
+		}
 		for i := arg1; i < arg2; i += arg3 {
 			result = append(result, object.NewDitoInteger(i))
 		}
 	} else {
+		if arg3 >= 0 {
+			return newError("`iota`: Invalid loop increment. want= < 0. got=%d", arg3)
+		}
 		for i := arg1; i > arg2; i += arg3 {
 			result = append(result, object.NewDitoInteger(i))
 		}
@@ -187,28 +98,15 @@ func ditoType(args ...object.Object) object.Object {
 }
 
 func ditoPrint(args ...object.Object) object.Object {
-	for _, arg := range args {
+	for i, arg := range args {
 		io.WriteString(os.Stdout, arg.Inspect())
+		if i < len(args)-1 {
+			io.WriteString(os.Stdout, ", ")
+		}
 	}
 	io.WriteString(os.Stdout, "\n")
 	return nil
 }
-
-// This dosent work.
-// func ditoPrintf(args ...object.Object) object.Object {
-
-// 	switch arg := args[0].(type) {
-// 	case *object.DitoString:
-// 		a := make([]interface{}, len(args)-1)
-// 		for _, item := range args[1:] {
-// 			a = append(a, item.Inspect())
-// 		}
-// 		fmt.Fprintf(os.Stdout, arg.Inspect(), a...)
-// 	default:
-// 		return newError("Argument to `printf` not supported, got %s", args[0].Type())
-// 	}
-// 	return nil
-// }
 
 func ditoSqrt(args ...object.Object) object.Object {
 	switch arg := args[0].(type) {
@@ -241,4 +139,18 @@ func ditoAbs(args ...object.Object) object.Object {
 	default:
 		return newError("Argument to `abs` not supported, got %s", args[0].Type())
 	}
+}
+
+func ditoSleep(args ...object.Object) object.Object {
+	switch arg := args[0].(type) {
+	case *object.Integer:
+		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
+		return object.NONE
+	case *object.Float:
+		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
+		return object.NONE
+	default:
+		return newError("Argument to `sleep` not supported, got %s", args[0].Type())
+	}
+
 }

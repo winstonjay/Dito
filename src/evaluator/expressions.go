@@ -3,7 +3,6 @@ package evaluator
 import (
 	"dito/src/ast"
 	"dito/src/object"
-	"fmt"
 	"math"
 )
 
@@ -70,6 +69,8 @@ func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) obje
 		return newError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
 	case left.Type() == object.StringObj:
 		return evalStringExpression(operator, left, right)
+	case left.Type() == object.ArrayObj:
+		return evalArrayExpression(operator, left, right)
 	case operator == "==":
 		return object.NewDitoBoolean(left == right)
 	case operator == "!=":
@@ -190,6 +191,19 @@ func evalStringExpression(operator string, left, right object.Object) object.Obj
 	}
 }
 
+func evalArrayExpression(operator string, left, right object.Object) object.Object {
+	leftVal := left.(*object.Array).Elements
+	rightVal := right.(*object.Array).Elements
+	switch operator {
+	case "+":
+		leftVal = append(leftVal, rightVal...)
+		return object.NewDitoArray(leftVal, int64(len(leftVal)))
+	default:
+		return newError("Unknown operator: %s %s %s",
+			left.Type(), operator, right.Type())
+	}
+}
+
 func evalIfElseExpression(node *ast.IfElseExpression, env *object.Environment) object.Object {
 	condition := Eval(node.Condition, env)
 	if isError(condition) {
@@ -235,7 +249,6 @@ func evalIndexExpression(node *ast.IndexExpression, env *object.Environment) obj
 	if idx < 0 {
 		idx += (size + 1)
 	}
-	fmt.Printf("len=%d, index=%d\n", size, idx)
 	if idx < 0 || idx > size {
 		return newError("Index out of range: len=%d, index=%d.", size, idx)
 	}

@@ -35,6 +35,6 @@ print("This can round to ", int(z + 0.5))
 # exit the current scope, meaning if done in main
 # this will exit the file.
 for true {
-    print("I should execute only once")
+    print("I should execute only")
     return 0
 }

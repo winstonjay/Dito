@@ -33,7 +33,7 @@ const (
 	BultinObj   = "Builtin" // not implemented
 )
 
-// singleton objects.
+// ######## singleton objects.
 var (
 	TRUE  = &Boolean{Value: true}
 	FALSE = &Boolean{Value: false}
@@ -48,7 +48,7 @@ func (rv *ReturnValue) Type() string    { return ReturnObj }
 func (rv *ReturnValue) Inspect() string { return rv.Value.Inspect() }
 
 /*
-	Primitive Type Objects.
+######## Primitive Type Objects.
 */
 
 // Array : array object.
@@ -79,15 +79,13 @@ func NewDitoArray(elements []Object, length int64) *Array {
 	return &Array{Elements: elements, Len: length}
 }
 
-// String : builtin integer type.
+// DitoString : builtin integer type.
 type DitoString struct {
 	Value string
 }
 
 func (s *DitoString) Type() string    { return StringObj }
 func (s *DitoString) Inspect() string { return s.Value }
-
-//
 
 // Integer : builtin integer type.
 // -9223372036854775807 and 9223372036854775807
@@ -99,8 +97,6 @@ func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
 
 func NewDitoInteger(value int64) *Integer { return &Integer{Value: value} }
 
-//
-
 // Float : builtin float type.
 type Float struct{ Value float64 }
 
@@ -109,8 +105,6 @@ func (f *Float) Type() string    { return FloatObj }
 func (f *Float) Inspect() string { return strconv.FormatFloat(f.Value, 'f', -1, 64) }
 
 func NewDitoFloat(value float64) *Float { return &Float{Value: value} }
-
-//
 
 // Boolean : builtin bool type.
 type Boolean struct{ Value bool }
@@ -125,15 +119,11 @@ func NewDitoBoolean(input bool) *Boolean {
 	return FALSE
 }
 
-//
-
 // None : builtin None type.
 type None struct{}
 
 func (n *None) Type() string    { return NoneObj }
 func (n *None) Inspect() string { return NoneObj }
-
-//
 
 // Error : builtin Error type.
 type Error struct{ Message string }
@@ -141,7 +131,25 @@ type Error struct{ Message string }
 func (e *Error) Type() string    { return ErrorObj }
 func (e *Error) Inspect() string { return "Evaluation " + ErrorObj + ": " + e.Message }
 
-//
+// Function :
+type Function struct {
+	Parameters []*ast.Identifier
+	Name       string
+	Stmts      *ast.BlockStatement
+	Env        *Environment
+}
+
+func (f *Function) Type() string    { return FunctionObj }
+func (f *Function) Inspect() string { return fmt.Sprintf("<%s>", f.Name) }
+
+func NewFunction(params []*ast.Identifier, name string, stmts *ast.BlockStatement, env *Environment) *Function {
+	return &Function{
+		Parameters: params,
+		Name:       name,
+		Stmts:      stmts,
+		Env:        env,
+	}
+}
 
 // LambdaFn :
 type LambdaFn struct {

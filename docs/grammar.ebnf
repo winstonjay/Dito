@@ -1,4 +1,5 @@
 ; -------------------------------------------------------------------------
+;   NOT UP TO DATE.
 ;   This file aims to define the grammar of the dito programing language
 ;   for documentation and referencing purposes.
 ;   Most definitions loosely correlate with parser functions/structure
@@ -19,7 +20,7 @@
 ;   expressions.
 ;
 ;   TODO: Add comparison exprssions.
-;
+;   TODO: Update recent changes.
 ; -------------------------------------------------------------------------
 
 program ::= stmt_list EOF
