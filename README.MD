@@ -4,8 +4,19 @@ Dito is a
 
 
 ### Examples:
+```go
+greet = func(name) -> ("Hello, " + name)
+```
 
-
+```go
+func newton_sqrt(x, delta) {
+    z = delta
+    for abs(x - z**2) > delta {
+        z -= (z**2 - x) / (2 * x)
+    }
+    return z
+}
+```
 
 
 ### Known Bugs
