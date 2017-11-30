@@ -91,6 +91,23 @@ func (as *AssignmentStatement) String() string {
 	return out.String()
 }
 
+// IndexAssignmentStatement is
+type IndexAssignmentStatement struct {
+	Token  token.Token
+	IdxExp *IndexExpression
+	Value  Expression
+}
+
+func (ias *IndexAssignmentStatement) statementNode()       {}
+func (ias *IndexAssignmentStatement) tokenLiteral() string { return "[]" + ias.Token.String() }
+func (ias *IndexAssignmentStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString(ias.IdxExp.Left.String())
+	out.WriteString(" " + ias.tokenLiteral() + " ")
+	out.WriteString(ias.Value.String())
+	return out.String()
+}
+
 // ReturnStatement is this
 type ReturnStatement struct {
 	Token token.Token // return
@@ -232,7 +249,7 @@ func (ce *CallExpression) String() string {
 // IndexExpression is
 type IndexExpression struct {
 	Token token.Token // [
-	Left  Expression
+	Left  *Identifier
 	Index Expression
 }
 

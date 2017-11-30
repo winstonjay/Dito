@@ -37,8 +37,8 @@ sqrt(25) + sqrt2(25)
 
 
 class Point(x, y) {
-    x := x
-    y := x
+    'x' := x
+    'y' := x
 public:
     hypot := func() -> (('x**2 + 'y**2)**0.5)
 }

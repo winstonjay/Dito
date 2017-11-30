@@ -4,12 +4,6 @@
 # this value is returned as an array.
 
 func collatz_sequence(start) {
-    # define a lambda function that can only be a single expression.
-    # here it uses a if else expression like what can be found in python.
-    collatz = func(n) -> (
-        n           if n <= 1 else
-        n / 2       if n % 2 == 0 else
-        3 * n + 1)
     # define an array with our start item.
     sequence = [start]
     # use a while style for loop to keep adding to the sequence.
@@ -22,3 +16,10 @@ func collatz_sequence(start) {
     }
     return sequence
 }
+
+# define a lambda function that can only be a single expression.
+# here it uses a if else expression like what can be found in python.
+collatz = func(n) -> (
+    n           if n <= 1 else
+    n / 2       if n % 2 == 0 else
+    3 * n + 1)

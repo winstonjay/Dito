@@ -7,6 +7,7 @@ import (
 	"dito/src/ast"
 	"dito/src/lexer"
 	"dito/src/token"
+	"fmt"
 	"strconv"
 )
 
@@ -153,6 +154,16 @@ func (p *Parser) statement() ast.Statement {
 		if p.peekToken.IsAssignmentOp() {
 			return p.assignmentStatement()
 		}
+		if p.peekTokenIs(token.LBRACKET) {
+			idxExp := p.expression(token.LOWEST)
+			if !p.peekToken.IsAssignmentOp() {
+				return &ast.ExpressionStatement{
+					Token:      token.LBRACE,
+					Expression: idxExp,
+				}
+			}
+			return p.indexAssignmentStatement(idxExp.(*ast.IndexExpression))
+		}
 		return p.expressionStatement()
 	case token.FUNC:
 		return p.functionStatement()
@@ -186,10 +197,17 @@ func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 	return stmt
 }
 
+func (p *Parser) indexAssignmentStatement(idxExp *ast.IndexExpression) *ast.IndexAssignmentStatement {
+	stmt := &ast.IndexAssignmentStatement{Token: token.LBRACE, IdxExp: idxExp}
+	p.nextToken()
+	p.nextToken()
+	stmt.Value = p.expression(token.LOWEST)
+	return stmt
+}
+
 func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.currentToken}
 	stmt.Expression = p.expression(token.LOWEST)
-	// inforce semicolons till we find sort a newline strategy.
 	return stmt
 }
 
@@ -426,7 +444,12 @@ func (p *Parser) groupedExpression() ast.Expression {
 }
 
 func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
-	exp := &ast.IndexExpression{Token: p.currentToken, Left: item}
+	id, ok := item.(*ast.Identifier)
+	if !ok {
+		fmt.Printf("ERROR ASSERTION")
+		return nil
+	}
+	exp := &ast.IndexExpression{Token: p.currentToken, Left: id}
 	p.nextToken()
 	exp.Index = p.expression(token.LOWEST)
 	if !p.expectPeek(token.RBRACKET) {

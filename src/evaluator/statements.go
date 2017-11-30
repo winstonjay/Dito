@@ -61,6 +61,35 @@ func evalAssignment(node *ast.AssignmentStatement, env *object.Environment) obje
 	return nil
 }
 
+func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environment) object.Object {
+	val := Eval(node.Value, env)
+	if isError(val) {
+		return val
+	}
+	ident := evalIdentifier(node.IdxExp.Left, env)
+	if isError(ident) {
+		return ident
+	}
+	index := Eval(node.IdxExp.Index, env)
+	if isError(index) {
+		return index
+	}
+	if ident.Type() != object.ArrayObj || index.Type() != object.IntergerObj {
+		return newError("Index operator not supported: %s[%s].", ident.Type(), index.Type())
+	}
+	arrayObject := ident.(*object.Array)
+	idx := index.(*object.Integer).Value
+	size := arrayObject.Len - 1
+	if idx < 0 {
+		idx += (size + 1)
+	}
+	if idx < 0 || idx > size {
+		return newError("Index out of range: len=%d, index=%d.", size, idx)
+	}
+	arrayObject.Elements[idx] = val
+	return nil
+}
+
 func evalIfStatement(ie *ast.IfStatement, env *object.Environment) object.Object {
 	condition := Eval(ie.Condition, env)
 	if isError(condition) {
