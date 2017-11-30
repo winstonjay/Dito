@@ -92,6 +92,12 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 		return object.NewDitoInteger(leftVal * rightVal)
 	case "**":
 		return IntegerObjPow(leftVal, rightVal)
+	case "//":
+		if rightVal == 0 {
+			return newError("Zero division error: %s %s %s",
+				left.Inspect(), operator, right.Inspect())
+		}
+		return object.NewDitoInteger(leftVal / rightVal)
 	case "/":
 		if rightVal == 0 {
 			return newError("Zero division error: %s %s %s",

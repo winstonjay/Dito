@@ -61,6 +61,7 @@ func New(s *lexer.Scanner) *Parser {
 		token.ADD:      p.infixExpression,
 		token.MUL:      p.infixExpression,
 		token.DIV:      p.infixExpression,
+		token.IDIV:     p.infixExpression,
 		token.MOD:      p.infixExpression,
 		token.POW:      p.infixExpression,
 		token.EQUALS:   p.infixExpression,

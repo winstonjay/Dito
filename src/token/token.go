@@ -224,7 +224,7 @@ func (t Token) Precedence() uint {
 		return LESSGREATER
 	case ADD, SUB, SHIFTL, SHIFTR:
 		return ADDSUB
-	case MOD, DIV, MUL:
+	case MOD, DIV, MUL, IDIV:
 		return TERM
 	case POW:
 		return EXPONENT
