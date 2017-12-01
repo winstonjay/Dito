@@ -14,9 +14,9 @@ const (
 	beginLiteral
 	IDVAL  // Alphanumeric idenifiers (varible names).
 	INT    // Generic Integers.
-	FLOAT  // Generic float token.
-	STRING // Strings.
-	BOOL   // generic bool
+	FLOAT  // Generic Floats.
+	STRING // Strings starting and ending with ".
+	BOOL   // Generic bool
 	endLiteral
 
 	beginOperator
@@ -43,7 +43,7 @@ const (
 	BITXOR // ^
 
 	LARROW // <- n.a.
-	RARROW // -> n.a.
+	RARROW // ->
 
 	LPAREN   // (
 	RPAREN   // )
@@ -72,7 +72,7 @@ const (
 
 	QUOTE // "
 
-	HASH // #
+	HASH // # start comments
 
 	beginKeyword
 	TRUE   // true
@@ -84,10 +84,10 @@ const (
 	FUNC   // func
 	AND    // and
 	OR     // or
-	RHO    // rho
-	IOTA   // iota
-	RETURN // return n.a.
-	IMPORT // import n.a.
+	RHO    // rho n.a
+	IOTA   // iota n.a
+	RETURN // return
+	IMPORT // import
 	endKeyword
 )
 
@@ -135,7 +135,7 @@ var tokensLiterals = [...]string{
 	MODEQUAL: "%=",
 
 	LARROW: "<-", // n.a.
-	RARROW: "->", // n.a.
+	RARROW: "->",
 
 	LPAREN:   "(",
 	RPAREN:   ")",
@@ -160,8 +160,8 @@ var tokensLiterals = [...]string{
 	FUNC: "func",
 	AND:  "and",
 	OR:   "or",
-	// RHO:  "rho",
-	// IOTA:  "iota",
+	// RHO:  "rho", n.a
+	// IOTA:  "iota", n.a
 	IMPORT: "import",
 	RETURN: "return",
 }
@@ -204,12 +204,15 @@ const (
 	EQUALITY         // == !=
 	LESSGREATER      // <= >= < >
 	ADDSUB           // + -
-	TERM             // * / %
+	TERM             // * / % //
 	EXPONENT         // **
 	PREFIX           // unary operators; eg. + - !
 	CALL             // Bracketed expressions, function calls; eg. foobar()
 	HIGHEST          // Is extranous... pretty much there just in case. n.a.
 )
+
+// TODO Adjust operator precedence for bitwise operations.
+// Implement all the bitwise operators.
 
 // Precedence Returns the parsing precedence of a given token.
 // values range from token.LOWEST to token.HIGHEST, constants
@@ -236,6 +239,9 @@ func (t Token) Precedence() uint {
 	return LOWEST
 }
 
+// IsAssignmentOp replies true or false depending whether a token is
+// an assignmen operator. An assignment operator is described token that
+// ends with '='.
 func (t Token) IsAssignmentOp() bool {
 	return beginAssignementOp < t && t < endAssignementOp
 }

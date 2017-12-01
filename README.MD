@@ -9,7 +9,7 @@ The most simple way to run is with `go run`. You can try out the language either
 
     go run main.go
 
-Or you can run a file from with in the `testdata/` directory with:
+Or you can run a file from `testdata/` directory when in the main directory with. (The default path is `testdata/`)
 
     go run main.go <filename>
 

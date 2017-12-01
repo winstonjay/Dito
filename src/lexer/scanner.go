@@ -4,14 +4,10 @@
 // parser will call till it reaches an token.EOF.
 package lexer
 
-/*
-TODO:
-	* Implement pattern for reading newlines without bugs.
-*/
+// TODO more package docs so i dont forget who i am.
 
 import (
 	"dito/src/token"
-	"fmt"
 )
 
 // Scanner is Lexical scanner analises a given program string.
@@ -41,17 +37,18 @@ func Init(input string) *Scanner {
 // NextToken : Returns the next token encountered by the lexical scanner.
 func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 
-	// Sorting the issue of new lines.
-	// in repl there is a semi colon being added so we dont have to type it.
-	// tests and other things have not been set for this.
-
+	// first see if we find a newline token return that and set the newline
+	// collection to false. This is so that at we only collect one newline token
+	// per space between non-whitespace chars. The rest of the newlines are not
+	// tokenised but the line postion is incremented.
 	if s.newline && (s.char == '\n' || s.char == '\r') {
 		s.newline = false
 		s.advanceLine()
 		return token.NEWLINE, token.NEWLINE.String(), s.lineno - 1
 	}
+	// reset newline
 	s.newline = true
-	// First make sure all comments and spaces are skipped.
+	// Make sure all comments and spaces are skipped.
 	s.skipWhitespace()
 	for s.char == '#' {
 		s.skipComment()
@@ -60,7 +57,6 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	// Run through all the possible operators and delimeters that are
 	// included in dito's grammar.
 	switch s.char {
-	// Tokens that can be one of 2 values.
 	case ':': // ':', ':='
 		tok = s.switch2(token.COLON, '=', token.NEWASSIGN)
 	case '=': // '=', '=='
@@ -121,12 +117,8 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	return tok, tok.String(), s.lineno
 }
 
-// TraceLine : Returns last line up to current column.
-// eg. at index 8 of "alpha := 100" we would get: 'alpha :=' <-.
-func (s *Scanner) TraceLine() string {
-	return s.input[s.linePos : s.linePos+s.column]
-}
-
+// switch 2 checks between 2 possible alternatives give a current token and a
+// the peek token returning the correct combination of chars.
 func (s *Scanner) switch2(current token.Token, expected byte, alt token.Token) token.Token {
 	if s.peek() == expected {
 		s.advance()
@@ -135,6 +127,8 @@ func (s *Scanner) switch2(current token.Token, expected byte, alt token.Token) t
 	return current
 }
 
+// switch 3 checks between 3 possible alternatives give a
+// current token and a the peek token.
 func (s *Scanner) switch3(
 	current token.Token,
 	expected1 byte, alt1 token.Token,
@@ -165,6 +159,9 @@ func (s *Scanner) readString() (token.Token, string, int) {
 	return token.STRING, literal, s.lineno
 }
 
+// readIdentifer reads while alphanumeric chars are under inspection.
+// it then determines if the collecting token literal is a keyword or
+// a user defined identifier, returning the type accordingly.
 func (s *Scanner) readIdentifer() (token.Token, string, int) {
 	start := s.pos
 	for isLetter(s.char) || isDigit(s.char) {
@@ -174,7 +171,8 @@ func (s *Scanner) readIdentifer() (token.Token, string, int) {
 	return token.LookUpIDVal(literal), literal, s.lineno
 }
 
-// readNumber : Return either an integer or a float.
+// readNumber returns either an integer or a float type token
+// with support for hex, e notation, and decimal.
 func (s *Scanner) readNumber() (token.Token, string, int) {
 	start := s.pos
 	// loop though digits until we read the end of 0-9.
@@ -204,7 +202,7 @@ Hexadecimal:
 	return token.INT, s.input[start:s.pos], s.lineno
 
 Mantissa:
-	// 0.321, 312.123, 10e2, 8E-2, etc.
+	// 0.321, 312.123 etc.
 	s.advance()
 	for isDigit(s.char) {
 		s.advance()
@@ -215,6 +213,7 @@ Mantissa:
 	return token.FLOAT, s.input[start:s.pos], s.lineno
 
 Exponent:
+	// 10e2, 8E-2, etc.
 	s.advance()
 	if s.char == '+' || s.char == '-' {
 		s.advance()
@@ -237,12 +236,6 @@ func (s *Scanner) advance() {
 	s.column++
 }
 
-// TODO: currently the line position is passed on
-// the parser and then differences in lines are used
-// to determine the end of expressions and statements.
-// this is not working right and in some cases semi
-// colons need to be used to stop errors. main example
-// is if statements geting confused with if experessions.
 func (s *Scanner) advanceLine() {
 	s.advance()
 	s.linePos = s.pos
@@ -293,24 +286,4 @@ func isSpace(char byte) bool {
 func isHex(char byte) bool {
 	return (isDigit(char) || 'a' <= char && char <= 'z' ||
 		'A' <= char && char <= 'Z')
-}
-
-// PrintScan : print out the entire lexical analysis of an input
-// in one go.
-func (s *Scanner) printScan() {
-
-	tok, literal, _ := s.NextToken()
-	tokenCount := 0
-	fmt.Printf("input:\n\n%s\n\n", s.input)
-	fmt.Printf("| line | col  | Token        | Literal     |\n")
-	fmt.Printf("-----------------------------------------\n")
-	for tok != token.EOF {
-		fmt.Printf("| %4d | %4d | %12s | %12s |\n",
-			s.lineno+1, s.column-len(literal), tok.String(), literal)
-		tokenCount++
-		tok, literal, _ = s.NextToken()
-	}
-	fmt.Printf("\nTotal Tokens: %d, \n", tokenCount)
-	fmt.Printf("Total Chars: %d, \n", s.pos)
-	fmt.Printf("Total Lines: %d, \n", s.lineno+1)
 }

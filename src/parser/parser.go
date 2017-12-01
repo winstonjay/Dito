@@ -3,6 +3,8 @@
 // Top Down Operator Precedence parsing. https://goo.gl/uoH6Ta
 package parser
 
+// TODO more package docs so i dont forget who i am.
+
 import (
 	"dito/src/ast"
 	"dito/src/lexer"
@@ -16,7 +18,8 @@ type (
 	infixParseFn  func(ast.Expression) ast.Expression
 )
 
-// Parser : structure who's methods implement a pratt parser.
+// Parser : structure who's methods implement a operator
+// precedence parser.
 type Parser struct {
 	scanner        *lexer.Scanner
 	errors         []*ParseError
@@ -37,6 +40,8 @@ func New(s *lexer.Scanner) *Parser {
 		scanner: s,
 		errors:  []*ParseError{},
 	}
+	// Define a table of methods for parsing expressions
+	// given a token.
 	p.prefixParseFns = map[token.Token]prefixParseFn{
 		// prefix / unary expressions
 		token.SUB: p.prefixExpression,
@@ -113,9 +118,7 @@ func (p *Parser) nextToken() {
 	p.peekToken, p.peekLiteral, p.currentLine = p.scanner.NextToken()
 }
 
-// // expressions are ended by a semicolon or a newline.
-// // there is no newline token, but we can see if the line number
-// // has changed from the scanners positon.
+// check to see if there is a newline, EOF or Semicolon token or complain.
 func (p *Parser) stmtEnd() bool {
 	if p.peekTokenIs(token.SEMI) ||
 		p.peekTokenIs(token.NEWLINE) ||
@@ -127,8 +130,12 @@ func (p *Parser) stmtEnd() bool {
 	return false
 }
 
-// ParseProgram : creates ast of the inputed text incrementally
+// ParseProgram creates ast of the inputed text incrementally
 // working with the scanner.
+// Program:
+// 		list of statements seperated by stmtend tokens.
+// stmtend:
+// 		newline | semicolon | EOF
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
@@ -147,8 +154,18 @@ func (p *Parser) ParseProgram() *ast.Program {
 
 /*
 ######## Statements.
-*/
+Statements pretty much make up the structure of a program.
+They can be defiend as any of the following.
 
+Statement:
+	assignmentStatement
+	indexAssignmentStatement
+	expressionStatement
+	functionStatement
+	returnStatement
+	forStatement
+	importStatement
+*/
 func (p *Parser) statement() ast.Statement {
 	switch p.currentToken {
 	case token.IDVAL:
@@ -181,6 +198,8 @@ func (p *Parser) statement() ast.Statement {
 	}
 }
 
+// returnStatement:
+//		'return' expression
 func (p *Parser) returnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.currentToken}
 	p.nextToken()
@@ -188,6 +207,8 @@ func (p *Parser) returnStatement() *ast.ReturnStatement {
 	return stmt
 }
 
+// assignmentStatement:
+//		identifier assignmentOperator expression
 func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 	stmt := &ast.AssignmentStatement{}
 	stmt.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
@@ -198,6 +219,8 @@ func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 	return stmt
 }
 
+// indexAssignmentStatement:
+//		identifier '[' expression ']' assignmentOperator expression
 func (p *Parser) indexAssignmentStatement(idxExp *ast.IndexExpression) *ast.IndexAssignmentStatement {
 	stmt := &ast.IndexAssignmentStatement{Token: token.LBRACE, IdxExp: idxExp}
 	p.nextToken()
@@ -206,12 +229,17 @@ func (p *Parser) indexAssignmentStatement(idxExp *ast.IndexExpression) *ast.Inde
 	return stmt
 }
 
+// expressionStatement:
+// 		expression
 func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.currentToken}
 	stmt.Expression = p.expression(token.LOWEST)
 	return stmt
 }
 
+// ifElseStatement:
+// 		'if' expression '{' blockStatement '}'
+// 		'if' expression '{' blockStatement '}' 'else' '{' blockStatement '}'
 func (p *Parser) ifElseStatement() *ast.IfStatement {
 	expression := &ast.IfStatement{Token: p.currentToken}
 	p.nextToken()
@@ -230,6 +258,8 @@ func (p *Parser) ifElseStatement() *ast.IfStatement {
 	return expression
 }
 
+// functionStatement
+// 		'func' identifier '(' functionParameters ')' '{' blockStatement '}'
 func (p *Parser) functionStatement() *ast.Function {
 	fn := &ast.Function{Token: p.currentToken}
 	if !p.expectPeek(token.IDVAL) {
@@ -247,6 +277,9 @@ func (p *Parser) functionStatement() *ast.Function {
 	return fn
 }
 
+// forStatement:
+// 		'for' identifier 'in' identifier '{' blockStatement '}'
+// 		'for' expression '{' blockStatement '}'
 func (p *Parser) forStatement() *ast.ForStatement {
 	stmt := &ast.ForStatement{Token: p.currentToken}
 	p.nextToken()
@@ -257,7 +290,6 @@ func (p *Parser) forStatement() *ast.ForStatement {
 		stmt.Iter = p.expression(token.LOWEST)
 	} else {
 		stmt.ID = nil
-
 		stmt.Condition = p.expression(token.LOWEST)
 	}
 	if !p.expectPeek(token.LBRACE) {
@@ -267,6 +299,9 @@ func (p *Parser) forStatement() *ast.ForStatement {
 	return stmt
 }
 
+// blockStatement:
+// 		statement stmtend blockstatement
+// 		statement stmtend
 func (p *Parser) blockStatement() *ast.BlockStatement {
 	if p.peekTokenIs(token.NEWLINE) {
 		p.nextToken()
@@ -287,6 +322,8 @@ func (p *Parser) blockStatement() *ast.BlockStatement {
 	return block
 }
 
+// importStatement
+//		'import' identifier
 func (p *Parser) importStatement() *ast.ImportStatement {
 	is := &ast.ImportStatement{Token: p.currentToken}
 	if !p.expectPeek(token.IDVAL) {
@@ -297,77 +334,19 @@ func (p *Parser) importStatement() *ast.ImportStatement {
 }
 
 /*
-######## Functions.
-As it is the only type of functions implemented are
-single expression lambda style functions they are created
-as follows: `sqrt := func(n) -> (n**0.5)`
-*/
-
-// lambdaFunction: func(<parameters>) -> <expr>
-func (p *Parser) lambdaFunction() ast.Expression {
-	lambda := &ast.LambdaFunction{Token: p.currentToken}
-	if !p.expectPeek(token.LPAREN) {
-		return nil
-	}
-	lambda.Parameters = p.functionParameters()
-	if !p.expectPeek(token.RARROW) {
-		return nil
-	}
-	p.nextToken()
-	lambda.Expr = p.expression(token.LOWEST)
-	return lambda
-}
-
-func (p *Parser) functionParameters() []*ast.Identifier {
-	identifiers := []*ast.Identifier{}
-	if p.peekTokenIs(token.RPAREN) {
-		p.nextToken()
-		return identifiers
-	}
-	p.nextToken()
-	idVal := p.identifier().(*ast.Identifier)
-	identifiers = append(identifiers, idVal)
-	for p.peekTokenIs(token.COMMA) {
-		p.nextToken()
-		p.nextToken()
-		idVal := p.identifier().(*ast.Identifier)
-		identifiers = append(identifiers, idVal)
-	}
-	if !p.expectPeek(token.RPAREN) {
-		return nil
-	}
-	return identifiers
-}
-
-func (p *Parser) callExpression(function ast.Expression) ast.Expression {
-	exp := &ast.CallExpression{Token: p.currentToken, Function: function}
-	exp.Arguments = p.expressionList(token.RPAREN)
-	return exp
-}
-
-/*
 	Expressions.
 */
 
-func (p *Parser) expressionList(delimiter token.Token) []ast.Expression {
-	list := []ast.Expression{}
-	if p.peekTokenIs(delimiter) {
-		p.nextToken()
-		return list
-	}
-	p.nextToken()
-	list = append(list, p.expression(token.LOWEST))
-	for p.peekTokenIs(token.COMMA) {
-		p.nextToken()
-		p.nextToken()
-		list = append(list, p.expression(token.LOWEST))
-	}
-	if !p.expectPeek(delimiter) {
-		return nil
-	}
-	return list
-}
-
+// expression:
+// 		lambdaFunction
+// 		callExpression
+// 		ifElseExpression
+// 		prefixExpression
+//		infixExpression
+// 		groupedExpression
+//		indexExpression
+//		identifier
+// 		atom
 func (p *Parser) expression(precedence uint) ast.Expression {
 	prefix := p.prefixParseFns[p.currentToken]
 	// we want to be able to do multiline expr inside parenthesis.
@@ -390,6 +369,78 @@ func (p *Parser) expression(precedence uint) ast.Expression {
 	return expr
 }
 
+// lambdaFunction:
+// 		'func' '(' functionParameters ')' '->' expression
+func (p *Parser) lambdaFunction() ast.Expression {
+	lambda := &ast.LambdaFunction{Token: p.currentToken}
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	lambda.Parameters = p.functionParameters()
+	if !p.expectPeek(token.RARROW) {
+		return nil
+	}
+	p.nextToken()
+	lambda.Expr = p.expression(token.LOWEST)
+	return lambda
+}
+
+// functionParameters:
+// 		identifer ',' functionParameters
+// 		identifier
+func (p *Parser) functionParameters() []*ast.Identifier {
+	identifiers := []*ast.Identifier{}
+	if p.peekTokenIs(token.RPAREN) {
+		p.nextToken()
+		return identifiers
+	}
+	p.nextToken()
+	idVal := p.identifier().(*ast.Identifier)
+	identifiers = append(identifiers, idVal)
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		idVal := p.identifier().(*ast.Identifier)
+		identifiers = append(identifiers, idVal)
+	}
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+	return identifiers
+}
+
+// callExpression:
+// 		identifier '(' expressionList ')'
+func (p *Parser) callExpression(function ast.Expression) ast.Expression {
+	exp := &ast.CallExpression{Token: p.currentToken, Function: function}
+	exp.Arguments = p.expressionList(token.RPAREN)
+	return exp
+}
+
+// expressionList
+// 		expression ',' expressionList
+// 		expression
+func (p *Parser) expressionList(delimiter token.Token) []ast.Expression {
+	list := []ast.Expression{}
+	if p.peekTokenIs(delimiter) {
+		p.nextToken()
+		return list
+	}
+	p.nextToken()
+	list = append(list, p.expression(token.LOWEST))
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		list = append(list, p.expression(token.LOWEST))
+	}
+	if !p.expectPeek(delimiter) {
+		return nil
+	}
+	return list
+}
+
+// ifElseExpression:
+// 		expression 'if' expression 'else' expression
 func (p *Parser) ifElseExpression(inital ast.Expression) ast.Expression {
 	expr := &ast.IfElseExpression{
 		Initial: inital,
@@ -408,6 +459,8 @@ func (p *Parser) ifElseExpression(inital ast.Expression) ast.Expression {
 	return expr
 }
 
+// prefixExpression:
+// 		prefixOperator expression
 func (p *Parser) prefixExpression() ast.Expression {
 	expr := &ast.PrefixExpression{
 		Token:    p.currentToken,
@@ -418,6 +471,8 @@ func (p *Parser) prefixExpression() ast.Expression {
 	return expr
 }
 
+// infixExpression:
+// 		expression binaryOperator expression
 func (p *Parser) infixExpression(left ast.Expression) ast.Expression {
 	expr := &ast.InfixExpression{
 		Token:    p.currentToken,
@@ -430,6 +485,8 @@ func (p *Parser) infixExpression(left ast.Expression) ast.Expression {
 	return expr
 }
 
+// groupedExpression:
+// 		'(' expression ')'
 func (p *Parser) groupedExpression() ast.Expression {
 	p.nextToken()
 	p.openParen = true
@@ -444,6 +501,8 @@ func (p *Parser) groupedExpression() ast.Expression {
 	return expr
 }
 
+// indexExpression:
+// 		identifier '[' expression ']'
 func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
 	id, ok := item.(*ast.Identifier)
 	if !ok {
@@ -463,6 +522,8 @@ func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
 ######## Atoms / Type Literals
 */
 
+// arrayLiteral:
+// '[' expressionList ']'
 func (p *Parser) arrayLiteral() ast.Expression {
 	return &ast.ArrayLiteral{
 		Token:    p.currentToken,
@@ -477,6 +538,9 @@ func (p *Parser) stringLiteral() ast.Expression {
 	}
 }
 
+// identifier:
+// 		must start with a alphabetic char
+// 		this includes '_' rest can be alphanumeric.
 func (p *Parser) identifier() ast.Expression {
 	return &ast.Identifier{
 		Token: p.currentToken,
