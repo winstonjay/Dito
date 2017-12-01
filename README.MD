@@ -17,14 +17,14 @@ Or you can run a file from with in the `testdata/` directory with:
 ### Program Examples:
 
 `greet` lambda function, as you might suspect, it outputs 'Hello, Dito!'
-```python
+```go
 greet = func(name) -> ("Hello, " + name)
 print(greet("Dito!"))
 ```
 
 `newton_sqrt` function, Calculate the square root of `x` to an accuracy of
 `delta` using newtons method.
-```python
+```go
 func newton_sqrt(x, delta) {
     z = delta
     for abs(x - z**2) > delta {
@@ -34,7 +34,7 @@ func newton_sqrt(x, delta) {
 }
 ```
 
-```python
+```
 func collatz_sequence(start) {
     # define an array with our start item.
     # define a lambda function that can only be a single expression.
