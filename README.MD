@@ -34,29 +34,22 @@ func newton_sqrt(x, delta) {
 }
 ```
 
-```
+```go
 func collatz_sequence(start) {
-    # define an array with our start item.
-    # define a lambda function that can only be a single expression.
-    # here it uses a if else expression like what can be found in python.
     collatz = func(n) -> (
         n           if n <= 1 else
         n / 2       if n % 2 == 0 else
         3 * n + 1)
     sequence = [start]
-    # use a while style for loop to keep adding to the sequence.
-    # checking the item at the last index of the sequence.
     for sequence[-1] > 1 {
-        # Get the next value in the sequence.
         newitem = collatz(sequence[-1])
-        # Append each new item to array.
         sequence += [newitem]
     }
     return sequence
 }
 print(collatz_sequence(13))
-# outputs [13, 40, 20, 10, 5, 16, 8, 4, 2, 1]
 ```
+outputs `[13, 40, 20, 10, 5, 16, 8, 4, 2, 1]`
 
 **For more examples see `testdata/` directory.**
 
