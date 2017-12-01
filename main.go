@@ -12,7 +12,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/user"
+	"runtime"
 )
 
 func main() {
@@ -27,11 +27,7 @@ func main() {
 		execFile(string(file), os.Stdout)
 		return
 	}
-	user, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
-	welcomeMsg(user.Username, repl.QUIT)
+	welcomeMsg(repl.QUIT)
 	repl.Start(os.Stdin, os.Stdout)
 }
 
@@ -47,7 +43,7 @@ func execFile(file string, out io.Writer) {
 	evaluator.Eval(program, env)
 }
 
-func welcomeMsg(username, quit string) {
-	fmt.Printf("Hello %s! Welcome to the Dito programing language\n", username)
-	fmt.Printf("Feel free to type commands. Type '%s' to quit.\n", quit)
+func welcomeMsg(quit string) {
+	fmt.Printf("Dito Interactive Shell V0.01 on %s\n", runtime.GOOS)
+	fmt.Printf("Enter '%s' to quit. Help is coming soon...\n", quit)
 }

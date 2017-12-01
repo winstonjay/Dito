@@ -3,7 +3,7 @@
 first  = func(x)    -> x[0]
 last   = func(x)    -> x[-1]
 append = func(x, y) -> x + [y]
-# pop    = func(x)    -> [x[0], x[:1]]
+# pop    = func(x)    -> [x[0], x[:1]] # slices not implemented
 
 func extend(x, y) {
     for i in y {

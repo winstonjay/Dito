@@ -1,4 +1,6 @@
-
-# Test for imports.
+# Test file for imports.
+# imports basically work by excuting the file so
+# all the varibles get loaded into memory.
+# Any import loops will make an infinite loop.
 alpha = iota(1, 11)
 hypot = func(a, b) -> sqrt(a**2 + b**2)
