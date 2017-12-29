@@ -152,10 +152,10 @@ func (s *Scanner) switch3(
 	}
 }
 
-// readString reads until it sees a double quote of EOF 0.
-// Strings can only be created with double quotes. They can
-// be multi-line but this should probally be treated as an
-// error in the future.
+// readString reads until it sees a double quote or 0 (EOF).
+// Strings can only be created with double quotes.
+// They can be multi-line but this should probally be
+// treated as an error in the future.
 func (s *Scanner) readString() (token.Token, string, int) {
 	start := s.pos + 1
 	for s.char != '"' && s.char != 0 {
