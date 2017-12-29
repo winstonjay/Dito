@@ -1,6 +1,4 @@
 // Package parser implements Dito's Parser.
-// Its is implemented blah blah blah...
-// Top Down Operator Precedence parsing. https://goo.gl/uoH6Ta
 package parser
 
 // TODO more package docs so i dont forget who i am.
@@ -18,8 +16,17 @@ type (
 	infixParseFn  func(ast.Expression) ast.Expression
 )
 
-// Parser : structure who's methods implement a operator
-// precedence parser.
+// Parser : structure who's methods implement a top-down
+// operator precedence parser.
+// (Based roughly on pratt parsing model: https://goo.gl/uoH6Ta)
+// expression prefix and infix parse functions are stored in a
+// table and mapped by particular tokens.
+// It should be initialised with a pointer to a lexical scanner.
+// Calling the method ParseProgram will return a fully formed AST.
+// For notes on the structure of the parser  most parse functions
+// are annotated with simple grammar notes. These are in the form
+// nodetype: one or more alternative rules of what ast structure
+// the function can return.
 type Parser struct {
 	scanner        *lexer.Scanner
 	errors         []*ParseError
@@ -34,20 +41,19 @@ type Parser struct {
 	infixParseFns  map[token.Token]infixParseFn
 }
 
-// New : Initalise a new parser.
+// New : Initalise a new parser with an newly initialsed Scanner.
 func New(s *lexer.Scanner) *Parser {
 	p := &Parser{
 		scanner: s,
 		errors:  []*ParseError{},
 	}
-	// Define a table of methods for parsing expressions
-	// given a token.
+	// Define a table of methods for parsing expressions given a token.
 	p.prefixParseFns = map[token.Token]prefixParseFn{
 		// prefix / unary expressions
 		token.SUB: p.prefixExpression,
 		token.ADD: p.prefixExpression,
 		token.NOT: p.prefixExpression,
-		//
+		// function.
 		token.FUNC: p.lambdaFunction,
 		// Token Literals.
 		token.IDVAL:    p.identifier,
@@ -87,7 +93,8 @@ func New(s *lexer.Scanner) *Parser {
 	return p
 }
 
-// Refresh :
+// Refresh : reset all values to defualt
+// for parsing a fresh input stream.
 func (p *Parser) Refresh(s *lexer.Scanner) {
 	p.scanner = s
 	p.errors = []*ParseError{}
@@ -95,6 +102,7 @@ func (p *Parser) Refresh(s *lexer.Scanner) {
 	p.nextToken()
 }
 
+// is the next token what we want if not create an error.
 func (p *Parser) expectPeek(t token.Token) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()
@@ -132,10 +140,8 @@ func (p *Parser) stmtEnd() bool {
 
 // ParseProgram creates ast of the inputed text incrementally
 // working with the scanner.
-// 		Program:
-// 			list of statements seperated by stmtend tokens.
-// 		stmtend:
-// 			newline | semicolon | EOF
+// Program: list of statements
+// stmtend: newline | semicolon | EOF
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
@@ -153,19 +159,17 @@ func (p *Parser) ParseProgram() *ast.Program {
 }
 
 /*
-######## Statements.
-Statements pretty much make up the structure of a program.
-They can be defiend as any of the following.
-
-Statement:
-	assignmentStatement
-	indexAssignmentStatement
-	expressionStatement
-	functionStatement
-	returnStatement
-	forStatement
-	importStatement
+#### Statements.
 */
+
+// statement:
+// 	   assignmentStatement
+// 	   indexAssignmentStatement
+// 	   expressionStatement
+// 	   functionStatement
+// 	   returnStatement
+// 	   forStatement
+// 	   importStatement
 func (p *Parser) statement() ast.Statement {
 	switch p.currentToken {
 	case token.IDVAL:
@@ -199,7 +203,7 @@ func (p *Parser) statement() ast.Statement {
 }
 
 // returnStatement:
-//		'return' expression
+//	   'return' expression
 func (p *Parser) returnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.currentToken}
 	p.nextToken()
@@ -208,7 +212,7 @@ func (p *Parser) returnStatement() *ast.ReturnStatement {
 }
 
 // assignmentStatement:
-//		identifier assignmentOperator expression
+//	   identifier assignmentOperator expression
 func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 	stmt := &ast.AssignmentStatement{}
 	stmt.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
@@ -220,7 +224,7 @@ func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 }
 
 // indexAssignmentStatement:
-//		identifier '[' expression ']' assignmentOperator expression
+//	   identifier '[' expression ']' assignmentOperator expression
 func (p *Parser) indexAssignmentStatement(idxExp *ast.IndexExpression) *ast.IndexAssignmentStatement {
 	stmt := &ast.IndexAssignmentStatement{Token: token.LBRACE, IdxExp: idxExp}
 	p.nextToken()
@@ -230,7 +234,7 @@ func (p *Parser) indexAssignmentStatement(idxExp *ast.IndexExpression) *ast.Inde
 }
 
 // expressionStatement:
-// 		expression
+// 	   expression
 func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.currentToken}
 	stmt.Expression = p.expression(token.LOWEST)
@@ -238,8 +242,8 @@ func (p *Parser) expressionStatement() *ast.ExpressionStatement {
 }
 
 // ifElseStatement:
-// 		'if' expression '{' blockStatement '}'
-// 		'if' expression '{' blockStatement '}' 'else' '{' blockStatement '}'
+// 	   'if' expression '{' blockStatement '}'
+// 	   'if' expression '{' blockStatement '}' 'else' '{' blockStatement '}'
 func (p *Parser) ifElseStatement() *ast.IfStatement {
 	expression := &ast.IfStatement{Token: p.currentToken}
 	p.nextToken()
@@ -259,7 +263,7 @@ func (p *Parser) ifElseStatement() *ast.IfStatement {
 }
 
 // functionStatement
-// 		'func' identifier '(' functionParameters ')' '{' blockStatement '}'
+// 	   'func' identifier '(' functionParameters ')' '{' blockStatement '}'
 func (p *Parser) functionStatement() *ast.Function {
 	fn := &ast.Function{Token: p.currentToken}
 	if !p.expectPeek(token.IDVAL) {
@@ -278,8 +282,8 @@ func (p *Parser) functionStatement() *ast.Function {
 }
 
 // forStatement:
-// 		'for' identifier 'in' identifier '{' blockStatement '}'
-// 		'for' expression '{' blockStatement '}'
+//     'for' identifier 'in' identifier '{' blockStatement '}'
+// 	   'for' expression '{' blockStatement '}'
 func (p *Parser) forStatement() *ast.ForStatement {
 	stmt := &ast.ForStatement{Token: p.currentToken}
 	p.nextToken()
@@ -300,8 +304,8 @@ func (p *Parser) forStatement() *ast.ForStatement {
 }
 
 // blockStatement:
-// 		statement stmtend blockstatement
-// 		statement stmtend
+//     statement stmtend blockstatement
+// 	   statement stmtend
 func (p *Parser) blockStatement() *ast.BlockStatement {
 	if p.peekTokenIs(token.NEWLINE) {
 		p.nextToken()
@@ -323,7 +327,7 @@ func (p *Parser) blockStatement() *ast.BlockStatement {
 }
 
 // importStatement
-//		'import' identifier
+//     'import' identifier
 func (p *Parser) importStatement() *ast.ImportStatement {
 	is := &ast.ImportStatement{Token: p.currentToken}
 	if !p.expectPeek(token.IDVAL) {
@@ -334,19 +338,19 @@ func (p *Parser) importStatement() *ast.ImportStatement {
 }
 
 /*
-	Expressions.
+#### Expressions.
 */
 
 // expression:
-// 		lambdaFunction
-// 		callExpression
-// 		ifElseExpression
-// 		prefixExpression
-//		infixExpression
-// 		groupedExpression
-//		indexExpression
-//		identifier
-// 		atom
+//     lambdaFunction
+// 	   callExpression
+// 	   ifElseExpression
+// 	   prefixExpression
+// 	   infixExpression
+// 	   groupedExpression
+// 	   indexExpression
+// 	   identifier
+// 	   atom
 func (p *Parser) expression(precedence uint) ast.Expression {
 	prefix := p.prefixParseFns[p.currentToken]
 	// we want to be able to do multiline expr inside parenthesis.
@@ -370,7 +374,7 @@ func (p *Parser) expression(precedence uint) ast.Expression {
 }
 
 // lambdaFunction:
-// 		'func' '(' functionParameters ')' '->' expression
+// 	   'func' '(' functionParameters ')' '->' expression
 func (p *Parser) lambdaFunction() ast.Expression {
 	lambda := &ast.LambdaFunction{Token: p.currentToken}
 	if !p.expectPeek(token.LPAREN) {
@@ -386,8 +390,8 @@ func (p *Parser) lambdaFunction() ast.Expression {
 }
 
 // functionParameters:
-// 		identifer ',' functionParameters
-// 		identifier
+// 	   identifer ',' functionParameters
+// 	   identifier
 func (p *Parser) functionParameters() []*ast.Identifier {
 	identifiers := []*ast.Identifier{}
 	if p.peekTokenIs(token.RPAREN) {
@@ -410,7 +414,7 @@ func (p *Parser) functionParameters() []*ast.Identifier {
 }
 
 // callExpression:
-// 		identifier '(' expressionList ')'
+// 	   identifier '(' expressionList ')'
 func (p *Parser) callExpression(function ast.Expression) ast.Expression {
 	exp := &ast.CallExpression{Token: p.currentToken, Function: function}
 	exp.Arguments = p.expressionList(token.RPAREN)
@@ -418,8 +422,8 @@ func (p *Parser) callExpression(function ast.Expression) ast.Expression {
 }
 
 // expressionList
-// 		expression ',' expressionList
-// 		expression
+// 	   expression ',' expressionList
+// 	   expression
 func (p *Parser) expressionList(delimiter token.Token) []ast.Expression {
 	list := []ast.Expression{}
 	if p.peekTokenIs(delimiter) {
@@ -460,7 +464,7 @@ func (p *Parser) ifElseExpression(inital ast.Expression) ast.Expression {
 }
 
 // prefixExpression:
-// 		prefixOperator expression
+//     prefixOperator expression
 func (p *Parser) prefixExpression() ast.Expression {
 	expr := &ast.PrefixExpression{
 		Token:    p.currentToken,
@@ -472,7 +476,7 @@ func (p *Parser) prefixExpression() ast.Expression {
 }
 
 // infixExpression:
-// 		expression binaryOperator expression
+//     expression binaryOperator expression
 func (p *Parser) infixExpression(left ast.Expression) ast.Expression {
 	expr := &ast.InfixExpression{
 		Token:    p.currentToken,
@@ -486,7 +490,7 @@ func (p *Parser) infixExpression(left ast.Expression) ast.Expression {
 }
 
 // groupedExpression:
-// 		'(' expression ')'
+// 	   '(' expression ')'
 func (p *Parser) groupedExpression() ast.Expression {
 	p.nextToken()
 	p.openParen = true
@@ -502,7 +506,7 @@ func (p *Parser) groupedExpression() ast.Expression {
 }
 
 // indexExpression:
-// 		identifier '[' expression ']'
+// 	   identifier '[' expression ']'
 func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
 	id, ok := item.(*ast.Identifier)
 	if !ok {
@@ -519,11 +523,10 @@ func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
 }
 
 /*
-######## Atoms / Type Literals
+#### Atoms / Type Literals
 */
 
-// arrayLiteral:
-// '[' expressionList ']'
+// arrayLiteral: '[' expressionList ']'
 func (p *Parser) arrayLiteral() ast.Expression {
 	return &ast.ArrayLiteral{
 		Token:    p.currentToken,
@@ -531,6 +534,7 @@ func (p *Parser) arrayLiteral() ast.Expression {
 	}
 }
 
+// stringLiteral: "[^"]*"
 func (p *Parser) stringLiteral() ast.Expression {
 	return &ast.StringLiteral{
 		Token: p.currentToken,
@@ -538,9 +542,7 @@ func (p *Parser) stringLiteral() ast.Expression {
 	}
 }
 
-// identifier:
-// 		must start with a alphabetic char
-// 		this includes '_' rest can be alphanumeric.
+// identifier: [A-Za-z_][A-Za-z_0-9]*
 func (p *Parser) identifier() ast.Expression {
 	return &ast.Identifier{
 		Token: p.currentToken,
@@ -548,6 +550,7 @@ func (p *Parser) identifier() ast.Expression {
 	}
 }
 
+// integer: base10Int | hexInt
 func (p *Parser) integerLiteral() ast.Expression {
 	lit := &ast.IntegerLiteral{Token: p.currentToken, Literal: p.currentLiteral}
 	value, err := strconv.ParseInt(p.currentLiteral, 0, 64)
@@ -570,6 +573,7 @@ func (p *Parser) floatLiteral() ast.Expression {
 	return lit
 }
 
+// boolean: true | false
 func (p *Parser) booleanLiteral() ast.Expression {
 	return &ast.BooleanLiteral{
 		Token: p.currentToken,
