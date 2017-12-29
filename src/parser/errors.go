@@ -26,7 +26,7 @@ type ParseError struct {
 //     Parse Error: Expected next token is ';'. got '=' instead.
 //     Last traceback @ line 3, col 20:
 // 	       x := pasta * 2 / 3 =
-// 						      ^ your problem right there.
+//                            ^ your problem right there.
 
 func (pe *ParseError) String() string {
 	return fmt.Sprintf(
