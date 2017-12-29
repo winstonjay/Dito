@@ -1,7 +1,11 @@
 // Package parser implements Dito's Parser.
 package parser
 
-// TODO more package docs so i dont forget who i am.
+// TODO: ful bodied functions that are written on one line
+// cause a pare error when the last expression ends with a
+// semi-colon. This is kind of a bug decide what to do about this.
+
+// TODO: Run more tests to find any more problems.
 
 import (
 	"dito/src/ast"
