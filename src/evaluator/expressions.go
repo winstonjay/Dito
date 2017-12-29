@@ -49,7 +49,7 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 }
 
 // Infix expressions.
-func evalInfixEpression(node *ast.InfixExpression, env *object.Environment) object.Object {
+func evalInfixExpression(node *ast.InfixExpression, env *object.Environment) object.Object {
 	operator := node.Operator
 	left := Eval(node.Left, env)
 	if isError(left) {

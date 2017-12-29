@@ -4,29 +4,27 @@
 // parser will call till it reaches an token.EOF.
 package lexer
 
-// TODO more package docs so i dont forget who i am.
+// TODO: fix issues with column positions, tracebacks etc.
 
 import (
 	"dito/src/token"
 )
 
-// Scanner is Lexical scanner analises a given program string.
-// It must be created/initalised by using the 'New' function.
+// Scanner implements the methods needed to scan a program.
 type Scanner struct {
-	// Fixed state from new.
-	input   string
-	char    byte // current char under examination
-	pos     int  // current char in input
-	peekPos int  // current next position (index of peek char)
-	linePos int  // index of the start of the current line.
-	lineno  int  // current line under examination
-	column  int  // current column position.
-	newline bool
+	input   string // Fixed state from new.
+	char    byte   // current char under examination
+	pos     int    // current char in input
+	peekPos int    // current next position (index of peek char)
+	linePos int    // index of the start of the current line.
+	lineno  int    // current line under examination
+	column  int    // current column position.
+	newline bool   // if or not to collect newline tokens.
 }
 
-// Init return an intialised lexical scanner. values not
-// initalised are set to go's default type values. so 0 for
-// all integers.
+// Init return an intialised lexical scanner. Values not
+// initalised are set to go's default type values :
+// 0 for all integers, false for bool.
 func Init(input string) *Scanner {
 	input += " " // add a buffer space at the end.
 	s := &Scanner{input: input}
@@ -46,8 +44,11 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		s.advanceLine()
 		return token.NEWLINE, token.NEWLINE.String(), s.lineno - 1
 	}
-	// reset newline
+
+	// reset newline collection so we collect the first trailing
+	// newline the next time this function is called.
 	s.newline = true
+
 	// Make sure all comments and spaces are skipped.
 	s.skipWhitespace()
 	for s.char == '#' {
@@ -55,28 +56,30 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		s.skipWhitespace()
 	}
 	// Run through all the possible operators and delimeters that are
-	// included in dito's grammar.
+	// included in dito's grammar, if not default to check for
+	// identifers and numbers. If we still havent found anything
+	// set tok to token.ILLEGAL.
 	switch s.char {
-	case ':': // ':', ':='
-		tok = s.switch2(token.COLON, '=', token.NEWASSIGN)
-	case '=': // '=', '=='
+	case '=': // = ==
 		tok = s.switch2(token.REASSIGN, '=', token.EQUALS)
-	case '*': // '*', '**'
+	case '*': // * **
 		tok = s.switch3(token.MUL, '*', token.POW, '=', token.MULEQUAL)
-	case '!': // '!', '!='
+	case '!': // ! !=
 		tok = s.switch2(token.NOT, '=', token.NEQUALS)
-	case '>': // '>', '>=', '>>'
+	case '>': // > >= >>
 		tok = s.switch3(token.GTHAN, '=', token.LEQUALS, '>', token.SHIFTR)
-	case '<': // '<', '<=', '<<'
+	case '<': // < <= <<
 		tok = s.switch3(token.LTHAN, '=', token.LEQUALS, '<', token.SHIFTL)
-	case '/': // '/', '//' implement int division.
+	case '/': // / //
 		tok = s.switch3(token.DIV, '=', token.DIVEQUAL, '/', token.IDIV)
-	case '-': // '-', '+=', ->'
+	case '-': // - -= ->
 		tok = s.switch3(token.SUB, '=', token.SUBEQUAL, '>', token.RARROW)
-	case '+': // +, +=
+	case '+': // + +=
 		tok = s.switch2(token.ADD, '=', token.ADDEQUAL)
-	case '%': // %, %=
+	case '%': // % %=
 		tok = s.switch2(token.MOD, '=', token.MODEQUAL)
+	case ':': // : :=
+		tok = s.switch2(token.COLON, '=', token.NEWASSIGN)
 	case '(':
 		tok = token.LPAREN
 	case ')':
@@ -93,14 +96,17 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		tok = token.LBRACKET
 	case ']':
 		tok = token.RBRACKET
+	case '"':
+		return s.readString()
 	case '.':
 		if isDigit(s.peek()) {
 			return s.readNumber()
 		}
 		tok = token.ILLEGAL
-	case '"':
-		return s.readString()
 	case 0:
+		// token.EOF represents end of input.
+		// the scanners caller should check for
+		// this to find out when to stop iterating.
 		tok = token.EOF
 	default:
 		if isDigit(s.char) {
@@ -119,18 +125,18 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 
 // switch 2 checks between 2 possible alternatives give a current token and a
 // the peek token returning the correct combination of chars.
-func (s *Scanner) switch2(current token.Token, expected byte, alt token.Token) token.Token {
+func (s *Scanner) switch2(curr token.Token, expected byte, alt token.Token) token.Token {
 	if s.peek() == expected {
 		s.advance()
 		return alt
 	}
-	return current
+	return curr
 }
 
 // switch 3 checks between 3 possible alternatives give a
 // current token and a the peek token.
 func (s *Scanner) switch3(
-	current token.Token,
+	curr token.Token,
 	expected1 byte, alt1 token.Token,
 	expected2 byte, alt2 token.Token,
 ) token.Token {
@@ -142,17 +148,18 @@ func (s *Scanner) switch3(
 		s.advance()
 		return alt2
 	default:
-		return current
+		return curr
 	}
 }
 
+// readString reads until it sees a double quote of EOF 0.
+// Strings can only be created with double quotes. They can
+// be multi-line but this should probally be treated as an
+// error in the future.
 func (s *Scanner) readString() (token.Token, string, int) {
 	start := s.pos + 1
-	for {
+	for s.char != '"' && s.char != 0 {
 		s.advance()
-		if s.char == '"' || s.char == 0 {
-			break
-		}
 	}
 	literal := s.input[start:s.pos]
 	s.advance()
@@ -173,16 +180,16 @@ func (s *Scanner) readIdentifer() (token.Token, string, int) {
 
 // readNumber returns either an integer or a float type token
 // with support for hex, e notation, and decimal.
+// All hex digits are integers and all exponated digits are floats.
 func (s *Scanner) readNumber() (token.Token, string, int) {
 	start := s.pos
 	// loop though digits until we read the end of 0-9.
 	for isDigit(s.char) {
 		s.advance()
 	}
-	// Once we have the significand we can find out what kind of number
-	// we want to return. If we have only scaned one digit and its a 0
-	// and our next byte is a `x` we have a hexidcimal.
+	// Once we have the significand, now find the numbers type.
 	switch {
+	// all hexadecimals start strictly with a 0x or a 0X.
 	case (s.char == 'x' || s.char == 'X') && s.input[start:s.pos] == "0":
 		goto Hexadecimal
 	case s.char == '.':
@@ -194,7 +201,7 @@ func (s *Scanner) readNumber() (token.Token, string, int) {
 	}
 
 Hexadecimal:
-	// 0xffaf, 0X0032f, etc.
+	// 0xffaf, 0X0032f, ...
 	s.advance()
 	for isHex(s.char) {
 		s.advance()
@@ -202,7 +209,7 @@ Hexadecimal:
 	return token.INT, s.input[start:s.pos], s.lineno
 
 Mantissa:
-	// 0.321, 312.123 etc.
+	// 0.321, 312.123, ...
 	s.advance()
 	for isDigit(s.char) {
 		s.advance()
@@ -213,7 +220,7 @@ Mantissa:
 	return token.FLOAT, s.input[start:s.pos], s.lineno
 
 Exponent:
-	// 10e2, 8E-2, etc.
+	// 10e2, 8E-2, 8.23e10, ...
 	s.advance()
 	if s.char == '+' || s.char == '-' {
 		s.advance()

@@ -35,10 +35,12 @@ func hello(x_ray: int, yankee: str, zebra: float)
 
 sqrt(25) + sqrt2(25)
 
+def Point: # {
+    x: int,
+    y: int
+    hypot: func() -> sqrt(x**2 + y**2)
+# }
 
-class Point(x, y) {
-    'x' := x
-    'y' := x
-public:
-    hypot := func() -> (('x**2 + 'y**2)**0.5)
-}
+p = Point(x: 100, y: 100)
+
+p.hypot()

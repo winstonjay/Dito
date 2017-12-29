@@ -132,10 +132,10 @@ func (p *Parser) stmtEnd() bool {
 
 // ParseProgram creates ast of the inputed text incrementally
 // working with the scanner.
-// Program:
-// 		list of statements seperated by stmtend tokens.
-// stmtend:
-// 		newline | semicolon | EOF
+// 		Program:
+// 			list of statements seperated by stmtend tokens.
+// 		stmtend:
+// 			newline | semicolon | EOF
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
