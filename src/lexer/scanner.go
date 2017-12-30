@@ -8,7 +8,6 @@ package lexer
 
 import (
 	"dito/src/token"
-	"fmt"
 )
 
 // Scanner implements the methods needed to scan a program.
@@ -165,7 +164,6 @@ func (s *Scanner) readString() (token.Token, string, int) {
 			break
 		}
 	}
-	fmt.Println(start, s.pos, s.input)
 	literal := s.input[start:s.pos]
 	s.advance()
 	return token.STRING, literal, s.lineno
