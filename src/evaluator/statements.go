@@ -108,39 +108,37 @@ func evalForStatement(fs *ast.ForStatement, env *object.Environment) object.Obje
 	iterCount := 0
 	var body, condition object.Object
 	if fs.ID == nil {
-		goto whileStmt
-	}
-	goto forInStmt
-
-whileStmt:
-	for {
-		condition = Eval(fs.Condition, env)
-		if !isTrue(condition) {
-			break
-		}
-		if isError(condition) {
-			return condition
-		}
-		if iterCount > 10000 {
-			return newError("Max iteration limit reached.")
-		}
-		iterCount++
-		body = Eval(fs.LoopBody, env)
-		if body != nil {
-			if body.Type() == object.ReturnObj {
-				return body
+		for {
+			condition = Eval(fs.Condition, env)
+			if !isTrue(condition) {
+				break
+			}
+			if isError(condition) {
+				return condition
+			}
+			if iterCount > 10000 {
+				return newError("Max iteration limit reached.")
+			}
+			iterCount++
+			body = Eval(fs.LoopBody, env)
+			if body != nil {
+				rt := body.Type()
+				if rt == object.ErrorObj || rt == object.ReturnObj {
+					return body
+				}
 			}
 		}
+		return body
 	}
-	return body
-forInStmt:
+
 	iter := Eval(fs.Iter, env).(*object.Array)
 	for _, item := range iter.Elements {
 		env.Set(fs.ID.Value, item)
 		body = Eval(fs.LoopBody, env)
 		if body != nil {
 			// the surrounding if is duplicated in isError fn.
-			if body.Type() == object.ReturnObj || isError(body) {
+			rt := body.Type()
+			if rt == object.ErrorObj || rt == object.ReturnObj {
 				return body
 			}
 		}

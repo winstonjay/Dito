@@ -1,0 +1,21 @@
+
+testStr = "a + 100"
+
+EOF = 0
+NUM = 1
+ID  = 2
+ADD = 3
+
+tokens = ["EOF", "NUM", "ID", "ADD"]
+
+
+func Scan(text) {
+    size = len(text)
+    pos  = 0
+    for pos < size {
+        char = testStr[pos]
+        pos += 1
+    }
+}
+
+Scan(testStr)

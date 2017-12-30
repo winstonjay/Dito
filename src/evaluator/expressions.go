@@ -75,6 +75,8 @@ func evalInfixExpression(node *ast.InfixExpression, env *object.Environment) obj
 		return object.NewDitoBoolean(left == right)
 	case operator == "!=":
 		return object.NewDitoBoolean(left != right)
+	case operator == "or":
+		return object.NewDitoBoolean(left == object.TRUE || right == object.TRUE)
 	default:
 		return newError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
@@ -246,19 +248,36 @@ func evalIndexExpression(node *ast.IndexExpression, env *object.Environment) obj
 	if isError(index) {
 		return left
 	}
-	if left.Type() != object.ArrayObj || index.Type() != object.IntergerObj {
+
+	if index.Type() != object.IntergerObj {
 		return newError("Index operator not supported: %s[%s].", left.Type(), index.Type())
 	}
-	arrayObject := left.(*object.Array)
+	if left.Type() != object.ArrayObj && left.Type() != object.StringObj {
+		return newError("Index operator not supported: %s[%s].", left.Type(), index.Type())
+	}
+
 	idx := index.(*object.Integer).Value
-	size := arrayObject.Len - 1
+
+	if left.Type() == object.ArrayObj {
+		arrayObject := left.(*object.Array)
+		size := arrayObject.Len - 1
+		if idx < 0 {
+			idx += (size + 1)
+		}
+		if idx < 0 || idx > size {
+			return newError("Index out of range: len=%d, index=%d.", size, idx)
+		}
+		return arrayObject.Elements[idx]
+	}
+	strObject := left.(*object.DitoString).Value
+	size := int64(len(strObject) - 1)
 	if idx < 0 {
 		idx += (size + 1)
 	}
 	if idx < 0 || idx > size {
 		return newError("Index out of range: len=%d, index=%d.", size, idx)
 	}
-	return arrayObject.Elements[idx]
+	return &object.DitoString{Value: string(strObject[idx])}
 }
 
 // x := iota(10)
