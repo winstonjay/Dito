@@ -98,10 +98,10 @@ var tokensLiterals = [...]string{
 	NEWLINE: "newline",
 
 	IDVAL:  "ID",
-	INT:    "int",
-	FLOAT:  "float",
-	STRING: "string",
-	BOOL:   "bool",
+	INT:    "Int",
+	FLOAT:  "Float",
+	STRING: "String",
+	BOOL:   "Bool",
 
 	SUB:  "-",
 	ADD:  "+",

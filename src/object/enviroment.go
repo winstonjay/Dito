@@ -19,6 +19,7 @@ func NewEnclosedEnviroment(outer *Environment) *Environment {
 	return env
 }
 
+// Get : get a varible inside the current scope
 func (e *Environment) Get(name string) (Object, bool) {
 	obj, ok := e.store[name]
 	if !ok && e.outer != nil {
@@ -27,8 +28,7 @@ func (e *Environment) Get(name string) (Object, bool) {
 	return obj, ok
 }
 
-// need to make another set method that enables users to set a
-// varible outside of their inital scope.
+// Set : set a varible inside the current scope.
 func (e *Environment) Set(name string, val Object) Object {
 	e.store[name] = val
 	return val
