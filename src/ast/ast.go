@@ -192,10 +192,10 @@ func (is *ImportStatement) String() string {
 ######## Function Types
 */
 
-// Function : single expression function.
+// Function : multi statement function.
 // func name(args) {
 //     body
-//}
+// }
 type Function struct {
 	Token      token.Token // token.FUNC
 	Parameters []*Identifier
