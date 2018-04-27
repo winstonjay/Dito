@@ -2,7 +2,6 @@ package parser
 
 import (
 	"dito/src/ast"
-	"dito/src/lexer"
 	"fmt"
 	"testing"
 )
@@ -36,7 +35,7 @@ func TestAssignmentStatement(t *testing.T) {
 
 	for i, tt := range tests {
 
-		scanner := lexer.Init(tt.input)
+		scanner := scanner.Init(tt.input)
 		parser := New(scanner)
 		program := parser.ParseProgram()
 		checkParserErrors(t, parser)
@@ -74,7 +73,7 @@ func TestExpressionStatement(t *testing.T) {
 
 	for i, tt := range tests {
 
-		scanner := lexer.Init(tt.input)
+		scanner := scanner.Init(tt.input)
 		parser := New(scanner)
 		program := parser.ParseProgram()
 		checkParserErrors(t, parser)
@@ -102,7 +101,7 @@ func TestInfixExpression(t *testing.T) {
 		{"+5", "+", 5},
 	}
 	for i, tt := range tests {
-		scanner := lexer.Init(tt.input)
+		scanner := scanner.Init(tt.input)
 		parser := New(scanner)
 		program := parser.ParseProgram()
 		checkParserErrors(t, parser)
@@ -159,7 +158,7 @@ func TestInfixExpressions(t *testing.T) {
 	}
 
 	for _, tt := range infixTests {
-		l := lexer.Init(tt.input)
+		l := scanner.Init(tt.input)
 		p := New(l)
 		program := p.ParseProgram()
 		checkParserErrors(t, p)

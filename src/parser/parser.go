@@ -9,7 +9,6 @@ package parser
 
 import (
 	"dito/src/ast"
-	"dito/src/lexer"
 	"dito/src/token"
 	"fmt"
 	"strconv"
@@ -32,7 +31,7 @@ type (
 // nodetype: one or more alternative rules of what ast structure
 // the function can return.
 type Parser struct {
-	scanner        *lexer.Scanner
+	scanner        *scanner.Scanner
 	errors         []*ParseError
 	currentToken   token.Token
 	currentLiteral string
@@ -46,7 +45,7 @@ type Parser struct {
 }
 
 // New : Initalise a new parser with an newly initialsed Scanner.
-func New(s *lexer.Scanner) *Parser {
+func New(s *scanner.Scanner) *Parser {
 	p := &Parser{
 		scanner: s,
 		errors:  []*ParseError{},
@@ -99,7 +98,7 @@ func New(s *lexer.Scanner) *Parser {
 
 // Refresh : reset all values to defualt
 // for parsing a fresh input stream.
-func (p *Parser) Refresh(s *lexer.Scanner) {
+func (p *Parser) Refresh(s *scanner.Scanner) {
 	p.scanner = s
 	p.errors = []*ParseError{}
 	p.nextToken()

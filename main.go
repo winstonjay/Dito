@@ -4,7 +4,6 @@ package main
 
 import (
 	"dito/src/evaluator"
-	"dito/src/lexer"
 	"dito/src/object"
 	"dito/src/parser"
 	"dito/src/repl"
@@ -33,7 +32,7 @@ func main() {
 
 func execFile(file string, out io.Writer) {
 	env := object.NewEnvironment()
-	l := lexer.Init(file)
+	l := scanner.Init(file)
 	p := parser.New(l)
 	program := p.ParseProgram()
 	if len(p.Errors()) != 0 {

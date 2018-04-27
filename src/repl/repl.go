@@ -3,7 +3,6 @@ package repl
 import (
 	"bufio"
 	"dito/src/evaluator"
-	"dito/src/lexer"
 	"dito/src/object"
 	"dito/src/parser"
 	"dito/src/token"
@@ -32,7 +31,7 @@ func Start(in io.Reader, out io.Writer) {
 		if line == QUIT {
 			return
 		}
-		l := lexer.Init(line + "\n")
+		l := scanner.Init(line + "\n")
 		p := parser.New(l)
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
@@ -48,7 +47,7 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 // For running inspections of the lexical scanner.
-func printTokens(l *lexer.Scanner) {
+func printTokens(l *scanner.Scanner) {
 	toke, literal, _ := l.NextToken()
 	for toke != token.EOF {
 		fmt.Printf("Token(type='%s', literal='%s')\n", toke.String(), literal)

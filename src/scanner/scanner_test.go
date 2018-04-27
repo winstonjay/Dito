@@ -1,4 +1,4 @@
-package lexer
+package scanner
 
 import (
 	"dito/src/token"

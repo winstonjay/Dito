@@ -1,8 +1,8 @@
-// Package lexer implements Dito's Lexical Scanner.
+// Package scanner implements Dito's Lexical Scanner.
 // Scanner scans file for tokens and passes them to parser.
 // This is implemented by the NextToken function, which the
 // parser will call till it reaches an token.EOF.
-package lexer
+package scanner
 
 // TODO: fix issues with column positions, tracebacks etc.
 

@@ -15,7 +15,7 @@ const (
 	IDVAL  // Alphanumeric idenifiers (varible names).
 	INT    // Generic Integers.
 	FLOAT  // Generic Floats.
-	STRING // Strings starting and ending with ".
+	STRING // Strings starting and ending with double quotes.
 	BOOL   // Generic bool
 	endLiteral
 
