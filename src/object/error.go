@@ -20,5 +20,11 @@ func NewError(format string, a ...interface{}) *Error {
 
 // ConvertType : return the conversion into the specified type
 func (e *Error) ConvertType(which TypeFlag) Object {
-	return NewError("Argument to %s not supported, got %s", e.Type(), which)
+	return NewError(ConvertTypeError, e.Type(), which)
 }
+
+// some predefiend errors for consistency.
+const (
+	InvalidArgLenError = "Wrong number of args to function %s. Want=%s. Got=%d."
+	ConvertTypeError   = "Cannot convet type '%s' to type '%s'"
+)

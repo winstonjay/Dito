@@ -9,6 +9,7 @@ package parser
 
 import (
 	"dito/src/ast"
+	"dito/src/scanner"
 	"dito/src/token"
 	"fmt"
 	"strconv"

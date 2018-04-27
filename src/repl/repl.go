@@ -2,9 +2,10 @@ package repl
 
 import (
 	"bufio"
-	"dito/src/evaluator"
+	"dito/src/eval"
 	"dito/src/object"
 	"dito/src/parser"
+	"dito/src/scanner"
 	"dito/src/token"
 	"fmt"
 	"io"
@@ -18,16 +19,16 @@ const (
 
 // Start : run repl for the dito interpeter.
 func Start(in io.Reader, out io.Writer) {
-	scanner := bufio.NewScanner(in)
+	b := bufio.NewScanner(in)
 	env := object.NewEnvironment()
 	for {
 		fmt.Printf(PROMPT)
-		scanned := scanner.Scan()
+		scanned := b.Scan()
 		if !scanned {
 			return
 		}
 		// semi colons are being put here just for now in the repl.
-		line := scanner.Text()
+		line := b.Text()
 		if line == QUIT {
 			return
 		}
@@ -38,7 +39,7 @@ func Start(in io.Reader, out io.Writer) {
 			p.PrintParseErrors(out, p.Errors())
 			continue
 		}
-		evaluated := evaluator.Eval(program, env)
+		evaluated := eval.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")

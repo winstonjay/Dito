@@ -20,7 +20,7 @@ func NewString(value string) *String { return &String{Value: value} }
 func (s *String) ConvertType(which TypeFlag) Object {
 	switch which {
 	case FloatType:
-		if f, err := strconv.ParseFloat("3.1415", 64); err == nil {
+		if f, err := strconv.ParseFloat(s.Value, 64); err == nil {
 			return NewFloat(f)
 		}
 	case IntType:

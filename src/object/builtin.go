@@ -22,3 +22,8 @@ func (b *Builtin) Inspect() string { return "<builtin function>" }
 func NewBuiltin(fn BuiltinFunction, argsMax, argsMin int, argType []string) *Builtin {
 	return &Builtin{Fn: fn, ArgsMax: argsMax, ArgsMin: argsMin, ArgType: argType}
 }
+
+// ConvertType : return the conversion into the specified type
+func (b *Builtin) ConvertType(which TypeFlag) Object {
+	return NewError(ConvertTypeError, b.Type(), which)
+}

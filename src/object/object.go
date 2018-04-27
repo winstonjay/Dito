@@ -61,3 +61,8 @@ func (rv *ReturnValue) Type() TypeFlag { return ReturnType }
 
 // Inspect : return a string representation of the objects value.
 func (rv *ReturnValue) Inspect() string { return rv.Value.Inspect() }
+
+// ConvertType : return the conversion into the specified type
+func (rv *ReturnValue) ConvertType(which TypeFlag) Object {
+	return NewError("Argument to %s not supported, got %s", rv.Type(), which)
+}

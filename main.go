@@ -3,10 +3,11 @@
 package main
 
 import (
-	"dito/src/evaluator"
+	"dito/src/eval"
 	"dito/src/object"
 	"dito/src/parser"
 	"dito/src/repl"
+	"dito/src/scanner"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -39,7 +40,7 @@ func execFile(file string, out io.Writer) {
 		p.PrintParseErrors(out, p.Errors())
 		return
 	}
-	evaluated := evaluator.Eval(program, env)
+	evaluated := eval.Eval(program, env)
 	if evaluated != nil {
 		io.WriteString(out, evaluated.Inspect())
 		io.WriteString(out, "\n")
