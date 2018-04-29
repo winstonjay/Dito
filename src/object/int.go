@@ -6,7 +6,7 @@ import (
 
 // Int : builtin integer type.
 // -9223372036854775807 and 9223372036854775807
-type Int struct{ Value int64 }
+type Int struct{ Value int }
 
 // Type : return objects type as a TypeFlag
 func (i *Int) Type() TypeFlag { return IntType }
@@ -15,7 +15,7 @@ func (i *Int) Type() TypeFlag { return IntType }
 func (i *Int) Inspect() string { return fmt.Sprintf("%d", i.Value) }
 
 // NewInt : return new initialised instance of the object.
-func NewInt(value int64) *Int { return &Int{Value: value} }
+func NewInt(value int) *Int { return &Int{Value: value} }
 
 // ConvertType : return the conversion into the specified type
 func (i *Int) ConvertType(which TypeFlag) Object {

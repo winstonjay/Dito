@@ -15,6 +15,21 @@ type Object interface {
 	ConvertType(which TypeFlag) Object
 }
 
+// Iterable : the requirements needed for a Object to be an Iterable.
+// eg: Array's, String's.
+type Iterable interface {
+	Object
+	// Length : return the number of items in the iterable
+	Length() Object
+	// IterItems : return a iterable channel to loop through the items in
+	// order.
+	// IterItems() <-chan Object
+	// // GetItem : get item at location of the provided key.
+	GetItem(Object) Object
+	// // SetItem : set item at location of the provided key.
+	SetItem(Object, Object) Object
+}
+
 // TypeFlag : type flag for what type of Dito object it is.
 type TypeFlag int
 
@@ -25,6 +40,7 @@ const (
 	FloatType
 	BoolType
 	StringType
+	CharType
 	NoneType
 	ErrorType
 	ReturnType
@@ -38,7 +54,7 @@ const (
 func (t TypeFlag) String() string { return typeName[t] }
 
 var typeName = [...]string{
-	"Int", "Float", "Bool", "String", "None", "Return", "Lambda", "Builtin",
+	"Int", "Float", "Bool", "String", "Char", "None", "Return", "Lambda", "Builtin",
 }
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

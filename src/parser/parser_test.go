@@ -2,6 +2,7 @@ package parser
 
 import (
 	"dito/src/ast"
+	"dito/src/scanner"
 	"fmt"
 	"testing"
 )
@@ -214,7 +215,7 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{
 	case string:
 		return testIdentifier(t, exp, string(v))
 	case int:
-		return testIntegerLiteral(t, exp, int64(v))
+		return testIntegerLiteral(t, exp, v)
 	case float64:
 		return testFloatLiteral(t, exp, float64(v))
 	case bool:
@@ -237,7 +238,7 @@ func testIdentifier(t *testing.T, idv ast.Expression, value string) bool {
 	return true
 }
 
-func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
+func testIntegerLiteral(t *testing.T, il ast.Expression, value int) bool {
 	integ, ok := il.(*ast.IntegerLiteral)
 	if !ok {
 		t.Errorf("il not *ast.IntegerLiteral. got=%T", il)

@@ -11,7 +11,6 @@ import (
 	"dito/src/ast"
 	"dito/src/scanner"
 	"dito/src/token"
-	"fmt"
 	"strconv"
 )
 
@@ -512,12 +511,7 @@ func (p *Parser) groupedExpression() ast.Expression {
 // indexExpression:
 //     identifier '[' expression ']'
 func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
-	id, ok := item.(*ast.Identifier)
-	if !ok {
-		fmt.Printf("ERROR ASSERTION")
-		return nil
-	}
-	exp := &ast.IndexExpression{Token: p.currentToken, Left: id}
+	exp := &ast.IndexExpression{Token: p.currentToken, Left: item}
 	p.nextToken()
 	exp.Index = p.expression(token.LOWEST)
 	if !p.expectPeek(token.RBRACKET) {
@@ -562,7 +556,7 @@ func (p *Parser) integerLiteral() ast.Expression {
 		p.genericError("integer", err)
 		return nil
 	}
-	lit.Value = value
+	lit.Value = int(value)
 	return lit
 }
 

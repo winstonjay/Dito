@@ -20,7 +20,7 @@ func (f *Float) ConvertType(which TypeFlag) Object {
 	case FloatType:
 		return f
 	case IntType:
-		return NewInt(int64(f.Value))
+		return NewInt(int(f.Value))
 	case StringType:
 		return NewString(f.Inspect())
 	case BoolType:

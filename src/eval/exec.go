@@ -12,8 +12,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalProgram(node.Statements, env)
 
 	// // Statements
-	// case *ast.AssignmentStatement:
-	// 	return evalAssignment(node, env)
+	case *ast.AssignmentStatement:
+		return evalAssignment(node, env)
 	// case *ast.IndexAssignmentStatement:
 	// 	return evalIndexAssignment(node, env)
 	// case *ast.ReturnStatement:
@@ -37,8 +37,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalInfixExpression(node, env)
 	case *ast.IfElseExpression:
 		return evalIfElseExpression(node, env)
-	// case *ast.IndexExpression:
-	// 	return evalIndexExpression(node, env)
+	case *ast.IndexExpression:
+		return evalIndexExpression(node, env)
 
 	// // Functions
 	// case *ast.Function:

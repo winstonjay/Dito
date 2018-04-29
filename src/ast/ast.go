@@ -249,7 +249,7 @@ func (ce *CallExpression) String() string {
 // IndexExpression is
 type IndexExpression struct {
 	Token token.Token // [
-	Left  *Identifier
+	Left  Expression
 	Index Expression
 }
 
@@ -370,7 +370,7 @@ func (sl *StringLiteral) String() string       { return sl.Value }
 type IntegerLiteral struct {
 	Token   token.Token // token.INT
 	Literal string      // int as a string repr
-	Value   int64       // int as a int64
+	Value   int         // int as a int64
 }
 
 func (il *IntegerLiteral) expressionNode()      {}
