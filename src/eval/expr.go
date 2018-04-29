@@ -235,30 +235,6 @@ func isNumericType(obj object.Object) bool {
 	return obj.Type() == object.FloatType || obj.Type() == object.IntType
 }
 
-// func evalIndexExpression(node *ast.IndexExpression, env *object.Environment) object.Object {
-// 	left := Eval(node.Left, env)
-// 	if isError(left) {
-// 		return left
-// 	}
-// 	index := Eval(node.Index, env)
-// 	if isError(index) {
-// 		return left
-// 	}
-// 	if left.Type() != object.ArrayObj || index.Type() != object.IntergerObj {
-// 		return object.NewError("Index operator not supported: %s[%s].", left.Type(), index.Type())
-// 	}
-// 	arrayObject := left.(*object.Array)
-// 	idx := index.(*object.Integer).Value
-// 	size := arrayObject.Len - 1
-// 	if idx < 0 {
-// 		idx += (size + 1)
-// 	}
-// 	if idx < 0 || idx > size {
-// 		return object.NewError("Index out of range: len=%d, index=%d.", size, idx)
-// 	}
-// 	return arrayObject.Elements[idx]
-// }
-
 func isTrue(obj object.Object) bool {
 	switch obj {
 	case object.NONE:

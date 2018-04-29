@@ -1,6 +1,9 @@
 package object
 
-import "strconv"
+import (
+	"math"
+	"strconv"
+)
 
 // Float : builtin float type basically go's float64
 type Float struct{ Value float64 }
@@ -28,4 +31,12 @@ func (f *Float) ConvertType(which TypeFlag) Object {
 	default:
 		return NewError("Argument to %s not supported, got %s", f.Type(), which)
 	}
+}
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Numeric interface:
+
+// Abs : return the absolute value of an number
+func (f *Float) Abs() Object {
+	return &Float{Value: math.Abs(f.Value)}
 }

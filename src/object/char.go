@@ -11,7 +11,7 @@ type Char struct{ Value byte }
 func (c *Char) Type() TypeFlag { return CharType }
 
 // Inspect : return a string representation of the objects value.
-func (c *Char) Inspect() string { return fmt.Sprintf("%c", c.Value) }
+func (c *Char) Inspect() string { return fmt.Sprintf("'%c'", c.Value) }
 
 // NewChar : return new initialised instance of the object.
 func NewChar(value byte) *Char { return &Char{Value: value} }
@@ -33,3 +33,9 @@ func (c *Char) ConvertType(which TypeFlag) Object {
 		return NewError("Argument to %s not supported, got %s", c.Type(), which)
 	}
 }
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Numeric interface:
+
+// Abs : return the absolute value of an number
+func (c *Char) Abs() *Char { return c }

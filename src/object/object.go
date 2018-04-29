@@ -24,10 +24,24 @@ type Iterable interface {
 	// IterItems : return a iterable channel to loop through the items in
 	// order.
 	// IterItems() <-chan Object
-	// // GetItem : get item at location of the provided key.
+	// GetItem : get item at location of the provided key.
 	GetItem(Object) Object
-	// // SetItem : set item at location of the provided key.
+	// SetItem : set item at location of the provided key.
 	SetItem(Object, Object) Object
+
+	// - Possible future candidates:
+
+	// Merge : merege/concatenate two items together.
+	// Merge(Object) Object
+	// Contains : is item in the iterable. would use 'in' operator.
+	// Contains(Object) Object
+}
+
+// Numeric : the requirements needed for a Object to be an Numeric.
+type Numeric interface {
+	Object
+	// Abs : return the absolute value of an number
+	Abs() Object
 }
 
 // TypeFlag : type flag for what type of Dito object it is.
@@ -41,20 +55,19 @@ const (
 	BoolType
 	StringType
 	CharType
+	ArrayType
 	NoneType
 	ErrorType
 	ReturnType
 	LambdaType
 	BultinType
-
-	// ArrayType  = "Array"
 	// FunctionType = "Function" // not implemented
 )
 
 func (t TypeFlag) String() string { return typeName[t] }
 
 var typeName = [...]string{
-	"Int", "Float", "Bool", "String", "Char", "None", "Return", "Lambda", "Builtin",
+	"Int", "Float", "Bool", "String", "Char", "Array", "None", "Return", "Lambda", "Builtin",
 }
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -14,7 +14,7 @@ type String struct {
 func (s *String) Type() TypeFlag { return StringType }
 
 // Inspect : return a string representation of the objects value.
-func (s *String) Inspect() string { return s.Value }
+func (s *String) Inspect() string { return fmt.Sprintf("\"%s\"", s.Value) }
 
 // NewString : return new initialised instance of the object.
 func NewString(value string) *String { return &String{Value: value} }
@@ -22,6 +22,8 @@ func NewString(value string) *String { return &String{Value: value} }
 // ConvertType : return the conversion into the specified type
 func (s *String) ConvertType(which TypeFlag) Object {
 	switch which {
+	case StringType:
+		return s
 	case FloatType:
 		if f, err := strconv.ParseFloat(s.Value, 64); err == nil {
 			return NewFloat(f)
@@ -30,21 +32,25 @@ func (s *String) ConvertType(which TypeFlag) Object {
 		if i, err := strconv.Atoi(s.Value); err == nil {
 			return NewInt(i)
 		}
-	case StringType:
-		return s
+	case ArrayType:
+		n := len(s.Value)
+		a := &Array{Elements: make([]Object, n), Len: n}
+		for i, s := range s.Value {
+			a.Elements[i] = &Char{Value: byte(s)}
+		}
+		return a
 	case BoolType:
 		return NewBool(s.Value != "")
 	}
 	return NewError("Argument to %s not supported, got %s", s.Type(), which)
 }
 
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 // Methods needed to satisfy the Iterable interface:
 
 // Length : return the number of items in the String. An item is an ascii char
 // like in C strings.
-func (s *String) Length() Object {
-	return &Int{Value: len(s.Value)}
-}
+func (s *String) Length() Object { return &Int{Value: len(s.Value)} }
 
 // GetItem : return the char at index
 func (s *String) GetItem(key Object) Object {

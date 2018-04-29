@@ -14,8 +14,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	// // Statements
 	case *ast.AssignmentStatement:
 		return evalAssignment(node, env)
-	// case *ast.IndexAssignmentStatement:
-	// 	return evalIndexAssignment(node, env)
+	case *ast.IndexAssignmentStatement:
+		return evalIndexAssignment(node, env)
 	// case *ast.ReturnStatement:
 	// 	return &object.ReturnValue{Value: Eval(node.Value, env)}
 	case *ast.ExpressionStatement:
@@ -59,8 +59,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return object.NewFloat(node.Value)
 	case *ast.BooleanLiteral:
 		return object.NewBool(node.Value)
-		// case *ast.ArrayLiteral:
-		// 	return evalArray(node, env)
+	case *ast.ArrayLiteral:
+		return evalArray(node, env)
 	}
 	return nil
 }
@@ -94,4 +94,9 @@ func isError(obj object.Object) bool {
 		return obj.Type() == object.ErrorType
 	}
 	return false
+}
+
+func evalArray(node *ast.ArrayLiteral, env *object.Environment) object.Object {
+	elements := evalExpressions(node.Elements, env)
+	return object.NewArray(elements, -1)
 }

@@ -32,3 +32,14 @@ func (i *Int) ConvertType(which TypeFlag) Object {
 		return NewError("Argument to %s not supported, got %s", i.Type(), which)
 	}
 }
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Numeric interface:
+
+// Abs : return the absolute value of an number
+func (i *Int) Abs() Object {
+	if i.Value >= 0 {
+		return i
+	}
+	return &Int{Value: -i.Value}
+}
