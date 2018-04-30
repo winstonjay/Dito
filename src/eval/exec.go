@@ -16,8 +16,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalAssignment(node, env)
 	case *ast.IndexAssignmentStatement:
 		return evalIndexAssignment(node, env)
-	// case *ast.ReturnStatement:
-	// 	return &object.ReturnValue{Value: Eval(node.Value, env)}
+	case *ast.ReturnStatement:
+		return &object.ReturnValue{Value: Eval(node.Value, env)}
 	case *ast.ExpressionStatement:
 		return Eval(node.Expression, env)
 	// case *ast.IfStatement:

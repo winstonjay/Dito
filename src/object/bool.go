@@ -22,6 +22,8 @@ func NewBool(input bool) *Bool {
 // ConvertType : return the conversion into the specified type
 func (b *Bool) ConvertType(which TypeFlag) Object {
 	switch which {
+	case BoolType:
+		return b
 	case IntType:
 		if b.Value {
 			return NewInt(1)

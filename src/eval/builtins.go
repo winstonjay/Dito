@@ -72,5 +72,5 @@ func objectPrint(args ...object.Object) object.Object {
 		}
 	}
 	io.WriteString(os.Stdout, "\n")
-	return nil
+	return object.NONE
 }

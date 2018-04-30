@@ -56,10 +56,10 @@ type TypeFlag int
 // Define the strings used availible to the user to describe objects. Values
 // here will be returned when an objects type method is called.
 const (
-	BoolType TypeFlag = iota
-	CharType
+	CharType TypeFlag = iota
 	IntType
 	FloatType
+	BoolType
 	StringType
 	ArrayType
 	NoneType
@@ -73,7 +73,7 @@ const (
 func (t TypeFlag) String() string { return typeName[t] }
 
 var typeName = [...]string{
-	"Bool", "Char", "Int", "Float", "String", "Array", "None", "Return", "Lambda", "Builtin",
+	"Char", "Int", "Float", "Bool", "String", "Array", "None", "None", "Return", "Lambda", "Builtin",
 }
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

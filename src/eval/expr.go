@@ -3,7 +3,6 @@ package eval
 import (
 	"dito/src/ast"
 	"dito/src/object"
-	"math"
 )
 
 func evalPrefixExpression(operator string, right object.Object) object.Object {
@@ -50,7 +49,10 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 
 // Infix expressions.
 func evalInfixExpression(node *ast.InfixExpression, env *object.Environment) object.Object {
-	operator := node.Operator
+	op := object.BinaryOps[node.Operator]
+	if op == nil {
+		return object.NewError("Unknown Binary operation: '%s'", node.Operator)
+	}
 	left := Eval(node.Left, env)
 	if isError(left) {
 		return left
@@ -59,154 +61,8 @@ func evalInfixExpression(node *ast.InfixExpression, env *object.Environment) obj
 	if isError(right) {
 		return right
 	}
-	switch {
-	case isNumericType(left) && isNumericType(right):
-		if left.Type() == object.IntType && right.Type() == object.IntType {
-			return evalIntegerInfixExpression(operator, left, right)
-		}
-		return evalFloatInfixExpression(operator, left, right)
-	case left.Type() != right.Type():
-		return object.NewError("Type mismatch: %s %s %s", left.Type(), operator, right.Type())
-	case left.Type() == object.StringType:
-		return evalStringExpression(operator, left, right)
-	case operator == "==":
-		return object.NewBool(left == right)
-	case operator == "!=":
-		return object.NewBool(left != right)
-	default:
-		return object.NewError("Unknown operator: %s %s %s", left.Type(), operator, right.Type())
-	}
+	return op.EvalBinary(env, left, right)
 }
-
-func evalIntegerInfixExpression(operator string, left, right object.Object) object.Object {
-	leftVal := left.(*object.Int).Value
-	rightVal := right.(*object.Int).Value
-	switch operator {
-	case "+":
-		return object.NewInt(leftVal + rightVal)
-	case "-":
-		return object.NewInt(leftVal - rightVal)
-	case "*":
-		return object.NewInt(leftVal * rightVal)
-	// case "**":
-	// 	return IntegerObjPow(leftVal, rightVal)
-	case "//":
-		if rightVal == 0 {
-			return object.NewError("Zero division error: %s %s %s",
-				left.Inspect(), operator, right.Inspect())
-		}
-		return object.NewInt(leftVal / rightVal)
-	case "/":
-		if rightVal == 0 {
-			return object.NewError("Zero division error: %s %s %s",
-				left.Inspect(), operator, right.Inspect())
-		}
-		if leftVal%rightVal == 0 {
-			return object.NewInt(leftVal / rightVal)
-		}
-		return object.NewFloat(float64(leftVal) / float64(rightVal))
-	case "%":
-		if rightVal == 0 {
-			return object.NewError("Zero division error: %s %s %s",
-				left.Inspect(), operator, right.Inspect())
-		}
-		return object.NewInt(leftVal % rightVal)
-	case "<<":
-		return object.NewInt(leftVal << uint(rightVal))
-	case ">>":
-		return object.NewInt(leftVal >> uint(rightVal))
-	case "==":
-		return object.NewBool(leftVal == rightVal)
-	case "!=":
-		return object.NewBool(leftVal != rightVal)
-	case "<":
-		return object.NewBool(leftVal < rightVal)
-	case "<=":
-		return object.NewBool(leftVal <= rightVal)
-	case ">":
-		return object.NewBool(leftVal > rightVal)
-	case ">=":
-		return object.NewBool(leftVal >= rightVal)
-	default:
-		return object.NewError("Unknown operator: %s %s %s",
-			left.Type(), operator, right.Type())
-	}
-}
-
-func evalFloatInfixExpression(operator string, left, right object.Object) object.Object {
-	var leftVal, rightVal float64
-	// Handle the type promotion if there is oone.
-	if left.Type() == object.FloatType {
-		leftVal = left.(*object.Float).Value
-	} else {
-		leftVal = float64(left.(*object.Int).Value)
-	}
-	if right.Type() == object.FloatType {
-		rightVal = right.(*object.Float).Value
-	} else {
-		rightVal = float64(right.(*object.Int).Value)
-	}
-	switch operator {
-	case "+":
-		return object.NewFloat(leftVal + rightVal)
-	case "-":
-		return object.NewFloat(leftVal - rightVal)
-	case "*":
-		return object.NewFloat(leftVal * rightVal)
-	case "**":
-		return object.NewFloat(math.Pow(leftVal, rightVal))
-	case "/":
-		if rightVal == 0 {
-			return object.NewError("Zero division error: %s %s %s",
-				left.Inspect(), operator, right.Inspect())
-		}
-		return object.NewFloat(leftVal / rightVal)
-	case "==":
-		return object.NewBool(leftVal == rightVal)
-	case "!=":
-		return object.NewBool(leftVal != rightVal)
-	case "<":
-		return object.NewBool(leftVal < rightVal)
-	case "<=":
-		return object.NewBool(leftVal <= rightVal)
-	case ">":
-		return object.NewBool(leftVal > rightVal)
-	case ">=":
-		return object.NewBool(leftVal >= rightVal)
-	default:
-		return object.NewError("Unknown operator: %s %s %s",
-			left.Type(), operator, right.Type())
-	}
-}
-
-func evalStringExpression(operator string, left, right object.Object) object.Object {
-	leftVal := left.(*object.String).Value
-	rightVal := right.(*object.String).Value
-	switch operator {
-	case "+":
-		return object.NewString(leftVal + rightVal)
-	case "==":
-		return object.NewBool(leftVal == rightVal)
-	case "!=":
-		return object.NewBool(leftVal != rightVal)
-	default:
-		return object.NewError("Unknown operator: %s %s %s",
-			left.Type(), operator, right.Type())
-	}
-}
-
-// func evalArrayExpression(operator string, left, right object.Object) object.Object {
-// 	leftVal := left.(*object.Array).Elements
-// 	rightVal := right.(*object.Array).Elements
-// 	switch operator {
-// 	case "+":
-// 		leftVal = append(leftVal, rightVal...)
-// 		return object.NewDitoArray(leftVal, int64(len(leftVal)))
-// 	default:
-// 		return object.NewError("Unknown operator: %s %s %s",
-// 			left.Type(), operator, right.Type())
-// 	}
-// }
 
 func evalIfElseExpression(node *ast.IfElseExpression, env *object.Environment) object.Object {
 	condition := Eval(node.Condition, env)
@@ -229,10 +85,6 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 		result = append(result, evaluated)
 	}
 	return result
-}
-
-func isNumericType(obj object.Object) bool {
-	return obj.Type() == object.FloatType || obj.Type() == object.IntType
 }
 
 func isTrue(obj object.Object) bool {
