@@ -1,9 +1,9 @@
 // Package parser implements Dito's Parser.
 package parser
 
-// TODO: ful bodied functions that are written on one line
-// cause a pare error when the last expression ends with a
-// semi-colon. This is kind of a bug decide what to do about this.
+// TODO: full bodied functions that are written on one line cause a parse error
+// when the last expression ends with a semi-colon. This is kind of a bug
+// decide what to do about this.
 
 // TODO: Run more tests to find any more problems.
 
@@ -19,17 +19,14 @@ type (
 	infixParseFn  func(ast.Expression) ast.Expression
 )
 
-// Parser : structure who's methods implement a top-down
-// operator precedence parser.
-// (Based roughly on pratt parsing model: https://goo.gl/uoH6Ta)
-// expression prefix and infix parse functions are stored in a
-// table and mapped by particular tokens.
-// It should be initialised with a pointer to a lexical scanner.
-// Calling the method ParseProgram will return a fully formed AST.
-// For notes on the structure of the parser  most parse functions
-// are annotated with simple grammar notes. These are in the form
-// nodetype: one or more alternative rules of what ast structure
-// the function can return.
+// Parser : structure who's methods implement a top-down operator precedence
+// parser. (Based roughly on pratt parsing model: https://goo.gl/uoH6Ta)
+// expression prefix and infix parse functions are stored in a table and mapped
+// by particular tokens. It should be initialised with a pointer to a lexical
+// scanner. Calling the method ParseProgram will return a fully formed AST. For
+// notes on the structure of the parser  most parse functions are annotated
+// with simple grammar notes. These are in the form nodetype: one or more
+// alternative rules of what ast structure the function can return.
 type Parser struct {
 	scanner        *scanner.Scanner
 	errors         []*ParseError
@@ -96,8 +93,7 @@ func New(s *scanner.Scanner) *Parser {
 	return p
 }
 
-// Refresh : reset all values to defualt
-// for parsing a fresh input stream.
+// Refresh : reset all values to defualt for parsing a fresh input stream.
 func (p *Parser) Refresh(s *scanner.Scanner) {
 	p.scanner = s
 	p.errors = []*ParseError{}
@@ -141,10 +137,10 @@ func (p *Parser) stmtEnd() bool {
 	return false
 }
 
-// ParseProgram creates ast of the inputed text incrementally
-// working with the scanner.
-// Program: list of statements
-// stmtend: newline | semicolon | EOF
+// ParseProgram creates ast of the inputed text incrementally working with the
+// scanner.
+// 	Program: list of statements
+// 	stmtend: newline | semicolon | EOF
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}

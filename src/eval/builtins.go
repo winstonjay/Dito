@@ -2,6 +2,8 @@ package eval
 
 import (
 	"dito/src/object"
+	"io"
+	"os"
 )
 
 // Builtins : map of builtin functions
@@ -14,9 +16,10 @@ var Builtins = map[string]*object.Builtin{
 	object.BoolType.String():   &object.Builtin{Fn: typeSwitch(object.BoolType)},
 	object.ArrayType.String():  &object.Builtin{Fn: typeSwitch(object.ArrayType)},
 
-	"type": &object.Builtin{Fn: objectType},
-	"len":  &object.Builtin{Fn: objectLen},
-	"abs":  &object.Builtin{Fn: objectAbs},
+	"type":  &object.Builtin{Fn: objectType},
+	"len":   &object.Builtin{Fn: objectLen},
+	"abs":   &object.Builtin{Fn: objectAbs},
+	"print": &object.Builtin{Fn: objectPrint},
 }
 
 func typeSwitch(which object.TypeFlag) object.BuiltinFunction {
@@ -59,4 +62,15 @@ func objectAbs(args ...object.Object) object.Object {
 		return num.Abs()
 	}
 	return object.NewError("Argument '%s' to func 'abs' is not a Numeric", args[0].Inspect())
+}
+
+func objectPrint(args ...object.Object) object.Object {
+	for i, arg := range args {
+		io.WriteString(os.Stdout, arg.Inspect())
+		if i < len(args)-1 {
+			io.WriteString(os.Stdout, ", ")
+		}
+	}
+	io.WriteString(os.Stdout, "\n")
+	return nil
 }

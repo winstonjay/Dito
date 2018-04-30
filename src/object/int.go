@@ -22,6 +22,8 @@ func (i *Int) ConvertType(which TypeFlag) Object {
 	switch which {
 	case IntType:
 		return i
+	case CharType:
+		return NewChar(byte(i.Value))
 	case FloatType:
 		return NewFloat(float64(i.Value))
 	case StringType:

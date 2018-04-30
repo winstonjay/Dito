@@ -38,6 +38,9 @@ func NewArray(elements []Object, length int) *Array {
 
 // ConvertType : return the conversion into the specified type
 func (a *Array) ConvertType(which TypeFlag) Object {
+	if which == ArrayType {
+		return a
+	}
 	return NewError("Argument to %s not supported, got %s", a.Type(), which)
 }
 
@@ -69,4 +72,16 @@ func (a *Array) SetItem(key Object, val Object) Object {
 	}
 	a.Elements[idx.Value] = val
 	return nil
+}
+
+// Iter : loop through items elements in order.
+func (a *Array) Iter() <-chan Object {
+	ch := make(chan Object)
+	go func() {
+		for _, item := range a.Elements {
+			ch <- item
+		}
+		close(ch)
+	}()
+	return ch
 }

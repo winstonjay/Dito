@@ -92,3 +92,15 @@ func (s *String) SetItem(key Object, val Object) Object {
 		return NewError("Index Assignment Error")
 	}
 }
+
+// Iter : loop through items elements in order.
+func (s *String) Iter() <-chan Object {
+	ch := make(chan Object)
+	go func() {
+		for _, item := range s.Value {
+			ch <- &Char{Value: byte(item)}
+		}
+		close(ch)
+	}()
+	return ch
+}

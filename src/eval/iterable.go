@@ -33,10 +33,29 @@ func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environ
 	if isError(key) {
 		return key
 	}
-	iter, ok := maybeIter.(object.Iterable)
-	if !ok {
-		return object.NewError("Index assignement error: wrong type")
+	if iter, ok := maybeIter.(object.Iterable); ok {
+		// returns object.Error or nil
+		return iter.SetItem(key, val)
 	}
-	// returns object.Error or nil
-	return iter.SetItem(key, val)
+	return object.NewError("Index assignement error: wrong type")
+}
+
+func evalForStatement(fs *ast.ForStatement, env *object.Environment) object.Object {
+	var body object.Object
+	iter, ok := Eval(fs.Iter, env).(object.Iterable)
+	if !ok {
+		return object.NewError("Loop error")
+	}
+	for item := range iter.Iter() {
+		env.Set(fs.ID.Value, item)
+		body = Eval(fs.LoopBody, env)
+		if body != nil {
+			// the surrounding if is duplicated in isError fn.
+			rt := body.Type()
+			if rt == object.ErrorType || rt == object.ReturnType {
+				return body
+			}
+		}
+	}
+	return body
 }

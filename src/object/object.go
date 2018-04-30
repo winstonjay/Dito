@@ -23,7 +23,7 @@ type Iterable interface {
 	Length() Object
 	// IterItems : return a iterable channel to loop through the items in
 	// order.
-	// IterItems() <-chan Object
+	Iter() <-chan Object
 	// GetItem : get item at location of the provided key.
 	GetItem(Object) Object
 	// SetItem : set item at location of the provided key.
@@ -36,6 +36,12 @@ type Iterable interface {
 	// Contains : is item in the iterable. would use 'in' operator.
 	// Contains(Object) Object
 }
+
+// // IterObject : key value pair for iterating over a Iterable
+// type IterObject struct {
+// 	key Object
+// 	val Object
+// }
 
 // Numeric : the requirements needed for a Object to be an Numeric.
 type Numeric interface {
@@ -50,11 +56,11 @@ type TypeFlag int
 // Define the strings used availible to the user to describe objects. Values
 // here will be returned when an objects type method is called.
 const (
-	IntType TypeFlag = iota
+	CharType TypeFlag = iota
+	IntType
 	FloatType
 	BoolType
 	StringType
-	CharType
 	ArrayType
 	NoneType
 	ErrorType

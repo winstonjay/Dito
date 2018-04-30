@@ -22,10 +22,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return Eval(node.Expression, env)
 	// case *ast.IfStatement:
 	// 	return evalIfStatement(node, env)
-	// case *ast.ForStatement:
-	// 	return evalForStatement(node, env)
-	// case *ast.BlockStatement:
-	// 	return evalBlockStatement(node, env)
+	case *ast.ForStatement:
+		return evalForStatement(node, env)
+	case *ast.BlockStatement:
+		return evalBlockStatement(node, env)
 	// case *ast.ImportStatement:
 	// 	return evalImportStatement(node, env)
 
