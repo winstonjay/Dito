@@ -1,55 +1,19 @@
 # Dito Programming Language
 
-Dito is a work-in-progress toy interpeted language made to learn about writing parsers, interpeters etc. Things change around a bit so some docs arn't up to date. The syntax is
-pretty generic at the moment but probally will try out some more idiosyncratic concepts in the future.
+Dito is a work-in-progress toy interpeted language made to learn about writing parsers, interpeters etc. Things change around a bit so some docs arn't up to date. The syntax is pretty generic at the moment but probally will try out some more idiosyncratic concepts in the future.
+
+This is the most up to date repo but its not that stable.
 
 ### Having a go...
 
-The most simple way to run is with `go run`. You can try out the language either in a interactive shell with:
+The most simple way to build with `go build` then use the executable or just `go run main.go`. You can try out the language either in a interactive shell with:
 
-    go run main.go
+    ./dito
 
-Or you can run a file from `testdata/` directory when in the main directory with. (The default path is `testdata/`)
+Or you can run a file from `exampledata/` directory when in the main directory with. (The default path is `exampledata/`)
 
-    go run main.go <filename>
+    ./dito funcs.dito
 
 
-### Program Examples:
-
-`greet` lambda function, as you might suspect, it outputs 'Hello, Dito!'
-```go
-greet = func(name) -> ("Hello, " + name)
-print(greet("Dito!"))
-```
-
-`newton_sqrt` function, Calculate the square root of `x` to an accuracy of
-`delta` using newtons method.
-```go
-func newton_sqrt(x, delta) {
-    z = delta
-    for abs(x - z**2) > delta {
-        z -= (z**2 - x) / (2 * x)
-    }
-    return z
-}
-```
-
-```go
-func collatz_sequence(start) {
-    collatz = func(n) -> (
-        n           if n <= 1 else
-        n / 2       if n % 2 == 0 else
-        3 * n + 1)
-    sequence = [start]
-    for sequence[-1] > 1 {
-        newitem = collatz(sequence[-1])
-        sequence += [newitem]
-    }
-    return sequence
-}
-print(collatz_sequence(13))
-```
-outputs `[13, 40, 20, 10, 5, 16, 8, 4, 2, 1]`
-
-**For more examples see `testdata/` directory.**
+**For more examples see `exampledata/` directory.**
 
