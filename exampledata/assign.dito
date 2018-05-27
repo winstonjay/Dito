@@ -1,0 +1,22 @@
+# ## Assignments
+# Varibles are immutable by defualt and created via the `let` keyword.
+let x = 100
+
+# NOTE: this is not currently enforced
+# # trying to update this varible this would cause an error.
+# try x = 300, pass "Could not reasign x"
+
+# To create a mutable varible the keyword mut must also be added.
+let mut y = 200
+
+# NOTE: this is not currently enforced
+
+# # As we have defined y as mutable this would be fine to do...
+# y = 3 - y
+
+# # or even any of the inplace operators.
+# y += x
+# y %= 100
+
+# Rationale is that using a combination of constants and duck-typing
+# is useful because...

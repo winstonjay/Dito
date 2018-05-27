@@ -1,0 +1,48 @@
+#### Functions
+# functions are first class citizens and they are like the functions of
+# most languages. They have their own scope, parameted etc. There are also
+# a limitied number of built in functions.
+
+func sqr(x) {
+    return x * x
+}
+
+# Lambdas:
+# lambdas are pretty much the same except that can only contain a single
+# expression.
+let collatz = func(n) -> (
+    n           if n <= 1 else
+    n / 2       if n % 2 == 0 else
+    3 * n + 1)
+
+# Composition.
+# both types of functions are first class citizens so they can be passed
+# and returned by other functions. So this is cool:
+let mul = func(a) -> func(b) -> a * b
+
+# this is kinda useless but we can use this like this:
+print(mul(10)(10))
+
+
+# this function takes a function/lambda as a arg and returns a function
+func map(fn) {
+    let i = 0
+    func f(array) {
+        for a in array {
+            array[i] = fn(a)
+            let i = i + 1
+        }
+        return array
+    }
+    return f
+}
+
+# we can use the function like this:
+let map_sqr = map(sqr)
+print(map_sqr([1, 2, 3, 4, 5]))
+
+# or event this:
+print(map(sqr)([1, 2, 3, 4, 5]))
+
+
+# TODO: implement more built in functions etc.

@@ -3,6 +3,7 @@ package parser
 import (
 	"dito/src/ast"
 	"dito/src/scanner"
+	"dito/src/token"
 	"fmt"
 	"testing"
 )
@@ -24,14 +25,15 @@ func TestAssignmentStatement(t *testing.T) {
 		input              string
 		expectedIdentifier string
 		expectedValue      interface{}
+		expectedToken      token.Token
 	}{
-		{"alpha := 100", "alpha", 100},
-		{"y = 99999999999;", "y", 99999999999},
-		{"beta = 2020202021", "beta", 2020202021},
-		{"floater := 202.900000", "floater", 202.900000},
-		{"half := 0.500000", "half", 0.500000},
-		{"do = true", "do", true},
-		{"maybe = false", "maybe", false},
+		{"let alpha = 100", "alpha", 100, token.LET},
+		{"let mut y = 99999999999;", "y", 99999999999, token.MUT},
+		{"let beta = 2020202021", "beta", 2020202021, token.LET},
+		{"let mut floater = 202.900000", "floater", 202.900000, token.MUT},
+		{"let half = 0.500000", "half", 0.500000, token.LET},
+		{"let do = true", "do", true, token.LET},
+		{"let maybe = false", "maybe", false, token.LET},
 	}
 
 	for i, tt := range tests {

@@ -74,9 +74,9 @@ func (bs *BlockStatement) String() string {
 	return out.String()
 }
 
-// AssignmentStatement : Identifier = expr | Identifier := expr
+// AssignmentStatement : let Identifier = expr | let mut Identifier = expr
 type AssignmentStatement struct {
-	Token token.Token // either := or =
+	Token token.Token // either let or mut
 	Name  *Identifier
 	Value Expression
 }
@@ -348,8 +348,9 @@ func (al *ArrayLiteral) String() string {
 
 // Identifier : alphanumeric varible name.
 type Identifier struct {
-	Token token.Token // token.IDVAL
-	Value string
+	Token   token.Token // token.IDVAL
+	Mutable bool
+	Value   string
 }
 
 func (i *Identifier) expressionNode()      {}

@@ -61,7 +61,7 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	// set tok to token.ILLEGAL.
 	switch s.char {
 	case '=': // = ==
-		tok = s.switch2(token.REASSIGN, '=', token.EQUALS)
+		tok = s.switch2(token.ASSIGN, '=', token.EQUALS)
 	case '*': // * **
 		tok = s.switch3(token.MUL, '*', token.POW, '=', token.MULEQUAL)
 	case '!': // ! !=
@@ -78,8 +78,6 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		tok = s.switch2(token.ADD, '=', token.ADDEQUAL)
 	case '%': // % %=
 		tok = s.switch2(token.MOD, '=', token.MODEQUAL)
-	case ':': // : :=
-		tok = s.switch2(token.COLON, '=', token.NEWASSIGN)
 	case '(':
 		tok = token.LPAREN
 	case ')':

@@ -11,12 +11,8 @@ func evalAssignment(node *ast.AssignmentStatement, env *object.Environment) obje
 	if isError(val) {
 		return val
 	}
-	// just ordinary assignement
-	if node.Token == token.REASSIGN || node.Token == token.NEWASSIGN {
-		env.Set(node.Name.Value, val)
-		return nil
-	}
-	return object.NewError("Assignement Error: unknown")
+	env.Set(node.Name.Value, val, node.Token == token.LET)
+	return nil
 }
 
 func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) object.Object {

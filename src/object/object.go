@@ -67,13 +67,14 @@ const (
 	ReturnType
 	LambdaType
 	BultinType
-	// FunctionType = "Function" // not implemented
+	FunctionType
 )
 
 func (t TypeFlag) String() string { return typeName[t] }
 
 var typeName = [...]string{
-	"Char", "Int", "Float", "Bool", "String", "Array", "None", "None", "Return", "Lambda", "Builtin",
+	"Char", "Int", "Float", "Bool", "String", "Array",
+	"None", "Error", "Return", "Lambda", "Builtin", "Function",
 }
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

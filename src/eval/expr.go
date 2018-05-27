@@ -47,23 +47,6 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	return object.NewError("Unknown operator: -%s", right.Type())
 }
 
-// Infix expressions.
-func evalInfixExpression(node *ast.InfixExpression, env *object.Environment) object.Object {
-	op := object.BinaryOps[node.Operator]
-	if op == nil {
-		return object.NewError("Unknown Binary operation: '%s'", node.Operator)
-	}
-	left := Eval(node.Left, env)
-	if isError(left) {
-		return left
-	}
-	right := Eval(node.Right, env)
-	if isError(right) {
-		return right
-	}
-	return op.EvalBinary(env, left, right)
-}
-
 func evalIfElseExpression(node *ast.IfElseExpression, env *object.Environment) object.Object {
 	condition := Eval(node.Condition, env)
 	if isError(condition) {

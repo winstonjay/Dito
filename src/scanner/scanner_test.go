@@ -7,34 +7,39 @@ import (
 
 func TestNextToken(t *testing.T) {
 
-	input := `alpha := 10.999 + 10**3
-_o_me_ga := (50 % 7) - 0.002
+	input := `let alpha = 10.999 + 10**3
+let mut _o_me_ga = (50 % 7) - 0.002
 
 
 # this is a single line comment you should not read me...
-hypot := func(a, b)->(a**2 + b**2)**0.5
+let hypot = func(a, b)->(a**2 + b**2)**0.5
 
-summer := true
-rain := true
-fun := false`
+let summer = true
+let mut rain = true
+let fun = false`
 	// ^^^^^ DO NOT CHANGE OR YOU HAVE TO WORK OUT THE WHOLE TEST AGAIN
 	// if you have to. extend the current string.
+	// TODO (ALREADY BROKE cols NEEDS FIXING, there are some alignment
+	// problemns with the coloum positions seen in trackbacks.
 	tests := []struct {
 		token   token.Token
 		literal string
 		line    int
 		column  int
 	}{
+		{token.LET, "let", 0, 0},
 		{token.IDVAL, "alpha", 0, 5},
-		{token.NEWASSIGN, ":=", 0, 8},
+		{token.ASSIGN, "=", 0, 8},
 		{token.FLOAT, "10.999", 0, 15},
 		{token.ADD, "+", 0, 17},
 		{token.INT, "10", 0, 20},
 		{token.POW, "**", 0, 22},
 		{token.INT, "3", 0, 23},
 		{token.NEWLINE, "newline", 0, -1},
+		{token.LET, "let", 1, 0},
+		{token.MUT, "mut", 1, 0},
 		{token.IDVAL, "_o_me_ga", 1, 8},
-		{token.NEWASSIGN, ":=", 1, 11},
+		{token.ASSIGN, "=", 1, 11},
 		{token.LPAREN, "(", 1, 13},
 		{token.INT, "50", 1, 15},
 		{token.MOD, "%", 1, 17},
@@ -44,8 +49,9 @@ fun := false`
 		{token.FLOAT, "0.002", 1, 28},
 		{token.NEWLINE, "newline", 1, -1},
 		// skips comment.
+		{token.LET, "let", 5, 0},
 		{token.IDVAL, "hypot", 5, 5},
-		{token.NEWASSIGN, ":=", 5, 7},
+		{token.ASSIGN, "=", 5, 7},
 		{token.FUNC, "func", 5, 12},
 		{token.LPAREN, "(", 5, 13},
 		{token.IDVAL, "a", 5, 14},
@@ -66,16 +72,20 @@ fun := false`
 		{token.FLOAT, "0.5", 5, 38},
 		{token.NEWLINE, "newline", 5, -1},
 
+		{token.LET, "let", 7, 0},
 		{token.IDVAL, "summer", 7, 6},
-		{token.NEWASSIGN, ":=", 7, 9},
+		{token.ASSIGN, "=", 7, 9},
 		{token.TRUE, "true", 7, 14},
 		{token.NEWLINE, "newline", 7, -1},
+		{token.LET, "let", 8, 0},
+		{token.MUT, "mut", 8, 0},
 		{token.IDVAL, "rain", 8, 4},
-		{token.NEWASSIGN, ":=", 8, 7},
+		{token.ASSIGN, "=", 8, 7},
 		{token.TRUE, "true", 8, 12},
 		{token.NEWLINE, "newline", 8, -1},
+		{token.LET, "let", 9, 0},
 		{token.IDVAL, "fun", 9, 3},
-		{token.NEWASSIGN, ":=", 9, 6},
+		{token.ASSIGN, "=", 9, 6},
 		{token.FALSE, "false", 9, 12},
 		// Allways end with EOF.
 		{token.EOF, "EOF", 9, 12},
@@ -115,11 +125,11 @@ func TestNewLines(t *testing.T) {
 		{token.INT, "100", 1},
 		{token.NEWLINE, "newline", 1},
 		{token.IDVAL, "hey", 4},
-		{token.NEWASSIGN, ":=", 4},
+		{token.ASSIGN, ":=", 4},
 		{token.INT, "200", 4},
 		{token.NEWLINE, "newline", 4},
 		{token.IDVAL, "x", 5},
-		{token.NEWASSIGN, ":=", 5},
+		{token.ASSIGN, ":=", 5},
 		{token.INT, "0xff", 5},
 		{token.NEWLINE, "newline", 5},
 		{token.EOF, "EOF", 10},

@@ -53,8 +53,7 @@ const (
 	RBRACKET // ]
 
 	beginAssignementOp
-	NEWASSIGN // :=
-	REASSIGN  // =
+	ASSIGN // =
 
 	ADDEQUAL // +=
 	SUBEQUAL // -=
@@ -75,17 +74,19 @@ const (
 	HASH // # start comments
 
 	beginKeyword
-	TRUE   // true
-	FALSE  // false
-	IF     // if
-	ELSE   // else
-	FOR    // for
-	IN     // in
-	FUNC   // func
-	AND    // and
-	OR     // or
-	RHO    // rho n.a
-	IOTA   // iota n.a
+	TRUE  // true
+	FALSE // false
+	IF    // if
+	ELSE  // else
+	FOR   // for
+	IN    // in
+	FUNC  // func
+	AND   // and
+	OR    // or
+	LET   // let
+	MUT   // mut
+	// RHO    // rho n.a
+	// IOTA   // iota n.a
 	RETURN // return
 	IMPORT // import
 	endKeyword
@@ -125,8 +126,7 @@ var tokensLiterals = [...]string{
 	BITOR:  "|",
 	BITXOR: "^",
 
-	NEWASSIGN: ":=",
-	REASSIGN:  "=",
+	ASSIGN: "=",
 
 	ADDEQUAL: "+=",
 	SUBEQUAL: "-=",
@@ -160,6 +160,10 @@ var tokensLiterals = [...]string{
 	FUNC: "func",
 	AND:  "and",
 	OR:   "or",
+
+	LET: "let",
+	MUT: "mut",
+
 	// RHO:  "rho", n.a
 	// IOTA:  "iota", n.a
 	IMPORT: "import",

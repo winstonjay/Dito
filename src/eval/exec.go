@@ -26,8 +26,6 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalForStatement(node, env)
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
-	// case *ast.ImportStatement:
-	// 	return evalImportStatement(node, env)
 
 	// Expressions
 	case *ast.PrefixExpression:
@@ -41,10 +39,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalIndexExpression(node, env)
 
 	// // Functions
-	// case *ast.Function:
-	// 	return evalDefineFunction(node, env)
-	// case *ast.LambdaFunction:
-	// 	return object.NewDitoLambdaFn(node.Parameters, node.Expr, env)
+	case *ast.Function:
+		return object.NewFunction(node, env)
+	case *ast.LambdaFunction:
+		return object.NewLambda(node.Parameters, node.Expr, env)
 	case *ast.CallExpression:
 		return evalFunctionCall(node.Function, node.Arguments, env)
 
@@ -60,7 +58,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.BooleanLiteral:
 		return object.NewBool(node.Value)
 	case *ast.ArrayLiteral:
-		return evalArray(node, env)
+		elements := evalExpressions(node.Elements, env)
+		return object.NewArray(elements, -1)
 	}
 	return nil
 }
@@ -96,7 +95,19 @@ func isError(obj object.Object) bool {
 	return false
 }
 
-func evalArray(node *ast.ArrayLiteral, env *object.Environment) object.Object {
-	elements := evalExpressions(node.Elements, env)
-	return object.NewArray(elements, -1)
+// Infix expressions.
+func evalInfixExpression(node *ast.InfixExpression, env *object.Environment) object.Object {
+	op := object.BinaryOps[node.Operator]
+	if op == nil {
+		return object.NewError("Unknown Binary operation: '%s'", node.Operator)
+	}
+	left := Eval(node.Left, env)
+	if isError(left) {
+		return left
+	}
+	right := Eval(node.Right, env)
+	if isError(right) {
+		return right
+	}
+	return op.EvalBinary(env, left, right)
 }

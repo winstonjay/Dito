@@ -47,7 +47,7 @@ func evalForStatement(fs *ast.ForStatement, env *object.Environment) object.Obje
 		return object.NewError("Loop error")
 	}
 	for item := range iter.Iter() {
-		env.Set(fs.ID.Value, item)
+		env.Set(fs.ID.Value, item, false)
 		body = Eval(fs.LoopBody, env)
 		if body != nil {
 			// the surrounding if is duplicated in isError fn.

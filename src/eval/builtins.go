@@ -68,7 +68,7 @@ func objectPrint(args ...object.Object) object.Object {
 	for i, arg := range args {
 		io.WriteString(os.Stdout, arg.Inspect())
 		if i < len(args)-1 {
-			io.WriteString(os.Stdout, ", ")
+			io.WriteString(os.Stdout, " ")
 		}
 	}
 	io.WriteString(os.Stdout, "\n")

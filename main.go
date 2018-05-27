@@ -20,7 +20,7 @@ func main() {
 	// https://gobyexample.com/command-line-flags
 	if len(args) > 0 {
 		filename := args[0]
-		file, err := ioutil.ReadFile("testdata/" + filename)
+		file, err := ioutil.ReadFile("exampledata/" + filename)
 		if err != nil {
 			panic(err)
 		}
@@ -41,7 +41,7 @@ func execFile(file string, out io.Writer) {
 		return
 	}
 	evaluated := eval.Eval(program, env)
-	if evaluated != nil {
+	if evaluated != nil && evaluated != object.NONE {
 		io.WriteString(out, evaluated.Inspect())
 		io.WriteString(out, "\n")
 	}

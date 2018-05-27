@@ -171,10 +171,12 @@ func (p *Parser) ParseProgram() *ast.Program {
 //     importStatement
 func (p *Parser) statement() ast.Statement {
 	switch p.currentToken {
+	case token.LET:
+		return p.assignmentStatement()
 	case token.IDVAL:
-		if p.peekToken.IsAssignmentOp() {
-			return p.assignmentStatement()
-		}
+		// if p.peekToken.IsAssignmentOp() {
+		// 	return p.reassignStatement()
+		// }
 		if p.peekTokenIs(token.LBRACKET) {
 			idxExp := p.expression(token.LOWEST)
 			if !p.peekToken.IsAssignmentOp() {
@@ -194,8 +196,6 @@ func (p *Parser) statement() ast.Statement {
 		return p.ifElseStatement()
 	case token.FOR:
 		return p.forStatement()
-	case token.IMPORT:
-		return p.importStatement()
 	default:
 		return p.expressionStatement()
 	}
@@ -211,13 +211,22 @@ func (p *Parser) returnStatement() *ast.ReturnStatement {
 }
 
 // assignmentStatement:
-//     identifier assignmentOperator expression
+//     let identifier = expression
+//     | let mux identifier = expression
 func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 	stmt := &ast.AssignmentStatement{}
-	stmt.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
-	p.nextToken() // we already saw what was ahead before we came here.
+	if p.peekTokenIs(token.MUT) {
+		p.nextToken()
+	}
 	stmt.Token = p.currentToken
-	p.nextToken() // this could be anything tbh.
+	if !p.expectPeek(token.IDVAL) {
+		return nil
+	}
+	stmt.Name = &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
+	if !p.expectPeek(token.ASSIGN) {
+		return nil
+	}
+	p.nextToken() // this could be anything.
 	stmt.Value = p.expression(token.LOWEST)
 	return stmt
 }
@@ -323,17 +332,6 @@ func (p *Parser) blockStatement() *ast.BlockStatement {
 		p.nextToken()
 	}
 	return block
-}
-
-// importStatement
-//     'import' identifier
-func (p *Parser) importStatement() *ast.ImportStatement {
-	is := &ast.ImportStatement{Token: p.currentToken}
-	if !p.expectPeek(token.IDVAL) {
-		return nil
-	}
-	is.Value = p.identifier().(*ast.Identifier).Value
-	return is
 }
 
 /*

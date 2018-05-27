@@ -19,8 +19,8 @@ func (l *Lambda) Type() TypeFlag { return LambdaType }
 func (l *Lambda) Inspect() string {
 	var out bytes.Buffer
 	out.WriteString("<")
-	out.WriteString(LambdaType.String())
-	out.WriteString(": func(")
+	// out.WriteString(LambdaType.String())
+	out.WriteString("Lambda(")
 	for i, param := range l.Parameters {
 		out.WriteString(param.String())
 		if i < len(l.Parameters)-1 {
@@ -28,7 +28,7 @@ func (l *Lambda) Inspect() string {
 		}
 	}
 	out.WriteString(")")
-	// out.WriteString(lf.Expr.String())
+	out.WriteString(l.Expr.String())
 	out.WriteString(">")
 	return out.String()
 }
