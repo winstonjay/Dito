@@ -16,7 +16,8 @@ let hypot = func(a, b)->(a**2 + b**2)**0.5
 
 let summer = true
 let mut rain = true
-let fun = false`
+let fun = false
+"he" ++ "llo"`
 	// ^^^^^ DO NOT CHANGE OR YOU HAVE TO WORK OUT THE WHOLE TEST AGAIN
 	// if you have to. extend the current string.
 	// TODO (ALREADY BROKE cols NEEDS FIXING, there are some alignment
@@ -87,8 +88,12 @@ let fun = false`
 		{token.IDVAL, "fun", 9, 3},
 		{token.ASSIGN, "=", 9, 6},
 		{token.FALSE, "false", 9, 12},
+		{token.NEWLINE, "newline", 9, -1},
+		{token.STRING, "he", 10, 12},
+		{token.CAT, "++", 10, 12},
+		{token.STRING, "llo", 10, 12},
 		// Allways end with EOF.
-		{token.EOF, "EOF", 9, 12},
+		{token.EOF, "EOF", 10, 12},
 	}
 
 	scanner := Init(input) // init scanner.

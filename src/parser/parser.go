@@ -75,6 +75,7 @@ func New(s *scanner.Scanner) *Parser {
 		token.IDIV:     p.infixExpression,
 		token.MOD:      p.infixExpression,
 		token.POW:      p.infixExpression,
+		token.CAT:      p.infixExpression,
 		token.EQUALS:   p.infixExpression,
 		token.NEQUALS:  p.infixExpression,
 		token.LEQUALS:  p.infixExpression,
@@ -174,9 +175,9 @@ func (p *Parser) statement() ast.Statement {
 	case token.LET:
 		return p.assignmentStatement()
 	case token.IDVAL:
-		// if p.peekToken.IsAssignmentOp() {
-		// 	return p.reassignStatement()
-		// }
+		if p.peekToken.IsAssignmentOp() {
+			return p.reAssignStatement()
+		}
 		if p.peekTokenIs(token.LBRACKET) {
 			idxExp := p.expression(token.LOWEST)
 			if !p.peekToken.IsAssignmentOp() {
@@ -227,6 +228,19 @@ func (p *Parser) assignmentStatement() *ast.AssignmentStatement {
 		return nil
 	}
 	p.nextToken() // this could be anything.
+	stmt.Value = p.expression(token.LOWEST)
+	return stmt
+}
+
+// reAssignStatement : Identifier assignOp expr
+// 	assignOp =  	= += -= *= /= %=
+func (p *Parser) reAssignStatement() *ast.ReAssignStatement {
+	stmt := &ast.ReAssignStatement{
+		Token: p.peekToken,
+		Name:  &ast.Identifier{Token: p.currentToken, Value: p.currentLiteral},
+	}
+	p.nextToken()
+	p.nextToken()
 	stmt.Value = p.expression(token.LOWEST)
 	return stmt
 }

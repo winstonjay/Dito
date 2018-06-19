@@ -91,6 +91,24 @@ func (as *AssignmentStatement) String() string {
 	return out.String()
 }
 
+// ReAssignStatement : Identifier assignOp expr
+// 	assignOp =  	= += -= *= /= %=
+type ReAssignStatement struct {
+	Token token.Token // assignment operator.
+	Name  *Identifier
+	Value Expression
+}
+
+func (as *ReAssignStatement) statementNode()       {}
+func (as *ReAssignStatement) tokenLiteral() string { return as.Token.String() }
+func (as *ReAssignStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString(as.Name.String())
+	out.WriteString(" " + as.tokenLiteral() + " ")
+	out.WriteString(as.Value.String())
+	return out.String()
+}
+
 // IndexAssignmentStatement is
 type IndexAssignmentStatement struct {
 	Token  token.Token

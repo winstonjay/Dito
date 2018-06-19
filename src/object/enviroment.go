@@ -6,6 +6,16 @@ type Varible struct {
 	mutable bool
 }
 
+// IsMutable : can it be changed
+func (v *Varible) IsMutable() bool {
+	return v.mutable
+}
+
+// Unpack : can it be changed
+func (v *Varible) Unpack() Object {
+	return v.value
+}
+
 // Environment : Holds the enviroment varibles created by the user. Pretty much
 // a symbol table.
 type Environment struct {
@@ -28,11 +38,11 @@ func NewEnclosedEnviroment(outer *Environment) *Environment {
 
 // Get : get a varible inside the current scope
 func (e *Environment) Get(name string) (Object, bool) {
-	obj, ok := e.store[name]
+	v, ok := e.store[name]
 	if !ok && e.outer != nil {
-		obj, ok = e.outer.GetVar(name)
+		v, ok = e.outer.GetVar(name)
 	}
-	return obj.value, ok
+	return v.value, ok
 }
 
 // GetVar :

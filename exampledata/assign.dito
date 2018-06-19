@@ -4,7 +4,7 @@ let x = 100
 
 # NOTE: this is not currently enforced
 # # trying to update this varible this would cause an error.
-# try x = 300, pass "Could not reasign x"
+try x = 300, "Could not reasign x!"
 
 # To create a mutable varible the keyword mut must also be added.
 let mut y = 200

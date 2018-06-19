@@ -74,6 +74,11 @@ func (a *Array) SetItem(key Object, val Object) Object {
 	return nil
 }
 
+// Concat : Add item to the current string creating a new string.
+func (a *Array) Concat(other Object) Object {
+	return NewArray(append(a.Elements, other.(*Array).Elements...), -1)
+}
+
 // Iter : loop through items elements in order.
 func (a *Array) Iter() <-chan Object {
 	ch := make(chan Object)

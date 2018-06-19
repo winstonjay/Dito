@@ -35,6 +35,7 @@ const (
 	LTHAN   // <
 	GTHAN   // >
 	NOT     // !
+	CAT     // ++
 
 	SHIFTL // <<
 	SHIFTR // >>
@@ -112,6 +113,7 @@ var tokensLiterals = [...]string{
 	MOD:  "%",
 	POW:  "**",
 	NOT:  "!",
+	CAT:  "++",
 
 	EQUALS:  "==",
 	NEQUALS: "!=",
@@ -229,7 +231,7 @@ func (t Token) Precedence() uint {
 		return EQUALITY
 	case LEQUALS, GEQUALS, LTHAN, GTHAN:
 		return LESSGREATER
-	case ADD, SUB, SHIFTL, SHIFTR:
+	case ADD, SUB, CAT, SHIFTL, SHIFTR:
 		return ADDSUB
 	case MOD, DIV, MUL, IDIV:
 		return TERM

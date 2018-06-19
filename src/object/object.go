@@ -28,11 +28,11 @@ type Iterable interface {
 	GetItem(Object) Object
 	// SetItem : set item at location of the provided key.
 	SetItem(Object, Object) Object
+	// Concat : Concat two items together.
+	Concat(Object) Object
 
 	// - Possible future candidates:
 
-	// Merge : merege/concatenate two items together.
-	// Merge(Object) Object
 	// Contains : is item in the iterable. would use 'in' operator.
 	// Contains(Object) Object
 }

@@ -12,7 +12,13 @@ type binaryOp struct {
 }
 
 func (op *binaryOp) whichType(t1, t2 TypeFlag) TypeFlag {
-	if t1 > 3 || t2 > 3 {
+	if t1 == StringType && t2 == StringType {
+		return StringType
+	}
+	if t1 == ArrayType && t2 == ArrayType {
+		return ArrayType
+	}
+	if t1 > BoolType || t2 > BoolType {
 		return ErrorType
 	}
 	if t1 > t2 {
@@ -241,6 +247,18 @@ func init() {
 				},
 				FloatType: func(env *Environment, a, b Object) Object {
 					return NewBool(a.(*Float).Value != b.(*Float).Value)
+				},
+			},
+		},
+
+		{
+			name: "++",
+			fn: map[TypeFlag]binaryFn{
+				StringType: func(env *Environment, a, b Object) Object {
+					return a.(*String).Concat(b)
+				},
+				ArrayType: func(env *Environment, a, b Object) Object {
+					return a.(*Array).Concat(b)
 				},
 			},
 		},
