@@ -1,0 +1,38 @@
+
+
+let last   = func(it) -> it[len(it) - 1]
+let first  = func(it) -> it[0]
+
+let append = func(it, val) ->  it ++ [val]
+
+func map(fn, iterable) {
+    let mut i = 0
+    for v in iterable {
+        iterable[i] = fn(v)
+        i += 1
+    }
+    return iterable
+}
+
+func reduce(fn, it) {
+    if len(it) == 0 {
+        return it
+    }
+    let mut val = it[0]
+    if isIterable(val) {
+        return -1
+    }
+    for v in it {
+        val = fn(val, v)
+    }
+    return val
+}
+
+let mul = func(a, b) -> a * b
+let add = func(a, b) -> a + b
+let sub = func(a, b) -> a - b
+let div = func(a, b) -> a / b
+
+
+print(map(func(a) -> a * 2, [1, 2, 3, 4, 5]))
+print(reduce(mul, [1, 2, 3, 4, 5]))

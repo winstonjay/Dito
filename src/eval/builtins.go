@@ -16,10 +16,12 @@ var Builtins = map[string]*object.Builtin{
 	object.BoolType.String():   &object.Builtin{Fn: typeSwitch(object.BoolType)},
 	object.ArrayType.String():  &object.Builtin{Fn: typeSwitch(object.ArrayType)},
 
-	"type":  &object.Builtin{Fn: objectType},
-	"len":   &object.Builtin{Fn: objectLen},
-	"abs":   &object.Builtin{Fn: objectAbs},
-	"print": &object.Builtin{Fn: objectPrint},
+	"type":       &object.Builtin{Fn: objectType},
+	"len":        &object.Builtin{Fn: objectLen},
+	"abs":        &object.Builtin{Fn: objectAbs},
+	"print":      &object.Builtin{Fn: objectPrint},
+	"isIterable": &object.Builtin{Fn: objectIsIterable},
+	"range":      &object.Builtin{Fn: objectRange},
 }
 
 func typeSwitch(which object.TypeFlag) object.BuiltinFunction {
@@ -73,4 +75,33 @@ func objectPrint(args ...object.Object) object.Object {
 	}
 	io.WriteString(os.Stdout, "\n")
 	return object.NONE
+}
+
+func objectIsIterable(args ...object.Object) object.Object {
+	if n := len(args); n != 1 {
+		return object.NewError(object.InvalidArgLenError, "len", 1, n)
+	}
+	_, ok := args[0].(object.Iterable)
+	return object.NewBool(ok)
+}
+
+func objectRange(args ...object.Object) object.Object {
+	if len(args) != 2 {
+		return object.NewError(object.InvalidArgLenError, "range", 2, len(args))
+	}
+	min, ok := args[0].(*object.Int)
+	if !ok {
+		return object.NewError("Invalid args[0] to `range` function. got=%T", args[0])
+	}
+	max, ok := args[1].(*object.Int)
+	if !ok {
+		return object.NewError("Invalid args[1] to `range` function. got=%T", args[1])
+	}
+	iter := make([]object.Object, max.Value-min.Value)
+	i := 0
+	for v := min.Value; v < max.Value; v++ {
+		iter[i] = object.NewInt(v)
+		i++
+	}
+	return object.NewArray(iter, -1)
 }

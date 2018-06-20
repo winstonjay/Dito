@@ -227,7 +227,7 @@ func (t Token) Precedence() uint {
 	switch t {
 	case IF:
 		return CONDITONS
-	case EQUALS, NEQUALS:
+	case EQUALS, NEQUALS, IN:
 		return EQUALITY
 	case LEQUALS, GEQUALS, LTHAN, GTHAN:
 		return LESSGREATER

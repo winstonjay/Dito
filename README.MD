@@ -17,3 +17,18 @@ Or you can run a file from `exampledata/` directory when in the main directory w
 
 **For more examples see `exampledata/` directory.**
 
+
+TODO: idk how on earth this has happend.
+
+
+(dito)> x
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+(dito)> x[0] * 2
+0
+(dito)> x[0] *= 2
+(dito)> x
+[2, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+(dito)> 0 * 2
+0
+
+sort this: inplace operators in general are a mess.

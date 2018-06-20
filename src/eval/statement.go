@@ -62,3 +62,17 @@ func evalBlockStatement(block *ast.BlockStatement, env *object.Environment) obje
 	}
 	return result
 }
+
+func evalIfStatement(ie *ast.IfStatement, env *object.Environment) object.Object {
+	condition := Eval(ie.Condition, env)
+	if isError(condition) {
+		return condition
+	}
+	if isTrue(condition) {
+		return Eval(ie.Consequence, env)
+	} else if ie.Alternative != nil {
+		return Eval(ie.Alternative, env)
+	} else {
+		return object.NONE
+	}
+}

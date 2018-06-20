@@ -15,7 +15,7 @@ func (op *binaryOp) whichType(t1, t2 TypeFlag) TypeFlag {
 	if t1 == StringType && t2 == StringType {
 		return StringType
 	}
-	if t1 == ArrayType && t2 == ArrayType {
+	if t2 == ArrayType {
 		return ArrayType
 	}
 	if t1 > BoolType || t2 > BoolType {
@@ -32,17 +32,21 @@ func (op *binaryOp) EvalBinary(env *Environment, a, b Object) Object {
 	if which == ErrorType {
 		return NewError("mis matched types: %s, %s", a.Type(), b.Type())
 	}
-	a = a.ConvertType(which)
-	b = b.ConvertType(which)
-	if a.Type() == ErrorType {
-		return NewError("a: cannot convert types: %s, %s (%s)", a.Type(), which, a.Inspect())
-	}
-	if b.Type() == ErrorType {
-		return NewError("b: cannot convert types: %s, %s (%s)", b.Type(), which, b.Inspect())
+	if which != ArrayType {
+		a = a.ConvertType(which)
+		b = b.ConvertType(which)
+		if a.Type() == ErrorType {
+			return NewError("a: cannot convert types: %s, %s (%s)",
+				a.Type(), which, a.Inspect())
+		}
+		if b.Type() == ErrorType {
+			return NewError("b: cannot convert types: %s, %s (%s)",
+				b.Type(), which, b.Inspect())
+		}
 	}
 	fn := op.fn[which]
 	if fn == nil {
-		return NewError("unknown binary function")
+		return NewError("unknown binary function for given types")
 	}
 	return fn(env, a, b)
 }
@@ -230,6 +234,9 @@ func init() {
 				FloatType: func(env *Environment, a, b Object) Object {
 					return NewBool(a.(*Float).Value == b.(*Float).Value)
 				},
+				StringType: func(env *Environment, a, b Object) Object {
+					return NewBool(a.(*String).Value == b.(*String).Value)
+				},
 			},
 		},
 
@@ -248,6 +255,9 @@ func init() {
 				FloatType: func(env *Environment, a, b Object) Object {
 					return NewBool(a.(*Float).Value != b.(*Float).Value)
 				},
+				StringType: func(env *Environment, a, b Object) Object {
+					return NewBool(a.(*String).Value != b.(*String).Value)
+				},
 			},
 		},
 
@@ -259,6 +269,18 @@ func init() {
 				},
 				ArrayType: func(env *Environment, a, b Object) Object {
 					return a.(*Array).Concat(b)
+				},
+			},
+		},
+
+		{
+			name: "in",
+			fn: map[TypeFlag]binaryFn{
+				StringType: func(env *Environment, a, b Object) Object {
+					return b.(*String).Contains(a)
+				},
+				ArrayType: func(env *Environment, a, b Object) Object {
+					return b.(*Array).Contains(a)
 				},
 			},
 		},

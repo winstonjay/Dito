@@ -30,11 +30,8 @@ type Iterable interface {
 	SetItem(Object, Object) Object
 	// Concat : Concat two items together.
 	Concat(Object) Object
-
-	// - Possible future candidates:
-
 	// Contains : is item in the iterable. would use 'in' operator.
-	// Contains(Object) Object
+	Contains(Object) Object
 }
 
 // // IterObject : key value pair for iterating over a Iterable

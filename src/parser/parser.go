@@ -76,6 +76,7 @@ func New(s *scanner.Scanner) *Parser {
 		token.MOD:      p.infixExpression,
 		token.POW:      p.infixExpression,
 		token.CAT:      p.infixExpression,
+		token.IN:       p.infixExpression,
 		token.EQUALS:   p.infixExpression,
 		token.NEQUALS:  p.infixExpression,
 		token.LEQUALS:  p.infixExpression,

@@ -3,6 +3,7 @@ package object
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // String : builtin string type
@@ -96,6 +97,11 @@ func (s *String) SetItem(key Object, val Object) Object {
 // Concat : Add item to the current string creating a new string.
 func (s *String) Concat(other Object) Object {
 	return NewString(s.Value + other.(*String).Value)
+}
+
+// Contains :
+func (s *String) Contains(sub Object) Object {
+	return NewBool(strings.Contains(s.Value, sub.(*String).Value))
 }
 
 // Iter : loop through items elements in order.

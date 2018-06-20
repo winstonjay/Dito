@@ -79,6 +79,28 @@ func (a *Array) Concat(other Object) Object {
 	return NewArray(append(a.Elements, other.(*Array).Elements...), -1)
 }
 
+// Contains :
+func (a *Array) Contains(item Object) Object {
+	if len(a.Elements) == 0 {
+		return FALSE
+	}
+	op := BinaryOps["=="]
+	env := &Environment{}
+	for _, v := range a.Elements {
+		if item.Type() != v.Type() {
+			continue
+		}
+		cmp := op.EvalBinary(env, item, v)
+		if cmp.Type() == ErrorType {
+			return cmp
+		}
+		if cmp.(*Bool).Value {
+			return TRUE
+		}
+	}
+	return FALSE
+}
+
 // Iter : loop through items elements in order.
 func (a *Array) Iter() <-chan Object {
 	ch := make(chan Object)
