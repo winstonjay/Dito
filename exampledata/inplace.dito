@@ -1,5 +1,0 @@
-
-let x = range(0, 10)
-print(x[0], x)
-x[0] *= 2
-print(x[0], x)

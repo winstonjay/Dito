@@ -10,24 +10,9 @@ The most simple way to build with `go build` then use the executable or just `go
 
     ./dito
 
-Or you can run a file from `exampledata/` directory when in the main directory with. (The default path is `exampledata/`)
+Or you can run a file from `examples/` directory when in the main directory with. (The default path is `examples/`)
 
     ./dito funcs.dito
 
 
-**For more examples see `exampledata/` directory.**
-
-
-TODO: idk how on earth this has happend.
-
-    (dito)> x
-    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    (dito)> x[0] * 2
-    0
-    (dito)> x[0] *= 2
-    (dito)> x
-    [2, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    (dito)> 0 * 2
-    0
-
-sort this: inplace operators in general are a mess.
+For examples see `examples` or `lib` directories.

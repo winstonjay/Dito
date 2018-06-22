@@ -1,0 +1,19 @@
+# ## Assignments
+# Varibles are immutable by defualt and created via the `let` keyword.
+let x = 100
+
+# trying to update this varible this would cause an error.
+# x = 300
+
+# To create a mutable varible the keyword `mut` must also be added.
+let mut y = 200
+
+# As we have defined y as mutable this would be fine to do...
+y = 3 - y
+
+# or even any of the inplace operators.
+y += x
+y %= 100
+
+# Rationale is that using a combination of constants and duck-typing
+# is useful because...

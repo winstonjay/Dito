@@ -43,5 +43,4 @@ print(map_sqr([1, 2, 3, 4, 5]))
 # or event this:
 print(map(sqr)([1, 2, 3, 4, 5]))
 
-
 # TODO: implement more built in functions etc.

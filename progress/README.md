@@ -12,6 +12,13 @@
 - fix tracebacks so that column position is correct and at the start of the token.
 
 
+types?
+
+    # Object   := Atomic | Iterable | Functional | Struct
+    # Atomic   := Int | Floar | Char | Bool
+    # Iterable := String | Array | Dict | Iterator
+    # Callable := Function | Iterator | Builtin
+
 # Environment Features
 - command-line help. (requires docs to be written)
 - docs.
@@ -71,4 +78,20 @@ operation causes runtime panic.
 ```
 (dito)> "x" ++ ["hello", "sup"]
 panic: interface conversion: object.Object is *object.String, not *object.Array
+```
+
+### 4
+
+sort this: inplace operators in general are a mess.
+
+```
+(dito)> x
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+(dito)> x[0] * 2
+0
+(dito)> x[0] *= 2
+(dito)> x
+[2, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+(dito)> 0 * 2
+0
 ```
