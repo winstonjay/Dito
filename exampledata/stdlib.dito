@@ -14,6 +14,11 @@ func map(fn, iterable) {
     return iterable
 }
 
+func map(fn: Fn, x: Iter) : Iter {
+
+}
+
+
 func reduce(fn, it) {
     if len(it) == 0 {
         return it

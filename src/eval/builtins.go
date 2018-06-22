@@ -10,18 +10,88 @@ import (
 var Builtins = map[string]*object.Builtin{
 
 	// type conversions.
-	object.IntType.String():    &object.Builtin{Fn: typeSwitch(object.IntType)},
-	object.FloatType.String():  &object.Builtin{Fn: typeSwitch(object.FloatType)},
-	object.StringType.String(): &object.Builtin{Fn: typeSwitch(object.StringType)},
-	object.BoolType.String():   &object.Builtin{Fn: typeSwitch(object.BoolType)},
-	object.ArrayType.String():  &object.Builtin{Fn: typeSwitch(object.ArrayType)},
+	"int": &object.Builtin{
+		Name:    "int",
+		Fn:      typeSwitch(object.IntType),
+		Info:    "Convert value to `Int`",
+		ArgC:    1,
+		ArgT:    []string{"Atom"},
+		ReturnT: "Int",
+	},
+	"float": &object.Builtin{
+		Name:    "float",
+		Fn:      typeSwitch(object.FloatType),
+		Info:    "Convert value to `Float`",
+		ArgC:    1,
+		ArgT:    []string{"Atom"},
+		ReturnT: "Float",
+	},
+	"string": &object.Builtin{
+		Name:    "string",
+		Fn:      typeSwitch(object.StringType),
+		Info:    "Convert value to `String`",
+		ArgC:    1,
+		ArgT:    []string{"Any"},
+		ReturnT: "String",
+	},
+	"bool": &object.Builtin{
+		Name:    "bool",
+		Fn:      typeSwitch(object.BoolType),
+		Info:    "Convert value to `Bool`",
+		ArgC:    1,
+		ArgT:    []string{"Any"},
+		ReturnT: "Bool",
+	},
+	"array": &object.Builtin{
+		Name:    "array",
+		Fn:      typeSwitch(object.ArrayType),
+		Info:    "Convert value to `Array`",
+		ArgC:    1,
+		ArgT:    []string{"Iter"},
+		ReturnT: "Array",
+	},
+	"type": &object.Builtin{
+		Name:    "type",
+		Fn:      objectType,
+		Info:    "Reflect a values type",
+		ArgC:    1,
+		ArgT:    []string{"Any"},
+		ReturnT: "String",
+	},
+	"len": &object.Builtin{
+		Name:    "len",
+		Fn:      objectLen,
+		Info:    "Return the length of an `Iter`",
+		ArgC:    1,
+		ArgT:    []string{"Iter"},
+		ReturnT: "Int",
+	},
+	"abs": &object.Builtin{
+		Name:    "abs",
+		Fn:      objectAbs,
+		Info:    "Return the absolute value of an `Atom`",
+		ArgC:    1,
+		ArgT:    []string{"Atom"},
+		ReturnT: "Atom",
+	},
+	"print": &object.Builtin{
+		Name:    "print",
+		Fn:      objectPrint,
+		Info:    "Print a varible number of arguments to the std out.",
+		ArgC:    -1,
+		ArgT:    []string{"Any..."},
+		ReturnT: "None",
+	},
+	"range": &object.Builtin{
+		Name:    "range",
+		Fn:      objectRange,
+		Info:    "Generate an Array of Int's within a given range.",
+		ArgC:    2,
+		ArgT:    []string{"Int", "Int"},
+		ReturnT: "Array",
+	},
 
-	"type":       &object.Builtin{Fn: objectType},
-	"len":        &object.Builtin{Fn: objectLen},
-	"abs":        &object.Builtin{Fn: objectAbs},
-	"print":      &object.Builtin{Fn: objectPrint},
-	"isIterable": &object.Builtin{Fn: objectIsIterable},
-	"range":      &object.Builtin{Fn: objectRange},
+	// "isIterable": &object.Builtin{Fn: objectIsIterable},
 }
 
 func typeSwitch(which object.TypeFlag) object.BuiltinFunction {
@@ -77,13 +147,13 @@ func objectPrint(args ...object.Object) object.Object {
 	return object.NONE
 }
 
-func objectIsIterable(args ...object.Object) object.Object {
-	if n := len(args); n != 1 {
-		return object.NewError(object.InvalidArgLenError, "len", 1, n)
-	}
-	_, ok := args[0].(object.Iterable)
-	return object.NewBool(ok)
-}
+// func objectIsIterable(args ...object.Object) object.Object {
+// 	if n := len(args); n != 1 {
+// 		return object.NewError(object.InvalidArgLenError, "len", 1, n)
+// 	}
+// 	_, ok := args[0].(object.Iterable)
+// 	return object.NewBool(ok)
+// }
 
 func objectRange(args ...object.Object) object.Object {
 	if len(args) != 2 {

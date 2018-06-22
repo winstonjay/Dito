@@ -1,0 +1,1105 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">dito/src/parser/errors.go (7.7%)</option>
+				
+				<option value="file1">dito/src/parser/parser.go (32.5%)</option>
+				
+				<option value="file2">dito/src/scanner/scanner.go (99.2%)</option>
+				
+				<option value="file3">dito/src/scanner/trace.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package parser
+
+import (
+        "dito/src/token"
+        "fmt"
+        "io"
+        "strings"
+)
+
+// TODO: fix issues with column positions, tracebacks etc
+// TODO: Maybe make error its own type of object.
+// TODO: Work on traceback aethetics.
+
+// ParseError : store error message
+type ParseError struct {
+        message   string // what's the problem?
+        column    int    // what line it is on?
+        lineno    int    // where does the problem start on this line?
+        lineTrace string // what does this line look like?
+}
+
+// Example error output or the aim for what the output aspires to be.
+// print all error messages then the last traceback.
+//     Parse Error: Expected next token is ':='. got '9' instead.
+//     Parse Error: Expected next token is '('. got '!' instead.
+//     Parse Error: Expected next token is ';'. got '=' instead.
+//     Last traceback @ line 3, col 20:
+//                x := pasta * 2 / 3 =
+//                            ^ your problem right there.
+
+func (pe *ParseError) String() string <span class="cov0" title="0">{
+        return fmt.Sprintf(
+                "Traceback line %d column %d:\n%*s%s\n%*s%s\n%s\n",
+                pe.lineno, pe.column, 4, " ", pe.lineTrace, 4+pe.column, " ", "^ Is your problem here?",
+                pe.message)
+}</span>
+
+/*
+#### main Parser methods for working with errors.
+*/
+
+func (p *Parser) newError(message string) *ParseError <span class="cov0" title="0">{
+        linecontent := strings.TrimRight(p.scanner.TraceLine(), "\n\t ")
+        return &amp;ParseError{
+                message:   message,
+                lineno:    p.currentLine,
+                column:    len(linecontent) - len(p.currentLiteral),
+                lineTrace: linecontent,
+        }
+}</span>
+
+// PrintParseErrors : output all parse errors.
+func (p *Parser) PrintParseErrors(out io.Writer, errors []*ParseError) <span class="cov0" title="0">{
+        io.WriteString(out, "PARSE ERROR:\n")
+        for _, msg := range p.Errors() </span><span class="cov0" title="0">{
+                io.WriteString(out, msg.String())
+        }</span>
+}
+
+// Errors : return a array o all acculumated errors found when parsing.
+func (p *Parser) Errors() []*ParseError <span class="cov8" title="1">{
+        return p.errors
+}</span>
+
+func (p *Parser) genericError(t string, e error) <span class="cov0" title="0">{
+        msg := fmt.Sprintf("Could not parse %q as %s: %v", p.currentLiteral, t, e)
+        p.errors = append(p.errors, p.newError(msg))
+}</span>
+
+func (p *Parser) peekError(t token.Token) <span class="cov0" title="0">{
+        msg := fmt.Sprintf("Expected next token is '%s'. got '%s' instead",
+                t, p.peekLiteral)
+        p.errors = append(p.errors, p.newError(msg))
+}</span>
+
+func (p *Parser) noParseFnError(t token.Token) <span class="cov0" title="0">{
+        msg := fmt.Sprintf("No parse function found for '%s'", t)
+        p.errors = append(p.errors, p.newError(msg))
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">// Package parser implements Dito's Parser.
+package parser
+
+// TODO: full bodied functions that are written on one line cause a parse error
+// when the last expression ends with a semi-colon. This is kind of a bug
+// decide what to do about this.
+
+// TODO: Run more tests to find any more problems.
+
+import (
+        "dito/src/ast"
+        "dito/src/scanner"
+        "dito/src/token"
+        "strconv"
+)
+
+type (
+        prefixParseFn func() ast.Expression
+        infixParseFn  func(ast.Expression) ast.Expression
+)
+
+// Parser : structure who's methods implement a top-down operator precedence
+// parser. (Based roughly on pratt parsing model: https://goo.gl/uoH6Ta)
+// expression prefix and infix parse functions are stored in a table and mapped
+// by particular tokens. It should be initialised with a pointer to a lexical
+// scanner. Calling the method ParseProgram will return a fully formed AST. For
+// notes on the structure of the parser  most parse functions are annotated
+// with simple grammar notes. These are in the form nodetype: one or more
+// alternative rules of what ast structure the function can return.
+type Parser struct {
+        scanner        *scanner.Scanner
+        errors         []*ParseError
+        currentToken   token.Token
+        currentLiteral string
+        peekToken      token.Token
+        peekLiteral    string
+        currentLine    int
+        peekTokenLine  int
+        openParen      bool
+        prefixParseFns map[token.Token]prefixParseFn
+        infixParseFns  map[token.Token]infixParseFn
+}
+
+// New : Initalise a new parser with an newly initialsed Scanner.
+func New(s *scanner.Scanner) *Parser <span class="cov8" title="1">{
+        p := &amp;Parser{
+                scanner: s,
+                errors:  []*ParseError{},
+        }
+        // Define a table of methods for parsing expressions given a token.
+        p.prefixParseFns = map[token.Token]prefixParseFn{
+                // prefix / unary expressions
+                token.SUB: p.prefixExpression,
+                token.ADD: p.prefixExpression,
+                token.NOT: p.prefixExpression,
+                // function.
+                token.FUNC: p.lambdaFunction,
+                // Token Literals.
+                token.IDVAL:    p.identifier,
+                token.INT:      p.integerLiteral,
+                token.FLOAT:    p.floatLiteral,
+                token.TRUE:     p.booleanLiteral,
+                token.FALSE:    p.booleanLiteral,
+                token.LBRACKET: p.arrayLiteral,
+                token.LPAREN:   p.groupedExpression,
+                token.STRING:   p.stringLiteral,
+        }
+
+        p.infixParseFns = map[token.Token]infixParseFn{
+                // infix / binary Expressions.
+                token.SUB:      p.infixExpression,
+                token.ADD:      p.infixExpression,
+                token.MUL:      p.infixExpression,
+                token.DIV:      p.infixExpression,
+                token.IDIV:     p.infixExpression,
+                token.MOD:      p.infixExpression,
+                token.POW:      p.infixExpression,
+                token.CAT:      p.infixExpression,
+                token.IN:       p.infixExpression,
+                token.EQUALS:   p.infixExpression,
+                token.NEQUALS:  p.infixExpression,
+                token.LEQUALS:  p.infixExpression,
+                token.GEQUALS:  p.infixExpression,
+                token.LTHAN:    p.infixExpression,
+                token.GTHAN:    p.infixExpression,
+                token.LSHIFT:   p.infixExpression,
+                token.RSHIFT:   p.infixExpression,
+                token.LPAREN:   p.callExpression,
+                token.LBRACKET: p.indexExpression,
+                token.IF:       p.ifElseExpression,
+        }
+        // twice to fill current and peek token.
+        p.nextToken()
+        p.nextToken()
+        return p
+}</span>
+
+// Refresh : reset all values to defualt for parsing a fresh input stream.
+func (p *Parser) Refresh(s *scanner.Scanner) <span class="cov0" title="0">{
+        p.scanner = s
+        p.errors = []*ParseError{}
+        p.nextToken()
+        p.nextToken()
+}</span>
+
+// is the next token what we want if not create an error.
+func (p *Parser) expectPeek(t token.Token) bool <span class="cov8" title="1">{
+        if p.peekTokenIs(t) </span><span class="cov8" title="1">{
+                p.nextToken()
+                return true
+        }</span>
+        <span class="cov0" title="0">p.peekError(t)
+        return false</span>
+}
+
+func (p *Parser) peekTokenIs(t token.Token) bool <span class="cov8" title="1">{
+        return p.peekToken == t
+}</span>
+
+func (p *Parser) currentTokenIs(t token.Token) bool <span class="cov8" title="1">{
+        return p.currentToken == t
+}</span>
+
+func (p *Parser) nextToken() <span class="cov8" title="1">{
+        p.currentToken = p.peekToken
+        p.currentLiteral = p.peekLiteral
+        p.peekToken, p.peekLiteral, p.currentLine = p.scanner.NextToken()
+}</span>
+
+// check to see if there is a newline, EOF or Semicolon token or complain.
+func (p *Parser) stmtEnd() bool <span class="cov8" title="1">{
+        if p.peekTokenIs(token.SEMI) ||
+                p.peekTokenIs(token.NEWLINE) ||
+                p.peekTokenIs(token.EOF) </span><span class="cov8" title="1">{
+                p.nextToken()
+                return true
+        }</span>
+        <span class="cov0" title="0">p.peekError(token.NEWLINE)
+        return false</span>
+}
+
+// ParseProgram creates ast of the inputed text incrementally working with the
+// scanner.
+//         Program: list of statements
+//         stmtend: newline | semicolon | EOF
+func (p *Parser) ParseProgram() *ast.Program <span class="cov8" title="1">{
+        program := &amp;ast.Program{}
+        program.Statements = []ast.Statement{}
+        for p.currentToken != token.EOF </span><span class="cov8" title="1">{
+                stmt := p.statement()
+                if stmt != nil </span><span class="cov8" title="1">{
+                        program.Statements = append(program.Statements, stmt)
+                }</span>
+                <span class="cov8" title="1">if !p.stmtEnd() </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov8" title="1">p.nextToken()</span>
+        }
+        <span class="cov8" title="1">return program</span>
+}
+
+/*
+#### Statements.
+*/
+
+// statement:
+//     assignmentStatement
+//     indexAssignmentStatement
+//     expressionStatement
+//     functionStatement
+//     returnStatement
+//     forStatement
+//     importStatement
+func (p *Parser) statement() ast.Statement <span class="cov8" title="1">{
+        switch p.currentToken </span>{
+        case token.LET:<span class="cov8" title="1">
+                return p.assignmentStatement()</span>
+        case token.IDVAL:<span class="cov8" title="1">
+                if p.peekToken.IsAssignmentOp() </span><span class="cov0" title="0">{
+                        return p.reAssignStatement()
+                }</span>
+                <span class="cov8" title="1">if p.peekTokenIs(token.LBRACKET) </span><span class="cov0" title="0">{
+                        idxExp := p.expression(token.LOWEST)
+                        if !p.peekToken.IsAssignmentOp() </span><span class="cov0" title="0">{
+                                return &amp;ast.ExpressionStatement{
+                                        Token:      token.LBRACE,
+                                        Expression: idxExp,
+                                }
+                        }</span>
+                        <span class="cov0" title="0">return p.indexAssignmentStatement(idxExp.(*ast.IndexExpression))</span>
+                }
+                <span class="cov8" title="1">return p.expressionStatement()</span>
+        case token.FUNC:<span class="cov0" title="0">
+                return p.functionStatement()</span>
+        case token.RETURN:<span class="cov0" title="0">
+                return p.returnStatement()</span>
+        case token.IF:<span class="cov0" title="0">
+                return p.ifElseStatement()</span>
+        case token.FOR:<span class="cov0" title="0">
+                return p.forStatement()</span>
+        default:<span class="cov8" title="1">
+                return p.expressionStatement()</span>
+        }
+}
+
+// returnStatement:
+//     'return' expression
+func (p *Parser) returnStatement() *ast.ReturnStatement <span class="cov0" title="0">{
+        stmt := &amp;ast.ReturnStatement{Token: p.currentToken}
+        p.nextToken()
+        stmt.Value = p.expression(token.LOWEST)
+        return stmt
+}</span>
+
+// assignmentStatement:
+//     let identifier = expression
+//     | let mux identifier = expression
+func (p *Parser) assignmentStatement() *ast.AssignmentStatement <span class="cov8" title="1">{
+        stmt := &amp;ast.AssignmentStatement{}
+        if p.peekTokenIs(token.MUT) </span><span class="cov8" title="1">{
+                p.nextToken()
+        }</span>
+        <span class="cov8" title="1">stmt.Token = p.currentToken
+        if !p.expectPeek(token.IDVAL) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">stmt.Name = &amp;ast.Identifier{Token: p.currentToken, Value: p.currentLiteral}
+        if !p.expectPeek(token.ASSIGN) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">p.nextToken() // this could be anything.
+        stmt.Value = p.expression(token.LOWEST)
+        return stmt</span>
+}
+
+// reAssignStatement : Identifier assignOp expr
+//         assignOp =          = += -= *= /= %=
+func (p *Parser) reAssignStatement() *ast.ReAssignStatement <span class="cov0" title="0">{
+        stmt := &amp;ast.ReAssignStatement{
+                Token: p.peekToken,
+                Name:  &amp;ast.Identifier{Token: p.currentToken, Value: p.currentLiteral},
+        }
+        p.nextToken()
+        p.nextToken()
+        stmt.Value = p.expression(token.LOWEST)
+        return stmt
+}</span>
+
+// indexAssignmentStatement:
+//     identifier '[' expression ']' assignmentOperator expression
+func (p *Parser) indexAssignmentStatement(idxExp *ast.IndexExpression) *ast.IndexAssignmentStatement <span class="cov0" title="0">{
+        stmt := &amp;ast.IndexAssignmentStatement{Token: token.LBRACE, IdxExp: idxExp}
+        p.nextToken()
+        p.nextToken()
+        stmt.Value = p.expression(token.LOWEST)
+        return stmt
+}</span>
+
+// expressionStatement:
+//     expression
+func (p *Parser) expressionStatement() *ast.ExpressionStatement <span class="cov8" title="1">{
+        stmt := &amp;ast.ExpressionStatement{Token: p.currentToken}
+        stmt.Expression = p.expression(token.LOWEST)
+        return stmt
+}</span>
+
+// ifElseStatement:
+//     'if' expression '{' blockStatement '}'
+//     'if' expression '{' blockStatement '}' 'else' '{' blockStatement '}'
+func (p *Parser) ifElseStatement() *ast.IfStatement <span class="cov0" title="0">{
+        expression := &amp;ast.IfStatement{Token: p.currentToken}
+        p.nextToken()
+        expression.Condition = p.expression(token.LOWEST)
+        if !p.expectPeek(token.LBRACE) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">expression.Consequence = p.blockStatement()
+        if p.peekTokenIs(token.ELSE) </span><span class="cov0" title="0">{
+                p.nextToken()
+                if !p.expectPeek(token.LBRACE) </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov0" title="0">expression.Alternative = p.blockStatement()</span>
+        }
+        <span class="cov0" title="0">return expression</span>
+}
+
+// functionStatement
+//     'func' identifier '(' functionParameters ')' '{' blockStatement '}'
+func (p *Parser) functionStatement() *ast.Function <span class="cov0" title="0">{
+        fn := &amp;ast.Function{Token: p.currentToken}
+        if !p.expectPeek(token.IDVAL) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">fn.Name = p.identifier().(*ast.Identifier)
+        if !p.expectPeek(token.LPAREN) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">fn.Parameters = p.functionParameters()
+        if !p.expectPeek(token.LBRACE) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">fn.Body = p.blockStatement()
+        return fn</span>
+}
+
+// forStatement:
+//     'for' identifier 'in' identifier '{' blockStatement '}'
+//     'for' expression '{' blockStatement '}'
+func (p *Parser) forStatement() *ast.ForStatement <span class="cov0" title="0">{
+        stmt := &amp;ast.ForStatement{Token: p.currentToken}
+        p.nextToken()
+        if p.currentTokenIs(token.IDVAL) &amp;&amp; p.peekTokenIs(token.IN) </span><span class="cov0" title="0">{
+                stmt.ID = p.identifier().(*ast.Identifier)
+                p.nextToken()
+                p.nextToken()
+                stmt.Iter = p.expression(token.LOWEST)
+        }</span><span class="cov0" title="0"> else {
+                stmt.ID = nil
+                stmt.Condition = p.expression(token.LOWEST)
+        }</span>
+        <span class="cov0" title="0">if !p.expectPeek(token.LBRACE) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">stmt.LoopBody = p.blockStatement()
+        return stmt</span>
+}
+
+// blockStatement:
+//     statement stmtend blockstatement
+//     statement stmtend
+func (p *Parser) blockStatement() *ast.BlockStatement <span class="cov0" title="0">{
+        if p.peekTokenIs(token.NEWLINE) </span><span class="cov0" title="0">{
+                p.nextToken()
+        }</span>
+        <span class="cov0" title="0">block := &amp;ast.BlockStatement{Token: p.currentToken}
+        block.Statements = []ast.Statement{}
+        p.nextToken()
+        for !p.currentTokenIs(token.RBRACE) &amp;&amp; !p.currentTokenIs(token.EOF) </span><span class="cov0" title="0">{
+                stmt := p.statement()
+                if stmt != nil </span><span class="cov0" title="0">{
+                        block.Statements = append(block.Statements, stmt)
+                }</span>
+                <span class="cov0" title="0">if !p.stmtEnd() </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+                <span class="cov0" title="0">p.nextToken()</span>
+        }
+        <span class="cov0" title="0">return block</span>
+}
+
+/*
+#### Expressions.
+*/
+
+// expression:
+//     lambdaFunction
+//     callExpression
+//     ifElseExpression
+//     prefixExpression
+//     infixExpression
+//     groupedExpression
+//     indexExpression
+//     identifier
+//     atom
+func (p *Parser) expression(precedence uint) ast.Expression <span class="cov8" title="1">{
+        prefix := p.prefixParseFns[p.currentToken]
+        // we want to be able to do multiline expr inside parenthesis.
+        if prefix == nil </span><span class="cov0" title="0">{
+                p.noParseFnError(p.currentToken)
+                return nil
+        }</span>
+        <span class="cov8" title="1">expr := prefix()
+        for precedence &lt; p.peekToken.Precedence() </span><span class="cov8" title="1">{
+                infix := p.infixParseFns[p.peekToken]
+                if infix == nil </span><span class="cov0" title="0">{
+                        return expr
+                }</span>
+                <span class="cov8" title="1">p.nextToken()
+                expr = infix(expr)
+                if p.openParen &amp;&amp; p.currentTokenIs(token.NEWLINE) </span><span class="cov0" title="0">{
+                        p.nextToken()
+                }</span>
+        }
+        <span class="cov8" title="1">return expr</span>
+}
+
+// lambdaFunction:
+//     'func' '(' functionParameters ')' '-&gt;' expression
+func (p *Parser) lambdaFunction() ast.Expression <span class="cov0" title="0">{
+        lambda := &amp;ast.LambdaFunction{Token: p.currentToken}
+        if !p.expectPeek(token.LPAREN) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">lambda.Parameters = p.functionParameters()
+        if !p.expectPeek(token.RARROW) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">p.nextToken()
+        lambda.Expr = p.expression(token.LOWEST)
+        return lambda</span>
+}
+
+// functionParameters:
+//     identifer ',' functionParameters
+//     identifier
+func (p *Parser) functionParameters() []*ast.Identifier <span class="cov0" title="0">{
+        identifiers := []*ast.Identifier{}
+        if p.peekTokenIs(token.RPAREN) </span><span class="cov0" title="0">{
+                p.nextToken()
+                return identifiers
+        }</span>
+        <span class="cov0" title="0">p.nextToken()
+        idVal := p.identifier().(*ast.Identifier)
+        identifiers = append(identifiers, idVal)
+        for p.peekTokenIs(token.COMMA) </span><span class="cov0" title="0">{
+                p.nextToken()
+                p.nextToken()
+                idVal := p.identifier().(*ast.Identifier)
+                identifiers = append(identifiers, idVal)
+        }</span>
+        <span class="cov0" title="0">if !p.expectPeek(token.RPAREN) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">return identifiers</span>
+}
+
+// callExpression:
+//     identifier '(' expressionList ')'
+func (p *Parser) callExpression(function ast.Expression) ast.Expression <span class="cov0" title="0">{
+        exp := &amp;ast.CallExpression{Token: p.currentToken, Function: function}
+        exp.Arguments = p.expressionList(token.RPAREN)
+        return exp
+}</span>
+
+// expressionList
+//     expression ',' expressionList
+//     expression
+func (p *Parser) expressionList(delimiter token.Token) []ast.Expression <span class="cov0" title="0">{
+        list := []ast.Expression{}
+        if p.peekTokenIs(delimiter) </span><span class="cov0" title="0">{
+                p.nextToken()
+                return list
+        }</span>
+        <span class="cov0" title="0">p.nextToken()
+        list = append(list, p.expression(token.LOWEST))
+        for p.peekTokenIs(token.COMMA) </span><span class="cov0" title="0">{
+                p.nextToken()
+                p.nextToken()
+                list = append(list, p.expression(token.LOWEST))
+        }</span>
+        <span class="cov0" title="0">if !p.expectPeek(delimiter) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">return list</span>
+}
+
+// ifElseExpression:
+//     expression 'if' expression 'else' expression
+func (p *Parser) ifElseExpression(inital ast.Expression) ast.Expression <span class="cov0" title="0">{
+        expr := &amp;ast.IfElseExpression{
+                Initial: inital,
+                Token:   p.currentToken,
+        }
+        p.nextToken()
+        expr.Condition = p.expression(token.LOWEST)
+        if !p.expectPeek(token.ELSE) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">p.nextToken()
+        if p.openParen &amp;&amp; p.currentTokenIs(token.NEWLINE) </span><span class="cov0" title="0">{
+                p.nextToken()
+        }</span>
+        <span class="cov0" title="0">expr.Alternative = p.expression(token.LOWEST)
+        return expr</span>
+}
+
+// prefixExpression:
+//     prefixOperator expression
+func (p *Parser) prefixExpression() ast.Expression <span class="cov8" title="1">{
+        expr := &amp;ast.PrefixExpression{
+                Token:    p.currentToken,
+                Operator: p.currentLiteral,
+        }
+        p.nextToken()
+        expr.Right = p.expression(token.PREFIX)
+        return expr
+}</span>
+
+// infixExpression:
+//     expression binaryOperator expression
+func (p *Parser) infixExpression(left ast.Expression) ast.Expression <span class="cov8" title="1">{
+        expr := &amp;ast.InfixExpression{
+                Token:    p.currentToken,
+                Operator: p.currentLiteral,
+                Left:     left,
+        }
+        precedence := p.currentToken.Precedence()
+        p.nextToken()
+        expr.Right = p.expression(precedence)
+        return expr
+}</span>
+
+// groupedExpression:
+//     '(' expression ')'
+func (p *Parser) groupedExpression() ast.Expression <span class="cov0" title="0">{
+        p.nextToken()
+        p.openParen = true
+        if p.currentTokenIs(token.NEWLINE) </span><span class="cov0" title="0">{
+                p.nextToken()
+        }</span>
+        <span class="cov0" title="0">expr := p.expression(token.LOWEST)
+        if !p.expectPeek(token.RPAREN) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">p.openParen = false
+        return expr</span>
+}
+
+// indexExpression:
+//     identifier '[' expression ']'
+func (p *Parser) indexExpression(item ast.Expression) ast.Expression <span class="cov0" title="0">{
+        exp := &amp;ast.IndexExpression{Token: p.currentToken, Left: item}
+        p.nextToken()
+        exp.Index = p.expression(token.LOWEST)
+        if !p.expectPeek(token.RBRACKET) </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">return exp</span>
+}
+
+/*
+#### Atoms / Type Literals
+*/
+
+// arrayLiteral: '[' expressionList ']'
+func (p *Parser) arrayLiteral() ast.Expression <span class="cov0" title="0">{
+        return &amp;ast.ArrayLiteral{
+                Token:    p.currentToken,
+                Elements: p.expressionList(token.RBRACKET),
+        }
+}</span>
+
+// stringLiteral: "[^"]*"
+func (p *Parser) stringLiteral() ast.Expression <span class="cov0" title="0">{
+        return &amp;ast.StringLiteral{
+                Token: p.currentToken,
+                Value: p.currentLiteral,
+        }
+}</span>
+
+// identifier: [A-Za-z_][A-Za-z_0-9]*
+func (p *Parser) identifier() ast.Expression <span class="cov8" title="1">{
+        return &amp;ast.Identifier{
+                Token: p.currentToken,
+                Value: p.currentLiteral,
+        }
+}</span>
+
+// integer: base10Int | hexInt
+func (p *Parser) integerLiteral() ast.Expression <span class="cov8" title="1">{
+        lit := &amp;ast.IntegerLiteral{Token: p.currentToken, Literal: p.currentLiteral}
+        value, err := strconv.ParseInt(p.currentLiteral, 0, 64)
+        if err != nil </span><span class="cov0" title="0">{
+                p.genericError("integer", err)
+                return nil
+        }</span>
+        <span class="cov8" title="1">lit.Value = int(value)
+        return lit</span>
+}
+
+func (p *Parser) floatLiteral() ast.Expression <span class="cov8" title="1">{
+        lit := &amp;ast.FloatLiteral{Token: p.currentToken, Literal: p.currentLiteral}
+        value, err := strconv.ParseFloat(p.currentLiteral, 64)
+        if err != nil </span><span class="cov0" title="0">{
+                p.genericError("float", err)
+                return nil
+        }</span>
+        <span class="cov8" title="1">lit.Value = value
+        return lit</span>
+}
+
+// boolean: true | false
+func (p *Parser) booleanLiteral() ast.Expression <span class="cov8" title="1">{
+        return &amp;ast.BooleanLiteral{
+                Token: p.currentToken,
+                Value: p.currentTokenIs(token.TRUE),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">// Package scanner implements Dito's Lexical Scanner.
+// Scanner scans file for tokens and passes them to parser.
+// This is implemented by the NextToken function, which the
+// parser will call till it reaches an token.EOF.
+package scanner
+
+// TODO: fix issues with column positions, tracebacks etc.
+
+import (
+        "dito/src/token"
+)
+
+// Scanner implements the methods needed to scan a program.
+type Scanner struct {
+        input   string // Fixed state from new.
+        char    byte   // current char under examination
+        pos     int    // current char in input
+        peekPos int    // current next position (index of peek char)
+        linePos int    // index of the start of the current line.
+        lineno  int    // current line under examination
+        column  int    // current column position.
+        newline bool   // if or not to collect newline tokens.
+}
+
+// Init return an intialised lexical scanner. Values not
+// initalised are set to go's default type values :
+// 0 for all integers, false for bool.
+func Init(input string) *Scanner <span class="cov8" title="1">{
+        input += " " // add a buffer space at the end.
+        s := &amp;Scanner{input: input}
+        s.advance()
+        return s
+}</span>
+
+// NextToken : Returns the next token encountered by the lexical scanner.
+func (s *Scanner) NextToken() (tok token.Token, literal string, line int) <span class="cov8" title="1">{
+
+        // first see if we find a newline token return that and set the newline
+        // collection to false. This is so that at we only collect one newline token
+        // per space between non-whitespace chars. The rest of the newlines are not
+        // tokenised but the line postion is incremented.
+        if s.newline &amp;&amp; (s.char == '\n' || s.char == '\r') </span><span class="cov8" title="1">{
+                s.newline = false
+                s.advanceLine()
+                return token.NEWLINE, token.NEWLINE.String(), s.lineno - 1
+        }</span>
+
+        // reset newline collection so we collect the first trailing
+        // newline the next time this function is called.
+        <span class="cov8" title="1">s.newline = true
+
+        // Make sure all comments and spaces are skipped.
+        s.skipWhitespace()
+        for s.char == '#' </span><span class="cov8" title="1">{
+                s.skipComment()
+                s.skipWhitespace()
+        }</span>
+        // Run through all the possible operators and delimeters that are
+        // included in dito's grammar, if not default to check for
+        // identifers and numbers. If we still havent found anything
+        // set tok to token.ILLEGAL.
+        <span class="cov8" title="1">switch s.char </span>{
+        case '=':<span class="cov8" title="1"> // = ==
+                tok = s.switch2(token.ASSIGN, '=', token.EQUALS)</span>
+        case '%':<span class="cov8" title="1"> // % %=
+                tok = s.switch2(token.MOD, '=', token.MODEQUAL)</span>
+        case '!':<span class="cov8" title="1"> // ! !=
+                tok = s.switch2(token.NOT, '=', token.NEQUALS)</span>
+        case '*':<span class="cov8" title="1"> // * **
+                tok = s.switch3(token.MUL, '*', token.POW, '=', token.MULEQUAL)</span>
+        case '&gt;':<span class="cov8" title="1"> // &gt; &gt;= &gt;&gt;
+                tok = s.switch3(token.GTHAN, '=', token.GEQUALS, '&gt;', token.RSHIFT)</span>
+        case '&lt;':<span class="cov8" title="1"> // &lt; &lt;= &lt;&lt;
+                tok = s.switch3(token.LTHAN, '=', token.LEQUALS, '&lt;', token.LSHIFT)</span>
+        case '/':<span class="cov8" title="1"> // / /= //
+                tok = s.switch3(token.DIV, '=', token.DIVEQUAL, '/', token.IDIV)</span>
+        case '-':<span class="cov8" title="1"> // - -= -&gt;
+                tok = s.switch3(token.SUB, '=', token.SUBEQUAL, '&gt;', token.RARROW)</span>
+        case '+':<span class="cov8" title="1"> // + ++ +=
+                tok = s.switch3(token.ADD, '+', token.CAT, '=', token.ADDEQUAL)</span>
+        case '(':<span class="cov8" title="1">
+                tok = token.LPAREN</span>
+        case ')':<span class="cov8" title="1">
+                tok = token.RPAREN</span>
+        case ';':<span class="cov8" title="1">
+                tok = token.SEMI</span>
+        case ',':<span class="cov8" title="1">
+                tok = token.COMMA</span>
+        case '{':<span class="cov8" title="1">
+                tok = token.LBRACE</span>
+        case '}':<span class="cov8" title="1">
+                tok = token.RBRACE</span>
+        case '[':<span class="cov8" title="1">
+                tok = token.LBRACKET</span>
+        case ']':<span class="cov8" title="1">
+                tok = token.RBRACKET</span>
+        case '"':<span class="cov8" title="1">
+                return s.readString()</span>
+        case '.':<span class="cov8" title="1">
+                if isDigit(s.peek()) </span><span class="cov8" title="1">{
+                        return s.readNumber()
+                }</span>
+                <span class="cov8" title="1">tok = token.ILLEGAL</span>
+        case 0:<span class="cov8" title="1">
+                // token.EOF represents end of input.
+                // the scanners caller should check for
+                // this to find out when to stop iterating.
+                tok = token.EOF</span>
+        default:<span class="cov8" title="1">
+                if isDigit(s.char) </span><span class="cov8" title="1">{
+                        return s.readNumber()
+                }</span>
+                <span class="cov8" title="1">if isLetter(s.char) </span><span class="cov8" title="1">{
+                        return s.readIdentifer()
+                }</span>
+                // We shouldnt have got to this point irl. Error is currently
+                // handed by the parser as a no parse function found error.
+                <span class="cov8" title="1">tok = token.ILLEGAL</span>
+        }
+        <span class="cov8" title="1">s.advance() // Always advance.
+        return tok, tok.String(), s.lineno</span>
+}
+
+// switch 2 checks between 2 possible alternatives give a current token and a
+// the peek token returning the correct combination of chars.
+func (s *Scanner) switch2(curr token.Token, expected byte, alt token.Token) token.Token <span class="cov8" title="1">{
+        if s.peek() == expected </span><span class="cov8" title="1">{
+                s.advance()
+                return alt
+        }</span>
+        <span class="cov8" title="1">return curr</span>
+}
+
+// switch 3 checks between 3 possible alternatives give a
+// current token and a the peek token.
+func (s *Scanner) switch3(
+        curr token.Token,
+        expected1 byte, alt1 token.Token,
+        expected2 byte, alt2 token.Token,
+) token.Token <span class="cov8" title="1">{
+        switch s.peek() </span>{
+        case expected1:<span class="cov8" title="1">
+                s.advance()
+                return alt1</span>
+        case expected2:<span class="cov8" title="1">
+                s.advance()
+                return alt2</span>
+        default:<span class="cov8" title="1">
+                return curr</span>
+        }
+}
+
+// readString reads until it sees a double quote or 0 (EOF).
+// Strings can only be created with double quotes.
+// They can be multi-line but this should probally be
+// treated as an error in the future.
+func (s *Scanner) readString() (token.Token, string, int) <span class="cov8" title="1">{
+        start := s.pos + 1
+        for </span><span class="cov8" title="1">{
+                s.advance()
+                if s.char == '"' || s.char == 0 </span><span class="cov8" title="1">{
+                        break</span>
+                }
+        }
+        <span class="cov8" title="1">literal := s.input[start:s.pos]
+        s.advance()
+        return token.STRING, literal, s.lineno</span>
+}
+
+// readIdentifer reads while alphanumeric chars are under inspection.
+// it then determines if the collecting token literal is a keyword or
+// a user defined identifier, returning the type accordingly.
+func (s *Scanner) readIdentifer() (token.Token, string, int) <span class="cov8" title="1">{
+        start := s.pos
+        for isLetter(s.char) || isDigit(s.char) </span><span class="cov8" title="1">{
+                s.advance()
+        }</span>
+        <span class="cov8" title="1">literal := s.input[start:s.pos]
+        return token.LookUpIDVal(literal), literal, s.lineno</span>
+}
+
+// readNumber returns either an integer or a float type token
+// with support for hex, e notation, and decimal.
+// All hex digits are integers and all exponated digits are floats.
+func (s *Scanner) readNumber() (token.Token, string, int) <span class="cov8" title="1">{
+        start := s.pos
+        // loop though digits until we read the end of 0-9.
+        for isDigit(s.char) </span><span class="cov8" title="1">{
+                s.advance()
+        }</span>
+        // Once we have the significand, now find the numbers type.
+        <span class="cov8" title="1">switch </span>{
+        // all hexadecimals start strictly with a 0x or a 0X.
+        case (s.char == 'x' || s.char == 'X') &amp;&amp; s.input[start:s.pos] == "0":<span class="cov8" title="1">
+                goto Hexadecimal</span>
+        case s.char == '.':<span class="cov8" title="1">
+                goto Mantissa</span>
+        case s.char == 'e' || s.char == 'E':<span class="cov8" title="1">
+                goto Exponent</span>
+        default:<span class="cov8" title="1">
+                return token.INT, s.input[start:s.pos], s.lineno</span>
+        }
+
+Hexadecimal:
+        // 0xffaf, 0X0032f, ...
+        <span class="cov8" title="1">s.advance()
+        for isHex(s.char) </span><span class="cov8" title="1">{
+                s.advance()
+        }</span>
+        <span class="cov8" title="1">return token.INT, s.input[start:s.pos], s.lineno
+
+</span>Mantissa:
+        // 0.321, 312.123, ...
+        <span class="cov8" title="1">s.advance()
+        for isDigit(s.char) </span><span class="cov8" title="1">{
+                s.advance()
+        }</span>
+        <span class="cov8" title="1">if s.char == 'e' || s.char == 'E' </span><span class="cov8" title="1">{
+                goto Exponent</span>
+        }
+        <span class="cov8" title="1">return token.FLOAT, s.input[start:s.pos], s.lineno
+
+</span>Exponent:
+        // 10e2, 8E-2, 8.23e10, ...
+        <span class="cov8" title="1">s.advance()
+        if s.char == '+' || s.char == '-' </span><span class="cov8" title="1">{
+                s.advance()
+        }</span>
+        <span class="cov8" title="1">s.advance()
+        for isDigit(s.char) </span><span class="cov8" title="1">{
+                s.advance()
+        }</span>
+        <span class="cov8" title="1">return token.FLOAT, s.input[start:s.pos], s.lineno</span>
+}
+
+func (s *Scanner) advance() <span class="cov8" title="1">{
+        if s.peekPos &gt;= len(s.input) </span><span class="cov8" title="1">{
+                s.char = 0
+                return
+        }</span>
+        <span class="cov8" title="1">s.char = s.input[s.peekPos]
+        s.pos = s.peekPos
+        s.peekPos++
+        s.column++</span>
+}
+
+func (s *Scanner) advanceLine() <span class="cov8" title="1">{
+        s.advance()
+        s.linePos = s.pos
+        s.column = 0
+        s.lineno++
+}</span>
+
+func (s *Scanner) peek() byte <span class="cov8" title="1">{
+        if s.peekPos &gt;= len(s.input) </span><span class="cov0" title="0">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">return s.input[s.peekPos]</span>
+}
+
+func (s *Scanner) skipWhitespace() <span class="cov8" title="1">{
+        for isSpace(s.char) </span><span class="cov8" title="1">{
+                if s.char == '\n' || s.char == '\r' </span><span class="cov8" title="1">{
+                        s.advanceLine()
+                }</span><span class="cov8" title="1"> else {
+                        s.advance()
+                }</span>
+        }
+}
+
+func (s *Scanner) skipComment() <span class="cov8" title="1">{
+        for s.char != 0 &amp;&amp; !(s.char == '\n' || s.char == '\r') </span><span class="cov8" title="1">{
+                s.advance()
+        }</span>
+        <span class="cov8" title="1">if s.char != 0 </span><span class="cov8" title="1">{
+                s.advanceLine()
+        }</span>
+}
+
+func isDigit(char byte) bool <span class="cov8" title="1">{
+        return '0' &lt;= char &amp;&amp; char &lt;= '9'
+}</span>
+
+func isLetter(char byte) bool <span class="cov8" title="1">{
+        return ('a' &lt;= char &amp;&amp; char &lt;= 'z' ||
+                'A' &lt;= char &amp;&amp; char &lt;= 'Z' || char == '_')
+}</span>
+
+func isSpace(char byte) bool <span class="cov8" title="1">{
+        return (char == ' ' || char == '\t' ||
+                char == '\n' || char == '\r')
+}</span>
+
+func isHex(char byte) bool <span class="cov8" title="1">{
+        return (isDigit(char) || 'a' &lt;= char &amp;&amp; char &lt;= 'z' ||
+                'A' &lt;= char &amp;&amp; char &lt;= 'Z')
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package scanner
+
+// TraceLine : Returns last line up to current column.
+// eg. at index 8 of "alpha := 100" we would get: 'alpha :=' &lt;-.
+func (s *Scanner) TraceLine() string <span class="cov0" title="0">{
+        return s.input[s.linePos : s.linePos+s.column]
+}</span>
+
+// // PrintScan method prints out a table of the entire lexical
+// // analysis of an input in one go.
+// func (s *Scanner) PrintScan() {
+//         tok, literal, _ := s.NextToken()
+//         tokenCount := 0
+//         fmt.Printf("input:\n\n%s\n\n", s.input)
+//         fmt.Printf("| line | col  | Token        | Literal     |\n")
+//         fmt.Printf("-----------------------------------------\n")
+//         for tok != token.EOF {
+//                 fmt.Printf("| %4d | %4d | %12s | %12s |\n",
+//                         s.lineno+1, s.column-len(literal), tok.String(), literal)
+//                 tokenCount++
+//                 tok, literal, _ = s.NextToken()
+//         }
+//         fmt.Printf("\nTotal Tokens: %d, \n", tokenCount)
+//         fmt.Printf("Total Chars: %d, \n", s.pos)
+//         fmt.Printf("Total Lines: %d, \n", s.lineno+1)
+// }
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

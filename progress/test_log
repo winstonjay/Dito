@@ -1,0 +1,9 @@
+2018-06-21 22:52:36
+?   	dito	[no test files]
+?   	dito/src/ast	[no test files]
+?   	dito/src/eval	[no test files]
+?   	dito/src/object	[no test files]
+ok  	dito/src/parser	0.007s	coverage: 31.2% of statements
+?   	dito/src/repl	[no test files]
+ok  	dito/src/scanner	0.007s	coverage: 98.3% of statements
+?   	dito/src/token	[no test files]

@@ -1,1 +1,31 @@
 
+## Type heirarchy
+
+# Object   := Atomic | Iterable | Functional | Struct
+# Atomic   := Int | Floar | Char | Bool
+# Iterable := String | Array | Dict | Iterator
+# Callable := Function | Iterator | Builtin
+# Struct   :=
+
+
+type Point {
+    x: atom
+    y: atom
+
+    func +(v: Point) {
+        :x += v
+        :y += v
+        return
+    }
+
+    func in(v: Point) {
+
+    }
+
+    func -(v: Point) {
+
+    }
+}
+
+let p = Point(3, 4)
+p.+ Point(2)

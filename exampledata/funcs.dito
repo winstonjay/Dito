@@ -23,7 +23,6 @@ let mul = func(a) -> func(b) -> a * b
 # this is kinda useless but we can use this like this:
 print(mul(10)(10))
 
-
 # this function takes a function/lambda as a arg and returns a function
 func map(fn) {
     let i = 0

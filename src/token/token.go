@@ -27,6 +27,7 @@ const (
 	IDIV // //
 	MOD  // %
 	POW  // **
+	CAT  // ++
 
 	EQUALS  // ==
 	NEQUALS // !=
@@ -35,15 +36,16 @@ const (
 	LTHAN   // <
 	GTHAN   // >
 	NOT     // !
-	CAT     // ++
 
-	SHIFTL // <<
-	SHIFTR // >>
+	LSHIFT // <<
+	RSHIFT // >>
+
+	// start: not implemented by scanner
 	BITAND // &
 	BITOR  // \
 	BITXOR // ^
+	// end
 
-	LARROW // <- n.a.
 	RARROW // ->
 
 	LPAREN   // (
@@ -52,6 +54,11 @@ const (
 	LBRACE   // }
 	LBRACKET // [
 	RBRACKET // ]
+
+	SEMI  // ;
+	COLON // :
+	COMMA // ,
+	endOperator
 
 	beginAssignementOp
 	ASSIGN // =
@@ -63,11 +70,6 @@ const (
 	MODEQUAL // %=
 	endAssignementOp
 
-	SEMI  // ;
-	COLON // :
-	COMMA // ,
-	endOperator
-
 	NEWLINE // \n
 
 	QUOTE // "
@@ -75,19 +77,17 @@ const (
 	HASH // # start comments
 
 	beginKeyword
-	TRUE  // true
-	FALSE // false
-	IF    // if
-	ELSE  // else
-	FOR   // for
-	IN    // in
-	FUNC  // func
-	AND   // and
-	OR    // or
-	LET   // let
-	MUT   // mut
-	// RHO    // rho n.a
-	// IOTA   // iota n.a
+	TRUE   // true
+	FALSE  // false
+	IF     // if
+	ELSE   // else
+	FOR    // for
+	IN     // in
+	FUNC   // func
+	AND    // and
+	OR     // or
+	LET    // let
+	MUT    // mut
 	RETURN // return
 	IMPORT // import
 	endKeyword
@@ -95,9 +95,9 @@ const (
 
 var tokensLiterals = [...]string{
 
-	ILLEGAL: "Illegal Token!",
+	ILLEGAL: "ILLEGAL",
 	EOF:     "EOF",
-	NEWLINE: "newline",
+	NEWLINE: "NEWLINE",
 
 	IDVAL:  "ID",
 	INT:    "Int",
@@ -122,11 +122,14 @@ var tokensLiterals = [...]string{
 	LTHAN:   "<",
 	GTHAN:   ">",
 
-	SHIFTL: "<<",
-	SHIFTR: ">>",
+	LSHIFT: "<<",
+	RSHIFT: ">>",
+
+	// start: not implemented by scanner
 	BITAND: "&",
 	BITOR:  "|",
 	BITXOR: "^",
+	// end
 
 	ASSIGN: "=",
 
@@ -136,7 +139,6 @@ var tokensLiterals = [...]string{
 	DIVEQUAL: "/=",
 	MODEQUAL: "%=",
 
-	LARROW: "<-", // n.a.
 	RARROW: "->",
 
 	LPAREN:   "(",
@@ -166,8 +168,6 @@ var tokensLiterals = [...]string{
 	LET: "let",
 	MUT: "mut",
 
-	// RHO:  "rho", n.a
-	// IOTA:  "iota", n.a
 	IMPORT: "import",
 	RETURN: "return",
 }
@@ -231,7 +231,7 @@ func (t Token) Precedence() uint {
 		return EQUALITY
 	case LEQUALS, GEQUALS, LTHAN, GTHAN:
 		return LESSGREATER
-	case ADD, SUB, CAT, SHIFTL, SHIFTR:
+	case ADD, SUB, CAT, LSHIFT, RSHIFT:
 		return ADDSUB
 	case MOD, DIV, MUL, IDIV:
 		return TERM

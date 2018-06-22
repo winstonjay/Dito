@@ -69,9 +69,9 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	case '*': // * **
 		tok = s.switch3(token.MUL, '*', token.POW, '=', token.MULEQUAL)
 	case '>': // > >= >>
-		tok = s.switch3(token.GTHAN, '=', token.LEQUALS, '>', token.SHIFTR)
+		tok = s.switch3(token.GTHAN, '=', token.GEQUALS, '>', token.RSHIFT)
 	case '<': // < <= <<
-		tok = s.switch3(token.LTHAN, '=', token.LEQUALS, '<', token.SHIFTL)
+		tok = s.switch3(token.LTHAN, '=', token.LEQUALS, '<', token.LSHIFT)
 	case '/': // / /= //
 		tok = s.switch3(token.DIV, '=', token.DIVEQUAL, '/', token.IDIV)
 	case '-': // - -= ->

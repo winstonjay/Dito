@@ -16,8 +16,11 @@ let hypot = func(a, b)->(a**2 + b**2)**0.5
 
 let summer = true
 let mut rain = true
-let fun = false
-"he" ++ "llo"`
+let fun = false != true
+"he" ++ "llo"
+[10e2 + 3, 8.23e10, 0xffcc, 3e-5]; func float_5(a) { return .5 * a; }
+.@ @
+x /= fun << 1`
 	// ^^^^^ DO NOT CHANGE OR YOU HAVE TO WORK OUT THE WHOLE TEST AGAIN
 	// if you have to. extend the current string.
 	// TODO (ALREADY BROKE cols NEEDS FIXING, there are some alignment
@@ -26,74 +29,131 @@ let fun = false
 		token   token.Token
 		literal string
 		line    int
-		column  int
+		column  int // TODO
 	}{
+		// let alpha = 10.999 + 10**3
 		{token.LET, "let", 0, 0},
-		{token.IDVAL, "alpha", 0, 5},
-		{token.ASSIGN, "=", 0, 8},
-		{token.FLOAT, "10.999", 0, 15},
-		{token.ADD, "+", 0, 17},
-		{token.INT, "10", 0, 20},
-		{token.POW, "**", 0, 22},
-		{token.INT, "3", 0, 23},
-		{token.NEWLINE, "newline", 0, -1},
+		{token.IDVAL, "alpha", 0, 0},
+		{token.ASSIGN, "=", 0, 0},
+		{token.FLOAT, "10.999", 0, 0},
+		{token.ADD, "+", 0, 0},
+		{token.INT, "10", 0, 0},
+		{token.POW, "**", 0, 0},
+		{token.INT, "3", 0, 0},
+		{token.NEWLINE, "NEWLINE", 0, 0},
+
+		// let mut _o_me_ga = (50 % 7) - 0.002
 		{token.LET, "let", 1, 0},
 		{token.MUT, "mut", 1, 0},
-		{token.IDVAL, "_o_me_ga", 1, 8},
-		{token.ASSIGN, "=", 1, 11},
-		{token.LPAREN, "(", 1, 13},
-		{token.INT, "50", 1, 15},
-		{token.MOD, "%", 1, 17},
-		{token.INT, "7", 1, 19},
-		{token.RPAREN, ")", 1, 20},
-		{token.SUB, "-", 1, 22},
-		{token.FLOAT, "0.002", 1, 28},
-		{token.NEWLINE, "newline", 1, -1},
-		// skips comment.
-		{token.LET, "let", 5, 0},
-		{token.IDVAL, "hypot", 5, 5},
-		{token.ASSIGN, "=", 5, 7},
-		{token.FUNC, "func", 5, 12},
-		{token.LPAREN, "(", 5, 13},
-		{token.IDVAL, "a", 5, 14},
-		{token.COMMA, ",", 5, 15},
-		{token.IDVAL, "b", 5, 17},
-		{token.RPAREN, ")", 5, 18},
-		{token.RARROW, "->", 5, 19},
-		{token.LPAREN, "(", 5, 21},
-		{token.IDVAL, "a", 5, 22},
-		{token.POW, "**", 5, 24},
-		{token.INT, "2", 5, 25},
-		{token.ADD, "+", 5, 27},
-		{token.IDVAL, "b", 5, 29},
-		{token.POW, "**", 5, 31},
-		{token.INT, "2", 5, 32},
-		{token.RPAREN, ")", 5, 33},
-		{token.POW, "**", 5, 35},
-		{token.FLOAT, "0.5", 5, 38},
-		{token.NEWLINE, "newline", 5, -1},
+		{token.IDVAL, "_o_me_ga", 1, 0},
+		{token.ASSIGN, "=", 1, 0},
+		{token.LPAREN, "(", 1, 0},
+		{token.INT, "50", 1, 0},
+		{token.MOD, "%", 1, 0},
+		{token.INT, "7", 1, 0},
+		{token.RPAREN, ")", 1, 0},
+		{token.SUB, "-", 1, 0},
+		{token.FLOAT, "0.002", 1, 0},
+		{token.NEWLINE, "NEWLINE", 1, 0},
 
+		// skips comment.
+
+		// let hypot = func(a, b)->(a**2 + b**2)**0.5
+		{token.LET, "let", 5, 0},
+		{token.IDVAL, "hypot", 5, 0},
+		{token.ASSIGN, "=", 5, 0},
+		{token.FUNC, "func", 5, 0},
+		{token.LPAREN, "(", 5, 0},
+		{token.IDVAL, "a", 5, 0},
+		{token.COMMA, ",", 5, 0},
+		{token.IDVAL, "b", 5, 0},
+		{token.RPAREN, ")", 5, 0},
+		{token.RARROW, "->", 5, 0},
+		{token.LPAREN, "(", 5, 0},
+		{token.IDVAL, "a", 5, 0},
+		{token.POW, "**", 5, 0},
+		{token.INT, "2", 5, 0},
+		{token.ADD, "+", 5, 0},
+		{token.IDVAL, "b", 5, 0},
+		{token.POW, "**", 5, 0},
+		{token.INT, "2", 5, 0},
+		{token.RPAREN, ")", 5, 0},
+		{token.POW, "**", 5, 0},
+		{token.FLOAT, "0.5", 5, 0},
+		{token.NEWLINE, "NEWLINE", 5, 0},
+
+		// let summer = true
 		{token.LET, "let", 7, 0},
-		{token.IDVAL, "summer", 7, 6},
-		{token.ASSIGN, "=", 7, 9},
-		{token.TRUE, "true", 7, 14},
-		{token.NEWLINE, "newline", 7, -1},
+		{token.IDVAL, "summer", 7, 0},
+		{token.ASSIGN, "=", 7, 0},
+		{token.TRUE, "true", 7, 0},
+		{token.NEWLINE, "NEWLINE", 7, 0},
+
+		// let mut rain = true
 		{token.LET, "let", 8, 0},
 		{token.MUT, "mut", 8, 0},
-		{token.IDVAL, "rain", 8, 4},
-		{token.ASSIGN, "=", 8, 7},
-		{token.TRUE, "true", 8, 12},
-		{token.NEWLINE, "newline", 8, -1},
+		{token.IDVAL, "rain", 8, 0},
+		{token.ASSIGN, "=", 8, 0},
+		{token.TRUE, "true", 8, 0},
+		{token.NEWLINE, "NEWLINE", 8, 0},
+
+		// let fun = false != true
 		{token.LET, "let", 9, 0},
-		{token.IDVAL, "fun", 9, 3},
-		{token.ASSIGN, "=", 9, 6},
-		{token.FALSE, "false", 9, 12},
-		{token.NEWLINE, "newline", 9, -1},
-		{token.STRING, "he", 10, 12},
-		{token.CAT, "++", 10, 12},
-		{token.STRING, "llo", 10, 12},
+		{token.IDVAL, "fun", 9, 0},
+		{token.ASSIGN, "=", 9, 0},
+		{token.FALSE, "false", 9, 0},
+		{token.NEQUALS, "!=", 9, 0},
+		{token.TRUE, "true", 9, 0},
+		{token.NEWLINE, "NEWLINE", 9, 0},
+
+		// "he" ++ "llo"
+		{token.STRING, "he", 10, 0},
+		{token.CAT, "++", 10, 0},
+		{token.STRING, "llo", 10, 0},
+		{token.NEWLINE, "NEWLINE", 10, 0},
+
+		// [10e2 + 3, 8.23e10, 0xffcc, 3e-5]; func float_5(a) { return .5 * a; }
+		{token.LBRACKET, "[", 11, 0},
+		{token.FLOAT, "10e2", 11, 0},
+		{token.ADD, "+", 11, 0},
+		{token.INT, "3", 11, 0},
+		{token.COMMA, ",", 11, 0},
+		{token.FLOAT, "8.23e10", 11, 0},
+		{token.COMMA, ",", 11, 0},
+		{token.INT, "0xffcc", 11, 0},
+		{token.COMMA, ",", 11, 0},
+		{token.FLOAT, "3e-5", 11, 0},
+		{token.RBRACKET, "]", 11, 0},
+		{token.SEMI, ";", 11, 0},
+		{token.FUNC, "func", 11, 0},
+		{token.IDVAL, "float_5", 11, 0},
+		{token.LPAREN, "(", 11, 0},
+		{token.IDVAL, "a", 11, 0},
+		{token.RPAREN, ")", 11, 0},
+		{token.LBRACE, "{", 11, 0},
+		{token.RETURN, "return", 11, 0},
+		{token.FLOAT, ".5", 11, 0},
+		{token.MUL, "*", 11, 0},
+		{token.IDVAL, "a", 11, 0},
+		{token.SEMI, ";", 11, 0},
+		{token.RBRACE, "}", 11, 0},
+		{token.NEWLINE, "NEWLINE", 11, 0},
+
+		// .@ @
+		{token.ILLEGAL, "ILLEGAL", 12, 0},
+		{token.ILLEGAL, "ILLEGAL", 12, 0},
+		{token.ILLEGAL, "ILLEGAL", 12, 0},
+		{token.NEWLINE, "NEWLINE", 12, 0},
+
+		// x /= fun << 1
+		{token.IDVAL, "x", 13, 0},
+		{token.DIVEQUAL, "/=", 13, 0},
+		{token.IDVAL, "fun", 13, 0},
+		{token.LSHIFT, "<<", 13, 0},
+		{token.INT, "1", 13, 0},
+
 		// Allways end with EOF.
-		{token.EOF, "EOF", 10, 12},
+		{token.EOF, "EOF", 13, 0},
 	}
 
 	scanner := Init(input) // init scanner.
@@ -128,28 +188,35 @@ func TestNewLines(t *testing.T) {
 		line    int
 	}{
 		{token.INT, "100", 1},
-		{token.NEWLINE, "newline", 1},
+		{token.NEWLINE, "NEWLINE", 1},
+		{token.LET, "let", 4},
 		{token.IDVAL, "hey", 4},
-		{token.ASSIGN, ":=", 4},
+		{token.ASSIGN, "=", 4},
 		{token.INT, "200", 4},
-		{token.NEWLINE, "newline", 4},
+		{token.NEWLINE, "NEWLINE", 4},
+		{token.LET, "let", 5},
 		{token.IDVAL, "x", 5},
-		{token.ASSIGN, ":=", 5},
+		{token.ASSIGN, "=", 5},
 		{token.INT, "0xff", 5},
-		{token.NEWLINE, "newline", 5},
-		{token.EOF, "EOF", 10},
+		{token.GEQUALS, ">=", 5},
+		{token.INT, "5000", 5},
+		{token.NEWLINE, "NEWLINE", 5},
+		{token.STRING, "bye", 12},
+		{token.EOF, "EOF", 12},
 	}
 	scanner := Init(`
 100
 
 # Hopefully the lines are now working.
-hey := 200
-x := 0xff
+let hey = 200
+let x = 0xff >= 5000
 
-# we only want newline to be seen just
+
+# we only want NEWLINE to be seen just
 # after content and then ignore the rest.
 
-# after content. like "x + y\n"`)
+# after content. like "x + y\n
+"bye"`)
 	for i, tt := range tests {
 		tok, literal, lineno := scanner.NextToken()
 		if tok != tt.token {
@@ -161,8 +228,8 @@ x := 0xff
 				i, tt.literal, literal)
 		}
 		if lineno != tt.line {
-			t.Fatalf("test[%d](%s) - Invalid line index. expected=%d, got=%d",
-				i, tt.literal, tt.line, lineno)
+			t.Fatalf("test[%d](%s) - Invalid line index. expected=%d, got=%d.\n-> `%s`",
+				i, tt.literal, tt.line, lineno, literal)
 		}
 	}
 }
