@@ -3,7 +3,13 @@ package eval
 import (
 	"dito/src/ast"
 	"dito/src/object"
+	"math/rand"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().UTC().UnixNano())
+}
 
 // Eval :
 func Eval(node ast.Node, env *object.Environment) object.Object {
@@ -28,6 +34,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalForStatement(node, env)
 	case *ast.BlockStatement:
 		return evalBlockStatement(node, env)
+	case *ast.ImportStatement:
+		return evalImportStatement(node, env)
 
 	// Expressions
 	case *ast.PrefixExpression:

@@ -3,7 +3,9 @@ package eval
 import (
 	"dito/src/object"
 	"io"
+	"math/rand"
 	"os"
+	"time"
 )
 
 // Builtins : map of builtin functions
@@ -90,6 +92,22 @@ var Builtins = map[string]*object.Builtin{
 		ArgT:    []string{"Int", "Int"},
 		ReturnT: "Array",
 	},
+	"rand": &object.Builtin{
+		Name:    "rand",
+		Fn:      objectRand,
+		Info:    "Generate a random Float between 0-1.",
+		ArgC:    0,
+		ArgT:    []string{},
+		ReturnT: "Float",
+	},
+	"time": &object.Builtin{
+		Name:    "time",
+		Fn:      objectTime,
+		Info:    "Return current Unix timestamp as an Int",
+		ArgC:    0,
+		ArgT:    []string{},
+		ReturnT: "Int",
+	},
 
 	// "isIterable": &object.Builtin{Fn: objectIsIterable},
 }
@@ -174,4 +192,18 @@ func objectRange(args ...object.Object) object.Object {
 		i++
 	}
 	return object.NewArray(iter, -1)
+}
+
+func objectRand(args ...object.Object) object.Object {
+	if len(args) != 0 {
+		return object.NewError(object.InvalidArgLenError, "rand", 0, len(args))
+	}
+	return object.NewFloat(rand.Float64())
+}
+
+func objectTime(args ...object.Object) object.Object {
+	if len(args) != 0 {
+		return object.NewError(object.InvalidArgLenError, "rand", 0, len(args))
+	}
+	return object.NewInt(int(time.Now().Unix()))
 }

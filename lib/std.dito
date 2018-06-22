@@ -1,0 +1,119 @@
+# stdlib.dito :
+# file contains a number of
+#
+#
+
+# '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# constants:
+# MIN_INT 64bit: -9223372036854775808
+# MAX_INT 64bit:  9223372036854775807
+let PI      =  3.141592653589793
+let E       =  2.718281828459045
+let MIN_INT = (1 << 63)
+let MAX_INT = (1 << 63) - 1
+
+
+# '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Array ops:
+
+let last   = func(it) -> it[len(it) - 1]
+let first  = func(it) -> it[0]
+let append = func(it, val) ->  it ++ [val]
+
+func map(fn, it) {
+    let mut i = 0
+    for v in it {
+        it[i] = fn(v)
+        i += 1
+    }
+    return it
+}
+
+func reduce(fn, it) {
+    let mut val = it[0]
+    for i in range(1, len(it)) {
+        val = fn(val, it[i])
+    }
+    return val
+}
+
+func filter(fn, it) {
+    let mut new_it = []
+    for v in it {
+        if fn(v) {
+            new_it = new_it ++ [v]
+        }
+    }
+    return new_it
+}
+
+func join(it, sep) {
+    "join items in an Iter as strings"
+    let mut val = string(it[0])
+    for i in range(1, len(it)) {
+        val = val ++ [sep, string(it[i])]
+    }
+    return val
+}
+
+# func iter(it) {
+#     let mut idx = 0
+#     func _next() {
+#         let mut idx = 1
+#         if idx < len(it) {
+#             return it[idx-1]
+#         }
+#     }
+#     return _next
+# }
+# let next = func(it) -> it()
+
+
+# '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# basic math ops:
+
+let add    = func(a, b)    -> a + b
+let sub    = func(a, b)    -> a - b
+let div    = func(a, b)    -> a / b
+let mul    = func(a, b)    -> a * b
+let idiv   = func(a, b)    -> a // b
+let mod    = func(a)       -> a % b
+let even   = func(a)       -> a % 2 == 0
+let odd    = func(a, b)    -> a % 2 != 0
+let sqrt   = func(a)       -> a**.5
+let divmod = func(a, b)    -> [a/b, a%b]
+let hypot  = func(a, b)    -> (a**2 + b**2)**.5
+let sum    = func(it)      -> reduce(add, it)
+let avg    = func(it)      -> sum(it) / len(it)
+let prod   = func(it)      -> reduce(mul, it)
+let pow    = func(a, b, z) -> a**b % z
+let min    = func(a, b)    -> a if a < b else b
+let max    = func(a, b)    -> a if a > b else b
+let argmax = func(f, a, b) -> a if f(a, b) else b
+
+
+# '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# rand utils:
+
+let randint = func(a)    -> int(rand() * a)
+let choice  = func(it)   -> it[int(rand() * len(it))]
+let uniform = func(a, b) -> (a + ((abs(a) if a<0 else 0) + b) * rand())
+
+# '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# time utils:
+
+let UNIX_EPOCH = 0x019DB1DED53E8000
+let UNIX_DAY   = 86400
+let UNIX_HOUR  = 3600
+let UNIX_MIN   = 60
+
+func strtime(t) {
+    let mut secs = (t - UNIX_TIME_START) % UNIX_DAY
+    if secs < 0 {
+        secs += UNIX_DAY
+    }
+    let tm_hour = secs // 3600
+    let tm_min  = secs // 60 % 60
+    let tm_sec  = secs % 60
+    return join([tm_hour, tm_min, tm_sec], ":")
+}

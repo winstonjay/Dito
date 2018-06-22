@@ -1,0 +1,24 @@
+
+func iter(it) {
+    let mut idx = 0
+    func __genexp__() {
+        if idx < len(it) {
+            idx += 1
+            return it[idx-1]
+        }
+    }
+    return  __genexp__
+}
+let next = func(it) -> it()
+
+# test
+# import iter; let gen = iter(range(0, 10))
+
+
+let mut counter = 0
+func inc() {
+    counter += 1
+    return counter
+}
+# [inc(), inc(), inc()] should equal [1, 2, 3]
+# but it currently equals [1, 1, 1]

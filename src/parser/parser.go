@@ -198,6 +198,8 @@ func (p *Parser) statement() ast.Statement {
 		return p.ifElseStatement()
 	case token.FOR:
 		return p.forStatement()
+	case token.IMPORT:
+		return p.importStatement()
 	default:
 		return p.expressionStatement()
 	}
@@ -586,4 +588,15 @@ func (p *Parser) booleanLiteral() ast.Expression {
 		Token: p.currentToken,
 		Value: p.currentTokenIs(token.TRUE),
 	}
+}
+
+// importStatement
+//     'import' identifier
+func (p *Parser) importStatement() *ast.ImportStatement {
+	is := &ast.ImportStatement{Token: p.currentToken}
+	if !p.expectPeek(token.IDVAL) {
+		return nil
+	}
+	is.Value = p.identifier().(*ast.Identifier).Value
+	return is
 }

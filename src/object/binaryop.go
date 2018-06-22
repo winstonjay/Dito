@@ -160,6 +160,36 @@ func init() {
 		},
 
 		{
+			name: "<<",
+			fn: map[TypeFlag]binaryFn{
+				CharType: func(env *Environment, a, b Object) Object {
+					return NewChar(a.(*Char).Value << b.(*Char).Value)
+				},
+				IntType: func(env *Environment, a, b Object) Object {
+					if shift := b.(*Int).Value; shift > -1 {
+						return NewInt(a.(*Int).Value << uint(shift))
+					}
+					return NewError("shift count type must be unsigned Int")
+				},
+			},
+		},
+
+		{
+			name: ">>",
+			fn: map[TypeFlag]binaryFn{
+				CharType: func(env *Environment, a, b Object) Object {
+					return NewChar(a.(*Char).Value >> b.(*Char).Value)
+				},
+				IntType: func(env *Environment, a, b Object) Object {
+					if shift := b.(*Int).Value; shift > -1 {
+						return NewInt(a.(*Int).Value >> uint(shift))
+					}
+					return NewError("shift count type must be unsigned Int")
+				},
+			},
+		},
+
+		{
 			name: "<",
 			fn: map[TypeFlag]binaryFn{
 				CharType: func(env *Environment, a, b Object) Object {
