@@ -366,9 +366,8 @@ func (al *ArrayLiteral) String() string {
 
 // Identifier : alphanumeric varible name.
 type Identifier struct {
-	Token   token.Token // token.IDVAL
-	Mutable bool
-	Value   string
+	Token token.Token // token.IDVAL
+	Value string
 }
 
 func (i *Identifier) expressionNode()      {}

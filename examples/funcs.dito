@@ -25,11 +25,11 @@ print(mul(10)(10))
 
 # this function takes a function/lambda as a arg and returns a function
 func map(fn) {
-    let i = 0
+    let mut i = 0
     func f(array) {
         for a in array {
             array[i] = fn(a)
-            let i = i + 1
+            i += 1
         }
         return array
     }
