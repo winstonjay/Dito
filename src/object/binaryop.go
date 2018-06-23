@@ -1,14 +1,16 @@
 package object
 
 import (
+	"dito/src/token"
 	"math"
 )
 
 type binaryFn func(*Environment, Object, Object) Object
 
 type binaryOp struct {
-	name string
-	fn   map[TypeFlag]binaryFn
+	token token.Token
+	name  string
+	fn    map[TypeFlag]binaryFn
 }
 
 func (op *binaryOp) whichType(t1, t2 TypeFlag) TypeFlag {
@@ -28,6 +30,25 @@ func (op *binaryOp) whichType(t1, t2 TypeFlag) TypeFlag {
 }
 
 func (op *binaryOp) EvalBinary(env *Environment, a, b Object) Object {
+
+	if op.name == "and" || op.name == "or" {
+		which := BoolType
+		fn := op.fn[which]
+		if fn == nil {
+			return NewError("unknown binary function for given types")
+		}
+		a = a.ConvertType(BoolType)
+		b = b.ConvertType(BoolType)
+		if a.Type() == ErrorType {
+			return NewError("a: cannot convert types: %s, %s (%s)",
+				a.Type(), which, a.Inspect())
+		}
+		if b.Type() == ErrorType {
+			return NewError("b: cannot convert types: %s, %s (%s)",
+				b.Type(), which, b.Inspect())
+		}
+		return fn(env, a, b)
+	}
 	which := op.whichType(a.Type(), b.Type())
 	if which == ErrorType {
 		return NewError("mis matched types: %s, %s", a.Type(), b.Type())
@@ -311,6 +332,24 @@ func init() {
 				},
 				ArrayType: func(env *Environment, a, b Object) Object {
 					return b.(*Array).Contains(a)
+				},
+			},
+		},
+
+		{
+			name: "and",
+			fn: map[TypeFlag]binaryFn{
+				BoolType: func(env *Environment, a, b Object) Object {
+					return NewBool(a.(*Bool).Value && b.(*Bool).Value)
+				},
+			},
+		},
+
+		{
+			name: "or",
+			fn: map[TypeFlag]binaryFn{
+				BoolType: func(env *Environment, a, b Object) Object {
+					return NewBool(a.(*Bool).Value || b.(*Bool).Value)
 				},
 			},
 		},

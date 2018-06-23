@@ -85,6 +85,8 @@ func New(s *scanner.Scanner) *Parser {
 		token.GTHAN:    p.infixExpression,
 		token.LSHIFT:   p.infixExpression,
 		token.RSHIFT:   p.infixExpression,
+		token.AND:      p.infixExpression,
+		token.OR:       p.infixExpression,
 		token.LPAREN:   p.callExpression,
 		token.LBRACKET: p.indexExpression,
 		token.IF:       p.ifElseExpression,
@@ -343,7 +345,7 @@ func (p *Parser) blockStatement() *ast.BlockStatement {
 		if stmt != nil {
 			block.Statements = append(block.Statements, stmt)
 		}
-		if !p.stmtEnd() {
+		if !p.peekTokenIs(token.RBRACE) && !p.stmtEnd() {
 			return nil
 		}
 		p.nextToken()

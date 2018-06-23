@@ -20,5 +20,6 @@ func inc() {
     counter += 1
     return counter
 }
+# import iter; [inc(), inc(), inc()]
 # [inc(), inc(), inc()] should equal [1, 2, 3]
 # but it currently equals [1, 1, 1]

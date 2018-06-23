@@ -173,7 +173,6 @@ var tokensLiterals = [...]string{
 }
 
 func (t Token) String() string {
-
 	if 0 <= t && t < Token(len(tokensLiterals)) {
 		return tokensLiterals[t]
 	}
@@ -204,17 +203,17 @@ func LookUpIDVal(IDString string) Token {
 // Pratt-like parsing method. They are called in this package
 // by the .Precedence() method return.
 const (
-	_           uint = iota
-	LOWEST           // non operators / default.
-	CONDITONS        // if, for
-	EQUALITY         // == !=
-	LESSGREATER      // <= >= < >
-	ADDSUB           // + -
-	TERM             // * / % //
-	EXPONENT         // **
-	PREFIX           // unary operators; eg. + - !
-	CALL             // Bracketed expressions, function calls; eg. foobar()
-	HIGHEST          // Is extranous... pretty much there just in case. n.a.
+	_          uint = iota
+	LOWEST          // non operators / default.
+	CONDITONS       // if
+	CONNECTIVE      // or and
+	COMPARISON      // == != <= >= < >
+	ADDSUB          // + -
+	TERM            // * / % //
+	EXPONENT        // **
+	PREFIX          // unary operators; eg. + - ! not
+	CALL            // Bracketed expressions, function calls; eg. foobar()
+	HIGHEST         // Is extranous... pretty much there just in case. n.a.
 )
 
 // TODO Adjust operator precedence for bitwise operations.
@@ -227,10 +226,10 @@ func (t Token) Precedence() uint {
 	switch t {
 	case IF:
 		return CONDITONS
-	case EQUALS, NEQUALS, IN:
-		return EQUALITY
-	case LEQUALS, GEQUALS, LTHAN, GTHAN:
-		return LESSGREATER
+	case OR, AND:
+		return CONNECTIVE
+	case EQUALS, NEQUALS, IN, LEQUALS, GEQUALS, LTHAN, GTHAN:
+		return COMPARISON
 	case ADD, SUB, CAT, LSHIFT, RSHIFT:
 		return ADDSUB
 	case MOD, DIV, MUL, IDIV:

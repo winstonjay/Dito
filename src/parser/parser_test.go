@@ -8,16 +8,7 @@ import (
 	"testing"
 )
 
-func checkParserErrors(t *testing.T, p *Parser) {
-	errors := p.Errors()
-	if len(errors) == 0 {
-		return
-	}
-	t.Errorf("parser has %d errors", len(errors))
-	for _, err := range errors {
-		t.Errorf("parser error: %q", err.message)
-	}
-	t.FailNow()
+func TestIfExpression(t *testing.T) {
 }
 
 func TestAssignmentStatement(t *testing.T) {
@@ -88,7 +79,7 @@ func TestExpressionStatement(t *testing.T) {
 	}
 }
 
-func TestInfixExpression(t *testing.T) {
+func TestPrefixExpression(t *testing.T) {
 	tests := []struct {
 		input    string
 		operator string
@@ -139,14 +130,14 @@ func TestInfixExpressions(t *testing.T) {
 		operator   string
 		rightValue interface{}
 	}{
-		{"5 + 5;", 5, "+", 5},
-		{"5 - 5;", 5, "-", 5},
-		{"5 * 5;", 5, "*", 5},
-		{"5 / 5;", 5, "/", 5},
-		{"5 > 5;", 5, ">", 5},
-		{"5 < 5;", 5, "<", 5},
-		{"5 == 5;", 5, "==", 5},
-		{"5 != 5;", 5, "!=", 5},
+		{"5 + 5", 5, "+", 5},
+		{"5 - 5", 5, "-", 5},
+		{"5 * 5", 5, "*", 5},
+		{"5 / 5", 5, "/", 5},
+		{"5 > 5", 5, ">", 5},
+		{"5 < 5", 5, "<", 5},
+		{"5 == 5", 5, "==", 5},
+		{"5 != 5", 5, "!=", 5},
 		{"foobar + barfoo;", "foobar", "+", "barfoo"},
 		{"foobar - barfoo;", "foobar", "-", "barfoo"},
 		{"foobar * barfoo;", "foobar", "*", "barfoo"},
@@ -177,7 +168,8 @@ func TestInfixExpressions(t *testing.T) {
 				program.Statements[0])
 		}
 
-		if !testInfixExpression(t, stmt.Expression, tt.leftValue, tt.operator, tt.rightValue) {
+		if !testInfixExpression(
+			t, stmt.Expression, tt.leftValue, tt.operator, tt.rightValue) {
 			return
 		}
 	}
@@ -288,4 +280,16 @@ func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
 		return false
 	}
 	return true
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+	if len(errors) == 0 {
+		return
+	}
+	t.Errorf("parser has %d errors", len(errors))
+	for _, err := range errors {
+		t.Errorf("parser error: %q", err.message)
+	}
+	t.FailNow()
 }
