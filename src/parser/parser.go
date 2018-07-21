@@ -447,11 +447,23 @@ func (p *Parser) expressionList(delimiter token.Token) []ast.Expression {
 		return list
 	}
 	p.nextToken()
+	if p.currentTokenIs(token.NEWLINE) {
+		p.nextToken()
+	}
 	list = append(list, p.expression(token.LOWEST))
 	for p.peekTokenIs(token.COMMA) {
 		p.nextToken()
 		p.nextToken()
+		if p.currentTokenIs(token.NEWLINE) {
+			p.nextToken()
+		}
 		list = append(list, p.expression(token.LOWEST))
+	}
+	if p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+	}
+	if p.peekTokenIs(token.NEWLINE) {
+		p.nextToken()
 	}
 	if !p.expectPeek(delimiter) {
 		return nil

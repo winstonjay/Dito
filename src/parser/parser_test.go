@@ -30,6 +30,8 @@ func TestIfElseExpression(t *testing.T) {
 				Alternative: &ast.Identifier{Token: token.IDVAL, Value: "z"},
 			},
 		},
+
+		// TODO multiline expressions are broken.
 	}
 	for i, tt := range tests {
 		program := parseTestProgram(t, tt.input)

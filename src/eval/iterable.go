@@ -33,6 +33,9 @@ func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environ
 	if isError(key) {
 		return key
 	}
+
+	// TODO INDEX ASSIGNMENT.
+
 	if iter, ok := maybeIter.(object.Iterable); ok {
 		// returns object.Error or nil
 		return iter.SetItem(key, val)

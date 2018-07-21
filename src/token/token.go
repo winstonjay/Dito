@@ -35,7 +35,6 @@ const (
 	GEQUALS // >=
 	LTHAN   // <
 	GTHAN   // >
-	NOT     // !
 
 	LSHIFT // <<
 	RSHIFT // >>
@@ -83,6 +82,7 @@ const (
 	ELSE   // else
 	FOR    // for
 	IN     // in
+	NOT    // not
 	FUNC   // func
 	AND    // and
 	OR     // or
@@ -112,7 +112,6 @@ var tokensLiterals = [...]string{
 	IDIV: "//",
 	MOD:  "%",
 	POW:  "**",
-	NOT:  "!",
 	CAT:  "++",
 
 	EQUALS:  "==",
@@ -161,6 +160,7 @@ var tokensLiterals = [...]string{
 	ELSE: "else",
 	FOR:  "for",
 	IN:   "in",
+	NOT:  "not",
 	FUNC: "func",
 	AND:  "and",
 	OR:   "or",

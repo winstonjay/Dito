@@ -7,7 +7,7 @@ import (
 
 func evalPrefixExpression(operator string, right object.Object) object.Object {
 	switch operator {
-	case "!":
+	case "not":
 		return evalBangOperatorExpression(right)
 	case "-":
 		return evalMinusPrefixOperatorExpression(right)

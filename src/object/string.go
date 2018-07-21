@@ -15,7 +15,7 @@ type String struct {
 func (s *String) Type() TypeFlag { return StringType }
 
 // Inspect : return a string representation of the objects value.
-func (s *String) Inspect() string { return fmt.Sprintf("\"%s\"", s.Value) }
+func (s *String) Inspect() string { return s.Value }
 
 // NewString : return new initialised instance of the object.
 func NewString(value string) *String { return &String{Value: value} }

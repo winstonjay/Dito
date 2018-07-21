@@ -31,7 +31,7 @@ func (op *binaryOp) whichType(t1, t2 TypeFlag) TypeFlag {
 
 func (op *binaryOp) EvalBinary(env *Environment, a, b Object) Object {
 
-	if op.name == "and" || op.name == "or" {
+	if op.token == token.AND || op.token == token.OR {
 		which := BoolType
 		fn := op.fn[which]
 		if fn == nil {
@@ -67,7 +67,7 @@ func (op *binaryOp) EvalBinary(env *Environment, a, b Object) Object {
 	}
 	fn := op.fn[which]
 	if fn == nil {
-		return NewError("unknown binary function for given types")
+		return NewError("unknown binary function for given types: %s %s", a.Type(), b.Type())
 	}
 	return fn(env, a, b)
 }
@@ -316,10 +316,11 @@ func init() {
 			name: "++",
 			fn: map[TypeFlag]binaryFn{
 				StringType: func(env *Environment, a, b Object) Object {
-					return a.(*String).Concat(b)
+					return a.(*String).Concat(b.(*String))
 				},
 				ArrayType: func(env *Environment, a, b Object) Object {
-					return a.(*Array).Concat(b)
+					// TODO: set up recovery. this causes a panic when used wrong.
+					return a.(*Array).Concat(b.(*Array))
 				},
 			},
 		},
