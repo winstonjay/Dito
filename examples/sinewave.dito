@@ -1,0 +1,25 @@
+# sinewave.dito :
+# print a animated sine wave to the stdout.
+import std
+
+func main(n, step, pause, fmtLine) {
+    let mut i = 0
+    for i < n {
+        print(fmtLine(i))
+        sleep(pause)
+        i += step
+    }
+    print("done!")
+}
+
+# sineFormatter : initalises a function for formatting lines
+# for drawing each step of a sine wave.
+func sineFormatter(width, marker) {
+    func fmtLine(i) {
+        let pos = width + int(width * sin(i))
+        return repeat(" ", pos) ++ marker
+    }
+    return fmtLine
+}
+
+main(100, .175, 40, sineFormatter(30, "*"))

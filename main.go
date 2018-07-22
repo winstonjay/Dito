@@ -19,8 +19,8 @@ func main() {
 	args := os.Args[1:] // args without program.
 	// https://gobyexample.com/command-line-flags
 	if len(args) > 0 {
-		filename := args[0]
-		file, err := ioutil.ReadFile("exampledata/" + filename)
+		filepath := args[0]
+		file, err := ioutil.ReadFile(filepath)
 		if err != nil {
 			panic(err)
 		}

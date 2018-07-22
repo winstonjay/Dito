@@ -3,6 +3,7 @@
 # file contains a super basic standard lib to extend the capabilities
 # of the built in functions and basic types. This will be split into
 # individual modules in the future as the language and features grow.
+# To some extent this file is being used as a implementation playground.
 # use:
 #     import std
 # ---------------------------------------------------------------------
@@ -28,14 +29,17 @@ let MAX_INT = (1 << 63) - 1
 let last   = func(it) -> it[len(it) - 1]
 let first  = func(it) -> it[0]
 let append = func(it, val) ->  it ++ [val]
+let copy   = func(it) -> [] ++ it
+# let pop    = func(it) -> TODO: implement slicing.
 
 func map(fn, it) {
     let mut i = 0
+    let arr = copy(it)
     for v in it {
-        it[i] = fn(v)
+        arr[i] = fn(v)
         i += 1
     }
-    return it
+    return arr
 }
 
 func reduce(fn, it) {
@@ -55,6 +59,26 @@ func filter(fn, it) {
         }
     }
     return new_it
+}
+
+func reversed(it) {
+    let arr = copy(it)
+    let mut i = 0
+    let mut j = len(it) - 1
+    for i < j {
+        swap(arr, i, j)
+        i += 1
+        j -= 1
+    }
+    return arr
+}
+
+# perform inplace swap of items.
+func swap(arr, i, j) {
+    let tmp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = tmp
+    return arr
 }
 
 func join(it, sep) {
@@ -87,28 +111,42 @@ func split(it, sep) {
     return arr
 }
 
+func repeat(str, n) {
+    let mut s = ""
+    for _ in range(0, n) {
+        s = s ++ str
+    }
+    return s
+}
+
 # ---------------------------------------------------------------------
 # math :
 #
 
-let add    = func(a, b)    -> a + b
-let sub    = func(a, b)    -> a - b
-let div    = func(a, b)    -> a / b
-let mul    = func(a, b)    -> a * b
-let idiv   = func(a, b)    -> a // b
-let mod    = func(a, b)    -> a % b
-let even   = func(a)       -> a % 2 == 0
-let odd    = func(a)       -> a % 2 != 0
-let sqrt   = func(a)       -> a**0.5
-let divmod = func(a, b)    -> [a/b, a%b]
-let hypot  = func(a, b)    -> (a**2 + b**2)**0.5
-let sum    = func(it)      -> reduce(add, it)
-let avg    = func(it)      -> sum(it) / len(it)
-let prod   = func(it)      -> reduce(mul, it)
-let pow    = func(a, b, z) -> a**b % z
-let min    = func(a, b)    -> a if a < b else b
-let max    = func(a, b)    -> a if a > b else b
-let argmax = func(f, a, b) -> a if f(a, b) else b
+let add     = func(a, b)  -> a + b
+let sub     = func(a, b)  -> a - b
+let div     = func(a, b)  -> a / b
+let mul     = func(a, b)  -> a * b
+let idiv    = func(a, b)  -> a // b
+let mod     = func(a, b)  -> a % b
+let even    = func(a)     -> a % 2 == 0
+let odd     = func(a)     -> a % 2 != 0
+let sqrt    = func(a)     -> a**0.5
+let exp     = func(x)     -> E**x
+let divmod  = func(a, b)  -> [a/b, a%b]
+let hypot   = func(a, b)  -> (a**2 + b**2)**0.5
+let sum     = func(it)    -> reduce(add, it)
+let avg     = func(it)    -> sum(it) / len(it)
+let prod    = func(it)    -> reduce(mul, it)
+let pow     = func(a,b,z) -> a**b % z
+let min     = func(a, b)  -> a if a < b else b
+let max     = func(a, b)  -> a if a > b else b
+let argmax  = func(f,a,b) -> a if f(a, b) else b
+let floor   = func(a)     -> int(a)
+let ceil    = func(a)     -> int(a) + 1
+let radians = func(a)     -> a * 57.295779513
+let degrees = func(a)     -> a * 0.01745329252
+let fact    = func(a)     -> prod(range(1, a + 1))
 
 
 # ---------------------------------------------------------------------
@@ -123,6 +161,15 @@ let choice  = func(it) -> it[int(rand() * len(it))]
 
 # generate a random number between a and b.
 let uniform = func(a, b) -> (a + ((abs(a) if a<0 else 0) + b) * rand())
+
+func shuffled(it) {
+    let arr = copy(it)
+    let maxIndex = len(arr) - 1
+    for i in range(0, maxIndex) {
+        swap(arr, i, randint(maxIndex))
+    }
+    return arr
+}
 
 # ---------------------------------------------------------------------
 # time :

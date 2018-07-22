@@ -215,6 +215,8 @@ let x = 0xff >= 5000
 # we only want NEWLINE to be seen just
 # after content and then ignore the rest.
 
+let j = 100 # trailing comments are not working for some reason.
+
 # after content. like "x + y\n
 "bye"`)
 	for i, tt := range tests {

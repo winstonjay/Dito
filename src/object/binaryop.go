@@ -67,7 +67,8 @@ func (op *binaryOp) EvalBinary(env *Environment, a, b Object) Object {
 	}
 	fn := op.fn[which]
 	if fn == nil {
-		return NewError("unknown binary function for given types: %s %s", a.Type(), b.Type())
+		return NewError("unknown binary function for given types: %s %s %s",
+			a.Type(), op.name, b.Type())
 	}
 	return fn(env, a, b)
 }

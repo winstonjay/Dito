@@ -1,0 +1,34 @@
+# collatz.dito:
+# Program defines a function that given a start
+# position will create a collatz sequence from start - 1
+# this value is returned as an array.
+# ---------------------------------------------------------------------
+# using `append` and `last`
+import std
+
+
+
+func collatzSequence(start) {
+    # define an array with our start item.
+    let mut seq = [start]
+    # use a while style for loop to keep adding to the sequence.
+    # checking the item at the last index of the sequence.
+    let mut curr = last(seq)
+    for curr > 1 {
+        # Get the next value in the sequence.
+        let newitem = collatz(curr)
+        # Append each new item to array.
+        seq = append(seq, newitem)
+        curr = last(seq)
+    }
+    return seq
+}
+
+# define a lambda function that can only be a single expression.
+# here it uses a if else expression like what can be found in python.
+let collatz = func(n) -> (
+    n           if n <= 1 else
+    n // 2      if n % 2 == 0 else
+    3 * n + 1)
+
+print(collatzSequence(35))

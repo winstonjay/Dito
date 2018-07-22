@@ -312,14 +312,16 @@ func (p *Parser) functionStatement() *ast.Function {
 //     'for' identifier 'in' identifier '{' blockStatement '}'
 //     'for' expression '{' blockStatement '}'
 func (p *Parser) forStatement() *ast.ForStatement {
-	stmt := &ast.ForStatement{Token: p.currentToken}
+	stmt := &ast.ForStatement{}
 	p.nextToken()
 	if p.currentTokenIs(token.IDVAL) && p.peekTokenIs(token.IN) {
+		stmt.Token = token.IN
 		stmt.ID = p.identifier().(*ast.Identifier)
 		p.nextToken()
 		p.nextToken()
 		stmt.Iter = p.expression(token.LOWEST)
 	} else {
+		stmt.Token = token.FOR
 		stmt.ID = nil
 		stmt.Condition = p.expression(token.LOWEST)
 	}

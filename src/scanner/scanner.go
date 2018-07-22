@@ -5,6 +5,8 @@
 package scanner
 
 // TODO: fix issues with column positions, tracebacks etc.
+// TODO: the line handling is pretty crap. trailing comments dont work
+// 		 and the general setup jsut dosent feel right.
 
 import (
 	"dito/src/token"

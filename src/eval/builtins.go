@@ -3,6 +3,7 @@ package eval
 import (
 	"dito/src/object"
 	"io"
+	"math"
 	"math/rand"
 	"os"
 	"time"
@@ -76,6 +77,30 @@ var Builtins = map[string]*object.Builtin{
 		ArgT:    []string{"Atom"},
 		ReturnT: "Atom",
 	},
+	"sin": &object.Builtin{
+		Name:    "sin",
+		Fn:      objectSin,
+		Info:    "Return the sine of x radians of an `Atom`",
+		ArgC:    1,
+		ArgT:    []string{"Atom"},
+		ReturnT: "Float",
+	},
+	"tan": &object.Builtin{
+		Name:    "tan",
+		Fn:      objectTan,
+		Info:    "Return the tangent of x radians of an `Atom`",
+		ArgC:    1,
+		ArgT:    []string{"Atom"},
+		ReturnT: "Float",
+	},
+	"cos": &object.Builtin{
+		Name:    "cos",
+		Fn:      objectCos,
+		Info:    "Return the cosine of x radians of an `Atom`",
+		ArgC:    1,
+		ArgT:    []string{"Atom"},
+		ReturnT: "Float",
+	},
 	"print": &object.Builtin{
 		Name:    "print",
 		Fn:      objectPrint,
@@ -107,6 +132,14 @@ var Builtins = map[string]*object.Builtin{
 		ArgC:    0,
 		ArgT:    []string{},
 		ReturnT: "Int",
+	},
+	"sleep": &object.Builtin{
+		Name:    "sleep",
+		Fn:      objectSleep,
+		Info:    "Pause execution for x milliseconds",
+		ArgC:    1,
+		ArgT:    []string{"Atom"},
+		ReturnT: "None",
 	},
 }
 
@@ -152,6 +185,48 @@ func objectAbs(args ...object.Object) object.Object {
 	return object.NewError("Argument '%s' to func 'abs' is not a Numeric", args[0].Inspect())
 }
 
+func objectCos(args ...object.Object) object.Object {
+	if n := len(args); n != 1 {
+		return object.NewError(object.InvalidArgLenError, "cos", 1, n)
+	}
+	switch v := args[0].(type) {
+	case *object.Float:
+		return object.NewFloat(math.Cos(v.Value))
+	case *object.Int:
+		return object.NewFloat(math.Cos(float64(v.Value)))
+	default:
+		return object.NewError("Argument '%s' to func 'cos' is invalid", args[0].Inspect())
+	}
+}
+
+func objectTan(args ...object.Object) object.Object {
+	if n := len(args); n != 1 {
+		return object.NewError(object.InvalidArgLenError, "tan", 1, n)
+	}
+	switch v := args[0].(type) {
+	case *object.Float:
+		return object.NewFloat(math.Tan(v.Value))
+	case *object.Int:
+		return object.NewFloat(math.Tan(float64(v.Value)))
+	default:
+		return object.NewError("Argument '%s' to func 'tan' is invalid", args[0].Inspect())
+	}
+}
+
+func objectSin(args ...object.Object) object.Object {
+	if n := len(args); n != 1 {
+		return object.NewError(object.InvalidArgLenError, "sin", 1, n)
+	}
+	switch v := args[0].(type) {
+	case *object.Float:
+		return object.NewFloat(math.Sin(v.Value))
+	case *object.Int:
+		return object.NewFloat(math.Sin(float64(v.Value)))
+	default:
+		return object.NewError("Argument '%s' to func 'sin' is invalid", args[0].Inspect())
+	}
+}
+
 func objectPrint(args ...object.Object) object.Object {
 	for i, arg := range args {
 		io.WriteString(os.Stdout, arg.Inspect())
@@ -183,6 +258,9 @@ func objectRange(args ...object.Object) object.Object {
 	if !ok {
 		return object.NewError("Invalid args[1] to `range` function. got=%T", args[1])
 	}
+	if max.Value-min.Value < 0 {
+		return object.NewError("Invalid args to `range` function. a > b.")
+	}
 	iter := make([]object.Object, max.Value-min.Value)
 	i := 0
 	for v := min.Value; v < max.Value; v++ {
@@ -201,7 +279,20 @@ func objectRand(args ...object.Object) object.Object {
 
 func objectTime(args ...object.Object) object.Object {
 	if len(args) != 0 {
-		return object.NewError(object.InvalidArgLenError, "rand", 0, len(args))
+		return object.NewError(object.InvalidArgLenError, "time", 0, len(args))
 	}
 	return object.NewInt(int(time.Now().Unix()))
+}
+
+func objectSleep(args ...object.Object) object.Object {
+	switch arg := args[0].(type) {
+	case *object.Int:
+		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
+		return object.NONE
+	case *object.Float:
+		time.Sleep(time.Duration(arg.Value) * time.Millisecond)
+		return object.NONE
+	default:
+		return object.NewError("Argument to `sleep` not supported, got %s", args[0].Type())
+	}
 }
