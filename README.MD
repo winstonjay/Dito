@@ -4,6 +4,11 @@ Dito is a work-in-progress toy interpeted language made to learn about writing p
 
 This is the most up to date repo but its not that stable.
 
+### Examples
+
+For examples see `examples` directory or
+
+
 ### Having a go...
 
 The most simple way to build with `go build` then use the executable or just `go run main.go`. You can try out the language either in a interactive shell with:
@@ -14,5 +19,3 @@ Or you can run a file from `examples/` directory when in the main directory with
 
     ./dito funcs.dito
 
-
-For examples see `examples` or `lib` directories.
