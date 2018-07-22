@@ -108,8 +108,6 @@ var Builtins = map[string]*object.Builtin{
 		ArgT:    []string{},
 		ReturnT: "Int",
 	},
-
-	// "isIterable": &object.Builtin{Fn: objectIsIterable},
 }
 
 func typeSwitch(which object.TypeFlag) object.BuiltinFunction {

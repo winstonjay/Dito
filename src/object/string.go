@@ -109,7 +109,7 @@ func (s *String) Iter() <-chan Object {
 	ch := make(chan Object)
 	go func() {
 		for _, item := range s.Value {
-			ch <- &Char{Value: byte(item)}
+			ch <- NewString(string(item))
 		}
 		close(ch)
 	}()

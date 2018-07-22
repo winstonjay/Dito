@@ -19,7 +19,11 @@ func (a *Array) Inspect() string {
 	var out bytes.Buffer
 	out.WriteString("[")
 	for i, el := range a.Elements {
-		out.WriteString(el.Inspect())
+		if el.Type() == StringType {
+			out.WriteString("\"" + el.Inspect() + "\"")
+		} else {
+			out.WriteString(el.Inspect())
+		}
 		if i < len(a.Elements)-1 {
 			out.WriteString(", ")
 		}
