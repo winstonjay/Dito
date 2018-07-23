@@ -37,6 +37,7 @@ func evalReAssign(node *ast.ReAssignStatement, env *object.Environment) object.O
 	// would it be quick to do this otherwise.
 	left := v.Unpack()
 	opString := node.Token.String()
+
 	op := object.BinaryOps[opString[:len(opString)-1]]
 	if op == nil {
 		return object.NewError("Unknown inplace binary op: '%s'", opString)

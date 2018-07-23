@@ -22,9 +22,9 @@ func evalIndexExpression(node *ast.IndexExpression, env *object.Environment) obj
 }
 
 func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environment) object.Object {
-	val := Eval(node.Value, env)
-	if isError(val) {
-		return val
+	right := Eval(node.Value, env)
+	if isError(right) {
+		return right
 	}
 	maybeIter := Eval(node.IdxExp.Left, env)
 	if isError(maybeIter) {
@@ -34,14 +34,28 @@ func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environ
 	if isError(key) {
 		return key
 	}
-
-	// TODO INDEX ASSIGNMENT.
-
-	if iter, ok := maybeIter.(object.Iterable); ok {
-		// returns object.Error or nil
-		return iter.SetItem(key, val)
+	iter, ok := maybeIter.(object.Iterable)
+	if !ok {
+		return object.NewError("Index assignement error: wrong type")
 	}
-	return object.NewError("Index assignement error: wrong type")
+	if node.Token == token.ASSIGN {
+		iter.SetItem(key, right)
+		return object.NONE
+	}
+	// TODO this is just implemented as a quick fix.
+	// this function should probally not reutrn a
+	left := iter.GetItem(key)
+	opString := node.Token.String()
+	op := object.BinaryOps[opString[:len(opString)-1]]
+	if op == nil {
+		return object.NewError("Unknown inplace binary op: '%s'", opString)
+	}
+	val := op.EvalBinary(env, left, right)
+	if isError(val) {
+		return val
+	}
+	iter.SetItem(key, val)
+	return object.NONE
 }
 
 func evalForStatement(fs *ast.ForStatement, env *object.Environment) object.Object {

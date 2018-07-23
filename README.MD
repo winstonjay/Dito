@@ -7,19 +7,29 @@ This is the most up to date repo but its not that stable.
 ### Examples
 
 For full list of examples see [`examples`](examples/) directory or the [stdlib](lib/std.dito).
-Heres calcualting a square root using newtonws method.
+Heres example of dynamic programming used to find the total number of ways a target number can
+be made given a set of coins.
 
 ```
-# Calculate square root of x to a acuracy of delta.
-func newton_sqrt(x, delta) {
-    let mut z = delta
-    for abs(x - z**2) > delta {
-        z -= (z**2 - x) / (2 * x)
+import std
+
+func coinSums(coins, target) {
+    let sack = zeros(target + 1)
+    sack[0] = 1
+    for coin in coins {
+        for i in range(coin, target+1) {
+            sack[i] += sack[i-coin]
+        }
     }
-    return z
+    return sack[target]
 }
 
-print(newton_sqrt(25, 1/128))
+let zeros = func(t) -> map(func(_) -> 0, range(0, t))
+
+let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
+let target = 200
+
+print(coinSums(coins, target))
 ```
 
 

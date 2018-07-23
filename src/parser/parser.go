@@ -253,8 +253,9 @@ func (p *Parser) reAssignStatement() *ast.ReAssignStatement {
 // indexAssignmentStatement:
 //     identifier '[' expression ']' assignmentOperator expression
 func (p *Parser) indexAssignmentStatement(idxExp *ast.IndexExpression) *ast.IndexAssignmentStatement {
-	stmt := &ast.IndexAssignmentStatement{Token: token.LBRACE, IdxExp: idxExp}
+	stmt := &ast.IndexAssignmentStatement{IdxExp: idxExp}
 	p.nextToken()
+	stmt.Token = p.currentToken
 	p.nextToken()
 	stmt.Value = p.expression(token.LOWEST)
 	return stmt

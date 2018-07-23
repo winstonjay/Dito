@@ -75,7 +75,7 @@ func (a *Array) SetItem(key Object, val Object) Object {
 		return NewError("index error")
 	}
 	a.Elements[idx.Value] = val
-	return nil
+	return a
 }
 
 // Concat : Add item to the current string creating a new string.
