@@ -3,13 +3,11 @@ package eval
 import (
 	"dito/src/ast"
 	"dito/src/object"
-	"fmt"
 )
 
 func evalFunctionCall(fn ast.Expression, fnArgs []ast.Expression, env *object.Environment) object.Object {
 	function := Eval(fn, env)
 	if isError(function) {
-		fmt.Println(function, "Func ERRROR")
 		return function
 	}
 	args := evalExpressions(fnArgs, env)

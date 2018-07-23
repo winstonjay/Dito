@@ -38,7 +38,6 @@ func NewEnclosedEnviroment(outer *Environment) *Environment {
 
 // Get : get a varible inside the current scope
 func (e *Environment) Get(name string) (Object, bool) {
-	// fmt.Println(name, e.store)
 	v, ok := e.store[name]
 	if !ok && e.outer != nil {
 		v, ok = e.outer.GetVar(name)
@@ -49,7 +48,6 @@ func (e *Environment) Get(name string) (Object, bool) {
 // GetVar :
 func (e *Environment) GetVar(name string) (Varible, bool) {
 	v, ok := e.store[name]
-	// fmt.Println(name, e.store, ok)
 	if !ok && e.outer != nil {
 		v, ok = e.outer.GetVar(name)
 	}
