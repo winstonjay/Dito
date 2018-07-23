@@ -8,13 +8,13 @@ This is the most up to date repo but its not that stable.
 
 For full list of examples see [`examples`](examples/) directory or the [stdlib](lib/std.dito).
 Heres example of dynamic programming used to find the total number of ways a target number can
-be made given a set of coins.
+be made given a set of coins. This can be found in full in the exampls dir described.
 
 ```swift
 import std
 
 func coinSums(coins, target) {
-    let sack = zeros(target + 1)
+    let sack = zeros(target+1)
     sack[0] = 1
     for coin in coins {
         for i in range(coin, target+1) {

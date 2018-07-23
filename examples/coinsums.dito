@@ -1,9 +1,25 @@
+# coinsums.dito :
+# find the total number of ways a target number can be made given a
+# set of coins.
+
+# make availble the `map` function.
 import std
 
+# main function is not required but is used here for structure.
+func main() {
+    let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
+    let target = 200
+    print(coinSums(coins, target))
+}
+
 func coinSums(coins, target) {
+    # intialise a array of zeros to the size of the target
     let sack = zeros(target + 1)
+    # set the start to get the sum chains going.
     sack[0] = 1
     for coin in coins {
+        # loop through and count how many times each coin
+        # can be placed within the target.
         for i in range(coin, target+1) {
             sack[i] += sack[i-coin]
         }
@@ -11,9 +27,7 @@ func coinSums(coins, target) {
     return sack[target]
 }
 
-let zeros = func(t) -> map(func(_) -> 0, range(0, t))
+# helper function to generate an n sized array of zeros.
+let zeros = func(n) -> map(func(_) -> 0, range(0, n))
 
-let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
-let target = 200
-
-print(coinSums(coins, target))
+main()

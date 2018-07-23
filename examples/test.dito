@@ -1,9 +1,0 @@
-
-
-let mut y = 100
-y += 1
-print(y)
-
-let x = [1, 2, 3]
-x[1] *= 3
-print(x)

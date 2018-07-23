@@ -162,12 +162,16 @@ let choice  = func(it) -> it[int(rand() * len(it))]
 # generate a random number between a and b.
 let uniform = func(a, b) -> (a + ((abs(a) if a<0 else 0) + b) * rand())
 
+func shuffle(it) {
+    let maxIndex = len(it) - 1
+    for i in range(0, maxIndex) {
+        swap(it, i, randint(maxIndex))
+    }
+}
+
 func shuffled(it) {
     let arr = copy(it)
-    let maxIndex = len(arr) - 1
-    for i in range(0, maxIndex) {
-        swap(arr, i, randint(maxIndex))
-    }
+    shuffle(arr)
     return arr
 }
 
