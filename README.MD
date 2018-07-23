@@ -10,7 +10,7 @@ For full list of examples see [`examples`](examples/) directory or the [stdlib](
 Heres example of dynamic programming used to find the total number of ways a target number can
 be made given a set of coins.
 
-```
+```swift
 import std
 
 func coinSums(coins, target) {
