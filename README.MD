@@ -6,7 +6,21 @@ This is the most up to date repo but its not that stable.
 
 ### Examples
 
-For examples see `examples` directory or
+For full list of examples see [`examples`](examples/) directory or the [stdlib](lib/std.dito).
+Heres calcualting a square root using newtonws method.
+
+```
+# Calculate square root of x to a acuracy of delta.
+func newton_sqrt(x, delta) {
+    let mut z = delta
+    for abs(x - z**2) > delta {
+        z -= (z**2 - x) / (2 * x)
+    }
+    return z
+}
+
+print(newton_sqrt(25, 1/128))
+```
 
 
 ### Having a go...
@@ -15,7 +29,7 @@ The most simple way to build with `go build` then use the executable or just `go
 
     ./dito
 
-Or you can run a file from `examples/` directory when in the main directory with. (The default path is `examples/`)
+or to run a file:
 
     ./dito funcs.dito
 
