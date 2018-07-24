@@ -7,8 +7,7 @@
 import std
 
 
-
-func collatzSequence(start) {
+def collatzSequence(start) {
     # define an array with our start item.
     let mut seq = [start]
     # use a while style for loop to keep adding to the sequence.
@@ -26,7 +25,7 @@ func collatzSequence(start) {
 
 # define a lambda function that can only be a single expression.
 # here it uses a if else expression like what can be found in python.
-let collatz = func(n) -> (
+let collatz = def(n) -> (
     n           if n <= 1 else
     n // 2      if n % 2 == 0 else
     3 * n + 1)

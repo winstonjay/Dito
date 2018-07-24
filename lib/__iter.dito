@@ -3,7 +3,7 @@
 #### TODO: this doesent work and has identified scope issues that
 # need some design considerations before solving.
 
-func iter(it) {
+def iter(it) {
     let mut idx = 0
     func __genexp__() {
         if idx < len(it) {
@@ -13,14 +13,14 @@ func iter(it) {
     }
     return  __genexp__
 }
-let next = func(it) -> it()
+let next = def(it) -> it()
 
 # test
 # import iter; let gen = iter(range(0, 10))
 
 
 let mut counter = 0
-func inc() {
+def inc() {
     counter += 1
     return counter
 }

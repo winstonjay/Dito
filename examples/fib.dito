@@ -3,10 +3,10 @@
 # 0 1   1   2   3   5   8   13  21  34  55  89  144 233 377 610
 
 # update as needed.
-let n = 15
+let n = 25
 
 # Calculate fibonacci numbers by recursion.
-let fib = func(n) -> (
+let fib = def(n) -> (
     n if n < 2 else
     fib(n-1) + fib(n-2))
 

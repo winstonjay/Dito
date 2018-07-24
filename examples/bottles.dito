@@ -6,7 +6,7 @@ import std
 # Change n to the number of bottle of beer you want.
 let n = 10
 
-let bottle = func(n) -> (
+let bottle = def(n) -> (
     string(n) ++ " Bottles of beer" if n > 1 else
     "One Bottle of beer"            if n == 1 else
     "No more bottles of beer")

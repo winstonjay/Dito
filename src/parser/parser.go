@@ -54,7 +54,7 @@ func New(s *scanner.Scanner) *Parser {
 		token.ADD: p.prefixExpression,
 		token.NOT: p.prefixExpression,
 		// function.
-		token.FUNC: p.lambdaFunction,
+		token.DEF: p.lambdaFunction,
 		// Token Literals.
 		token.IDVAL:    p.identifier,
 		token.INT:      p.integerLiteral,
@@ -192,7 +192,7 @@ func (p *Parser) statement() ast.Statement {
 			return p.indexAssignmentStatement(idxExp.(*ast.IndexExpression))
 		}
 		return p.expressionStatement()
-	case token.FUNC:
+	case token.DEF:
 		return p.functionStatement()
 	case token.RETURN:
 		return p.returnStatement()

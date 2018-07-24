@@ -215,7 +215,7 @@ func (is *ImportStatement) String() string {
 //     body
 // }
 type Function struct {
-	Token      token.Token // token.FUNC
+	Token      token.Token // token.DEF
 	Parameters []*Identifier
 	Name       *Identifier
 	Body       *BlockStatement
@@ -228,7 +228,7 @@ func (f *Function) String() string       { return fmt.Sprintf("<%s>", f.Name.Val
 // LambdaFunction : single expression function.
 // func(args) -> expr
 type LambdaFunction struct {
-	Token      token.Token // token.FUNC
+	Token      token.Token // token.DEF
 	Parameters []*Identifier
 	Expr       Expression
 }

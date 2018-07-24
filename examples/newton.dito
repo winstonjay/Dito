@@ -1,6 +1,6 @@
 # newtown.dito :
 # Calculate square root of x to a acuracy of delta. using newtons method.
-func newton_sqrt(x, delta) {
+def newton_sqrt(x, delta) {
     let mut z = delta
     for abs(x - z**2) > delta {
         z -= (z**2 - x) / (2 * x)

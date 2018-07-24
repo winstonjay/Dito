@@ -20,7 +20,7 @@ let mathTests = [
     max(20, 1)      == 20
 ]
 
-func runTests(tests, name) {
+def runTests(tests, name) {
     let mut i = 0
     print("running: " ++ name)
     if len(tests) == 1 {

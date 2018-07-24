@@ -83,7 +83,7 @@ const (
 	FOR    // for
 	IN     // in
 	NOT    // not
-	FUNC   // func
+	DEF    // func
 	AND    // and
 	OR     // or
 	LET    // let
@@ -161,7 +161,7 @@ var tokensLiterals = [...]string{
 	FOR:  "for",
 	IN:   "in",
 	NOT:  "not",
-	FUNC: "func",
+	DEF:  "def",
 	AND:  "and",
 	OR:   "or",
 

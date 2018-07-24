@@ -26,13 +26,13 @@ let MAX_INT = (1 << 63) - 1
 # ---------------------------------------------------------------------
 # Array ops:
 
-let last   = func(it) -> it[len(it) - 1]
-let first  = func(it) -> it[0]
-let append = func(it, val) ->  it ++ [val]
-let copy   = func(it) -> [] ++ it
-# let pop    = func(it) -> TODO: implement slicing.
+let last   = def(it) -> it[len(it) - 1]
+let first  = def(it) -> it[0]
+let append = def(it, val) ->  it ++ [val]
+let copy   = def(it) -> [] ++ it
+# let pop    = def(it) -> TODO: implement slicing.
 
-func map(fn, it) {
+def map(fn, it) {
     let mut i = 0
     let arr = copy(it)
     for v in it {
@@ -42,7 +42,7 @@ func map(fn, it) {
     return arr
 }
 
-func reduce(fn, it) {
+def reduce(fn, it) {
     let mut val = it[0]
     for i in range(1, len(it)) {
         val = fn(val, it[i])
@@ -50,7 +50,7 @@ func reduce(fn, it) {
     return val
 }
 
-func filter(fn, it) {
+def filter(fn, it) {
     let mut new_it = []
     for v in it {
         if fn(v) {
@@ -61,7 +61,7 @@ func filter(fn, it) {
     return new_it
 }
 
-func reversed(it) {
+def reversed(it) {
     let arr = copy(it)
     let mut i = 0
     let mut j = len(it) - 1
@@ -74,14 +74,14 @@ func reversed(it) {
 }
 
 # perform inplace swap of items.
-func swap(arr, i, j) {
+def swap(arr, i, j) {
     let tmp = arr[i]
     arr[i] = arr[j]
     arr[j] = tmp
     return arr
 }
 
-func join(it, sep) {
+def join(it, sep) {
     # join items in an Iter as strings
     let mut val = string(it[0])
     for i in range(1, len(it)) {
@@ -90,7 +90,7 @@ func join(it, sep) {
     return val
 }
 
-func split(it, sep) {
+def split(it, sep) {
     # split a string by seperator. Not really that effiecent.
     # maybe need some better language constructs for this.
     let mut arr = []
@@ -111,7 +111,7 @@ func split(it, sep) {
     return arr
 }
 
-func repeat(str, n) {
+def repeat(str, n) {
     let mut s = ""
     for _ in range(0, n) {
         s = s ++ str
@@ -123,53 +123,53 @@ func repeat(str, n) {
 # math :
 #
 
-let add     = func(a, b)  -> a + b
-let sub     = func(a, b)  -> a - b
-let div     = func(a, b)  -> a / b
-let mul     = func(a, b)  -> a * b
-let idiv    = func(a, b)  -> a // b
-let mod     = func(a, b)  -> a % b
-let even    = func(a)     -> a % 2 == 0
-let odd     = func(a)     -> a % 2 != 0
-let sqrt    = func(a)     -> a**0.5
-let exp     = func(x)     -> E**x
-let divmod  = func(a, b)  -> [a/b, a%b]
-let hypot   = func(a, b)  -> (a**2 + b**2)**0.5
-let sum     = func(it)    -> reduce(add, it)
-let avg     = func(it)    -> sum(it) / len(it)
-let prod    = func(it)    -> reduce(mul, it)
-let pow     = func(a,b,z) -> a**b % z
-let min     = func(a, b)  -> a if a < b else b
-let max     = func(a, b)  -> a if a > b else b
-let argmax  = func(f,a,b) -> a if f(a, b) else b
-let floor   = func(a)     -> int(a)
-let ceil    = func(a)     -> int(a) + 1
-let radians = func(a)     -> a * 57.295779513
-let degrees = func(a)     -> a * 0.01745329252
-let fact    = func(a)     -> prod(range(1, a + 1))
+let add     = def(a, b)  -> a + b
+let sub     = def(a, b)  -> a - b
+let div     = def(a, b)  -> a / b
+let mul     = def(a, b)  -> a * b
+let idiv    = def(a, b)  -> a // b
+let mod     = def(a, b)  -> a % b
+let even    = def(a)     -> a % 2 == 0
+let odd     = def(a)     -> a % 2 != 0
+let sqrt    = def(a)     -> a**0.5
+let exp     = def(x)     -> E**x
+let divmod  = def(a, b)  -> [a/b, a%b]
+let hypot   = def(a, b)  -> (a**2 + b**2)**0.5
+let sum     = def(it)    -> reduce(add, it)
+let avg     = def(it)    -> sum(it) / len(it)
+let prod    = def(it)    -> reduce(mul, it)
+let pow     = def(a,b,z) -> a**b % z
+let min     = def(a, b)  -> a if a < b else b
+let max     = def(a, b)  -> a if a > b else b
+let argmax  = def(f,a,b) -> a if f(a, b) else b
+let floor   = def(a)     -> int(a)
+let ceil    = def(a)     -> int(a) + 1
+let radians = def(a)     -> a * 57.295779513
+let degrees = def(a)     -> a * 0.01745329252
+let fact    = def(a)     -> prod(range(1, a + 1))
 
 
 # ---------------------------------------------------------------------
 # random :
-# Builds on top of the built in function `rand`.
+# Builds on top of the built in deftion `rand`.
 
 # return random int where result <= a
-let randint = func(a) -> int(rand() * a)
+let randint = def(a) -> int(rand() * a)
 
 # return a random choice from a iterable object.
-let choice  = func(it) -> it[int(rand() * len(it))]
+let choice  = def(it) -> it[int(rand() * len(it))]
 
 # generate a random number between a and b.
-let uniform = func(a, b) -> (a + ((abs(a) if a<0 else 0) + b) * rand())
+let uniform = def(a, b) -> (a + ((abs(a) if a<0 else 0) + b) * rand())
 
-func shuffle(it) {
+def shuffle(it) {
     let maxIndex = len(it) - 1
     for i in range(0, maxIndex) {
         swap(it, i, randint(maxIndex))
     }
 }
 
-func shuffled(it) {
+def shuffled(it) {
     let arr = copy(it)
     shuffle(arr)
     return arr
@@ -184,7 +184,7 @@ let UNIX_HOUR  = 3600
 let UNIX_MIN   = 60
 
 # return a string representation of the current time.
-func strtime(t) {
+def strtime(t) {
     let mut secs = (t - UNIX_EPOCH) % UNIX_DAY
     if secs < 0 {
         secs += UNIX_DAY

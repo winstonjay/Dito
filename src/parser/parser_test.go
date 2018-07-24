@@ -140,11 +140,11 @@ func TestPrefixExpression(t *testing.T) {
 		right    interface{}
 	}{
 		{"-100", "-", 100},
-		{"!true", "!", true},
-		{"!false", "!", false},
+		{"not true", "not", true},
+		{"not false", "not", false},
 		{"-2.5", "-", 2.50000},
 		{"-foo", "-", "foo"},
-		{"!foo", "!", "foo"},
+		{"not foo", "not", "foo"},
 		{"+foo", "+", "foo"},
 		{"+5", "+", 5},
 	}

@@ -12,13 +12,13 @@ let mut _o_me_ga = (50 % 7) - 0.002
 
 
 # this is a single line comment you should not read me...
-let hypot = func(a, b)->(a**2 + b**2)**0.5
+let hypot = def(a, b)->(a**2 + b**2)**0.5
 
 let summer = true
 let mut rain = true
 let fun = false != true
 "he" ++ "llo"
-[10e2 + 3, 8.23e10, 0xffcc, 3e-5]; func float_5(a) { return .5 * a; }
+[10e2 + 3, 8.23e10, 0xffcc, 3e-5]; def float_5(a) { return .5 * a; }
 .@ @
 x /= fun << 1`
 	// ^^^^^ DO NOT CHANGE OR YOU HAVE TO WORK OUT THE WHOLE TEST AGAIN
@@ -62,7 +62,7 @@ x /= fun << 1`
 		{token.LET, "let", 5, 0},
 		{token.IDVAL, "hypot", 5, 0},
 		{token.ASSIGN, "=", 5, 0},
-		{token.FUNC, "func", 5, 0},
+		{token.DEF, "def", 5, 0},
 		{token.LPAREN, "(", 5, 0},
 		{token.IDVAL, "a", 5, 0},
 		{token.COMMA, ",", 5, 0},
@@ -125,7 +125,7 @@ x /= fun << 1`
 		{token.FLOAT, "3e-5", 11, 0},
 		{token.RBRACKET, "]", 11, 0},
 		{token.SEMI, ";", 11, 0},
-		{token.FUNC, "func", 11, 0},
+		{token.DEF, "def", 11, 0},
 		{token.IDVAL, "float_5", 11, 0},
 		{token.LPAREN, "(", 11, 0},
 		{token.IDVAL, "a", 11, 0},
@@ -181,6 +181,8 @@ x /= fun << 1`
 	}
 }
 
+// NEWLINE needs a redesign around comments and newlines. Currently the final line dosent
+// return a newline causing problems for the parser. The whole set up is pretty bad tbh
 func TestNewLines(t *testing.T) {
 	tests := []struct {
 		token   token.Token
@@ -215,10 +217,12 @@ let x = 0xff >= 5000
 # we only want NEWLINE to be seen just
 # after content and then ignore the rest.
 
-let j = 100 # trailing comments are not working for some reason.
 
-# after content. like "x + y\n
 "bye"`)
+	// let j = 100 # trailing comments are not working for some reason.
+
+	// # after content. like "x + y\n
+	// "bye"`)
 	for i, tt := range tests {
 		tok, literal, lineno := scanner.NextToken()
 		if tok != tt.token {
