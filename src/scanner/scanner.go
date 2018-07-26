@@ -1,7 +1,8 @@
-// Package scanner implements Dito's Lexical Scanner.
-// Scanner scans file for tokens and passes them to parser.
-// This is implemented by the NextToken function, which the
-// parser will call till it reaches an token.EOF.
+/*Package scanner implements Dito's Lexical Scanner.
+Scanner scans file for tokens and passes them to parser.
+This is implemented by the NextToken function, which the
+parser will call till it reaches an token.EOF.
+*/
 package scanner
 
 // TODO: fix issues with column positions, tracebacks etc.
@@ -37,26 +38,28 @@ func Init(input string) *Scanner {
 // NextToken : Returns the next token encountered by the lexical scanner.
 func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 
-	// first see if we find a newline token return that and set the newline
-	// collection to false. This is so that at we only collect one newline token
-	// per space between non-whitespace chars. The rest of the newlines are not
-	// tokenised but the line postion is incremented.
+	// ------------------------------------------------------------------------
+	// * * * TODO * * *
+	// The way new lines are handled is kinda rubbish. Appart from having to
+	// the odd awkward check in the parser, the way it handles comments stops
+	// trailing comments.
+
 	if s.newline && (s.char == '\n' || s.char == '\r') {
 		s.newline = false
 		s.advanceLine()
 		return token.NEWLINE, token.NEWLINE.String(), s.lineno - 1
 	}
 
-	// reset newline collection so we collect the first trailing
-	// newline the next time this function is called.
 	s.newline = true
 
-	// Make sure all comments and spaces are skipped.
 	s.skipWhitespace()
 	for s.char == '#' {
 		s.skipComment()
 		s.skipWhitespace()
 	}
+
+	// ------------------------------------------------------------------------
+
 	// Run through all the possible operators and delimeters that are
 	// included in dito's grammar, if not default to check for
 	// identifers and numbers. If we still havent found anything
@@ -182,57 +185,51 @@ func (s *Scanner) readIdentifer() (token.Token, string, int) {
 }
 
 // readNumber returns either an integer or a float type token
-// with support for hex, e notation, and decimal.
+// with support for hex, scientific notation, and decimal.
 // All hex digits are integers and all exponated digits are floats.
 func (s *Scanner) readNumber() (token.Token, string, int) {
 	start := s.pos
-	// loop though digits until we read the end of 0-9.
+	// step 1: loop though digits until we read the end of 0-9.
 	for isDigit(s.char) {
 		s.advance()
 	}
-	// Once we have the significand, now find the numbers type.
+	// Step 2: Once we have the significand, now find the numbers type.
+	// The rule is if it has a decimal point or uses scientfic notation
+	// its a float. If it is hex or just a plain integer return a int.
 	switch {
 	// all hexadecimals start strictly with a 0x or a 0X.
 	case (s.char == 'x' || s.char == 'X') && s.input[start:s.pos] == "0":
-		goto Hexadecimal
+		// Hexadecimal e.g. 0xffaf, 0X0032f, ...
+		s.advance()
+		for isHex(s.char) {
+			s.advance()
+		}
+		return token.INT, s.input[start:s.pos], s.lineno
 	case s.char == '.':
-		goto Mantissa
+		// Mantissa e.g. 0.321, 312.123, ...
+		s.advance()
+		for isDigit(s.char) {
+			s.advance()
+		}
+		if s.char != 'e' && s.char != 'E' {
+			return token.FLOAT, s.input[start:s.pos], s.lineno
+		}
+		// if we reach here we go to the next case.
+		fallthrough
 	case s.char == 'e' || s.char == 'E':
-		goto Exponent
+		// Exponent e.g. 10e2, 8E-2, 8.23e10, ...
+		s.advance()
+		if s.char == '+' || s.char == '-' {
+			s.advance()
+		}
+		s.advance()
+		for isDigit(s.char) {
+			s.advance()
+		}
+		return token.FLOAT, s.input[start:s.pos], s.lineno
 	default:
 		return token.INT, s.input[start:s.pos], s.lineno
 	}
-
-Hexadecimal:
-	// 0xffaf, 0X0032f, ...
-	s.advance()
-	for isHex(s.char) {
-		s.advance()
-	}
-	return token.INT, s.input[start:s.pos], s.lineno
-
-Mantissa:
-	// 0.321, 312.123, ...
-	s.advance()
-	for isDigit(s.char) {
-		s.advance()
-	}
-	if s.char == 'e' || s.char == 'E' {
-		goto Exponent
-	}
-	return token.FLOAT, s.input[start:s.pos], s.lineno
-
-Exponent:
-	// 10e2, 8E-2, 8.23e10, ...
-	s.advance()
-	if s.char == '+' || s.char == '-' {
-		s.advance()
-	}
-	s.advance()
-	for isDigit(s.char) {
-		s.advance()
-	}
-	return token.FLOAT, s.input[start:s.pos], s.lineno
 }
 
 func (s *Scanner) advance() {

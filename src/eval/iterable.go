@@ -43,7 +43,6 @@ func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environ
 		return object.NONE
 	}
 	// TODO this is just implemented as a quick fix.
-	// this function should probally not reutrn a
 	left := iter.GetItem(key)
 	opString := node.Token.String()
 	op := object.BinaryOps[opString[:len(opString)-1]]

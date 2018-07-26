@@ -1,5 +1,9 @@
 package eval
 
+// TODO:
+// Need to review these tests. At a glance some of them seem a bit odd
+// or incorect.
+
 import (
 	"dito/src/object"
 	"dito/src/parser"
@@ -26,7 +30,7 @@ func TestIntExpr(t *testing.T) {
 		{"0x20 * 2 + 10", 74},
 		{"5 + 2 * 10", 25}, {"(5 + (2 * 10))", 25},
 		{"0x5a + (0xa + 0xb + 0xc)", 123},
-		{"0x14 + 0x00000002 * -0X000A", 0x000},
+		{"0x14 + 0x00000002 * -0X000A", 0x000}, // what is going on here.
 		{"0X32 // 2 * 2 + 10", 60},
 		{"2 * (5 + 10)", 30},
 		{"3 * 3 * 3 + 10", 37}, {"((3 * (3 * 3)) + 10)", 37},
@@ -38,7 +42,6 @@ func TestIntExpr(t *testing.T) {
 		{"1 << 63", -9223372036854775808},
 		{"9223372036854775807 >> 63", 0},
 		{"9223372036854775807 >> 32", 2147483647},
-		// {"2 ** 63", gives bad overflow error }
 	}
 
 	for _, tt := range tests {

@@ -238,14 +238,6 @@ func objectPrint(args ...object.Object) object.Object {
 	return object.NONE
 }
 
-// func objectIsIterable(args ...object.Object) object.Object {
-// 	if n := len(args); n != 1 {
-// 		return object.NewError(object.InvalidArgLenError, "len", 1, n)
-// 	}
-// 	_, ok := args[0].(object.Iterable)
-// 	return object.NewBool(ok)
-// }
-
 func objectRange(args ...object.Object) object.Object {
 	if len(args) != 2 {
 		return object.NewError(object.InvalidArgLenError, "range", 2, len(args))

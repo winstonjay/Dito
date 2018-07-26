@@ -8,6 +8,7 @@ import (
 )
 
 func init() {
+	// need random number generator for builtin function rand.
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
@@ -17,7 +18,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.Program:
 		return evalProgram(node.Statements, env)
 
-	// // Statements
+	// Statements
 	case *ast.AssignmentStatement:
 		return evalAssignment(node, env)
 	case *ast.ReAssignStatement:
