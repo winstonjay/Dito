@@ -48,7 +48,8 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return evalIfElseExpression(node, env)
 	case *ast.IndexExpression:
 		return evalIndexExpression(node, env)
-
+	case *ast.SliceExpression:
+		return evalSliceExpression(node, env)
 	// // Functions
 	case *ast.Function:
 		return object.NewFunction(node, env)

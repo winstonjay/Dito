@@ -28,10 +28,12 @@ type Iterable interface {
 	GetItem(Object) Object
 	// SetItem : set item at location of the provided key.
 	SetItem(Object, Object) Object
-	// Concat : Concat two items together.
+	// Concat : concat two iterables together.
 	Concat(Object) Object
 	// Contains : is item in the iterable. would use 'in' operator.
 	Contains(Object) Object
+	// Slice : return a slice of an iterables elements
+	Slice(Object, Object) Object
 }
 
 // // IterObject : key value pair for iterating over a Iterable
@@ -39,6 +41,8 @@ type Iterable interface {
 // 	key Object
 // 	val Object
 // }
+
+// TODO think about Numeric.
 
 // Numeric : the requirements needed for a Object to be an Numeric.
 type Numeric interface {

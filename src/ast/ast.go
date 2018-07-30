@@ -277,6 +277,20 @@ func (ie *IndexExpression) String() string {
 	return fmt.Sprintf("(%s[%s])", ie.Left.String(), ie.Index.String())
 }
 
+// SliceExpression :
+type SliceExpression struct {
+	Token token.Token // :
+	Left  Expression
+	S     Expression
+	E     Expression
+}
+
+func (se *SliceExpression) expressionNode()      {}
+func (se *SliceExpression) tokenLiteral() string { return se.Token.String() }
+func (se *SliceExpression) String() string {
+	return fmt.Sprintf("(%s[%s:%s])", se.Left.String(), se.S.String(), se.E.String())
+}
+
 // PrefixExpression :
 type PrefixExpression struct {
 	Token    token.Token
@@ -339,10 +353,28 @@ func (ie *IfElseExpression) String() string {
 	return out.String()
 }
 
-/*
-######## Atoms
+// #### Composite elements.
 
-*/
+// DictLiteral : Key value pairs.
+type DictLiteral struct {
+	Token token.Token
+	Items map[Expression]Expression
+}
+
+func (dl *DictLiteral) expressionNode()      {}
+func (dl *DictLiteral) tokenLiteral() string { return dl.Token.String() }
+
+func (dl *DictLiteral) String() string {
+	var b bytes.Buffer
+	items := []string{}
+	for key, val := range dl.Items {
+		items = append(items, key.String()+":"+val.String())
+	}
+	b.WriteString("{")
+	b.WriteString(strings.Join(items, ", "))
+	b.WriteString("}")
+	return b.String()
+}
 
 // ArrayLiteral : Arrays can contain an assorted range of elements.
 type ArrayLiteral struct {
@@ -363,6 +395,10 @@ func (al *ArrayLiteral) String() string {
 	out.WriteString("]")
 	return out.String()
 }
+
+/*
+######## Atoms
+*/
 
 // Identifier : alphanumeric varible name.
 type Identifier struct {

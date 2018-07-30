@@ -542,6 +542,28 @@ func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
 	exp := &ast.IndexExpression{Token: p.currentToken, Left: item}
 	p.nextToken()
 	exp.Index = p.expression(token.LOWEST)
+	if p.peekTokenIs(token.COLON) {
+		return p.sliceExpression(item, exp.Index)
+	}
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+	return exp
+}
+
+// sliceExpression
+// 		identifier '[' expression ':' expression ']'
+// hmmmm... this should probally be more independent from index expression.
+// but its not for now just to avoid back-tracking.
+func (p *Parser) sliceExpression(left, start ast.Expression) ast.Expression {
+	p.nextToken()
+	exp := &ast.SliceExpression{
+		Token: p.currentToken,
+		Left:  left,
+		S:     start,
+	}
+	p.nextToken()
+	exp.E = p.expression(token.LOWEST)
 	if !p.expectPeek(token.RBRACKET) {
 		return nil
 	}

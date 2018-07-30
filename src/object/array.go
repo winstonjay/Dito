@@ -78,6 +78,29 @@ func (a *Array) SetItem(key Object, val Object) Object {
 	return a
 }
 
+// Slice : return a slice of an arrays elements.
+func (a *Array) Slice(start Object, end Object) Object {
+	startInt, ok := start.(*Int)
+	if !ok {
+		return NewError("slice start index type error.")
+	}
+	endInt, ok := end.(*Int)
+	if !ok {
+		return NewError("slice end index type error.")
+	}
+	if startInt.Value > endInt.Value {
+		return NewError("slice index error. start must be less than end index")
+	}
+	if endInt.Value < 0 || endInt.Value > a.Len {
+		return NewError("slice end index out of bounds error")
+	}
+	if startInt.Value < 0 || startInt.Value >= a.Len {
+		return NewError("slice start index out of bounds error")
+	}
+	slice := a.Elements[startInt.Value:endInt.Value]
+	return NewArray(slice, len(slice))
+}
+
 // Concat : Add item to the current string creating a new string.
 func (a *Array) Concat(other Object) Object {
 	return NewArray(append(a.Elements, other.(*Array).Elements...), -1)

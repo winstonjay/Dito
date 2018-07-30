@@ -20,7 +20,8 @@ let fun = false != true
 "he" ++ "llo"
 [10e2 + 3, 8.23e10, 0xffcc, 3e-5]; def float_5(a) { return .5 * a; }
 .@ @
-x /= fun << 1`
+x /= fun << 1
+{"f\nn": hypot}`
 	// ^^^^^ DO NOT CHANGE OR YOU HAVE TO WORK OUT THE WHOLE TEST AGAIN
 	// if you have to. extend the current string.
 	// TODO (ALREADY BROKE cols NEEDS FIXING, there are some alignment
@@ -151,9 +152,17 @@ x /= fun << 1`
 		{token.IDVAL, "fun", 13, 0},
 		{token.LSHIFT, "<<", 13, 0},
 		{token.INT, "1", 13, 0},
+		{token.NEWLINE, "NEWLINE", 13, 0},
+
+		// {"fn": hypot}
+		{token.LBRACE, "{", 14, 0},
+		{token.STRING, "f\nn", 14, 0},
+		{token.COLON, ":", 14, 0},
+		{token.IDVAL, "hypot", 14, 0},
+		{token.RBRACE, "}", 14, 0},
 
 		// Allways end with EOF.
-		{token.EOF, "EOF", 13, 0},
+		{token.EOF, "EOF", 14, 0},
 	}
 
 	scanner := Init(input) // init scanner.

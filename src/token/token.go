@@ -10,6 +10,7 @@ type Token uint
 const (
 	EOF     Token = iota // end of file 0
 	ILLEGAL              // non recognised tokens.
+	UNEXPECTED_EOF
 
 	beginLiteral
 	IDVAL  // Alphanumeric idenifiers (varible names).
@@ -95,9 +96,10 @@ const (
 
 var tokensLiterals = [...]string{
 
-	ILLEGAL: "ILLEGAL",
-	EOF:     "EOF",
-	NEWLINE: "NEWLINE",
+	ILLEGAL:        "ILLEGAL",
+	EOF:            "EOF",
+	NEWLINE:        "NEWLINE",
+	UNEXPECTED_EOF: "UNEXPECTED_EOF",
 
 	IDVAL:  "ID",
 	INT:    "Int",

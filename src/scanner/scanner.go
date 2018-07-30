@@ -10,6 +10,7 @@ package scanner
 // 		 and the general setup jsut dosent feel right.
 
 import (
+	"bytes"
 	"dito/src/token"
 )
 
@@ -101,15 +102,16 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		tok = token.RBRACKET
 	case '"':
 		return s.readString()
+	case ':':
+		tok = token.COLON
 	case '.':
 		if isDigit(s.peek()) {
 			return s.readNumber()
 		}
 		tok = token.ILLEGAL
 	case 0:
-		// token.EOF represents end of input.
-		// the scanners caller should check for
-		// this to find out when to stop iterating.
+		// token.EOF represents end of input. the scanners caller should
+		// check for this to find out when to stop iterating.
 		tok = token.EOF
 	default:
 		if isDigit(s.char) {
@@ -160,16 +162,46 @@ func (s *Scanner) switch3(
 // They can be multi-line but this should probally be
 // treated as an error in the future.
 func (s *Scanner) readString() (token.Token, string, int) {
-	start := s.pos + 1
+	var b bytes.Buffer
 	for {
 		s.advance()
-		if s.char == '"' || s.char == 0 {
+		if s.char == '"' {
 			break
 		}
+		if s.char == '\n' || s.char == 0 {
+			return token.UNEXPECTED_EOF, b.String(), s.lineno
+		}
+		if s.char == '\\' {
+			b.WriteByte(s.escapeString())
+			continue
+		}
+		b.WriteByte(s.char)
 	}
-	literal := s.input[start:s.pos]
 	s.advance()
-	return token.STRING, literal, s.lineno
+	return token.STRING, b.String(), s.lineno
+}
+
+func (s *Scanner) escapeString() byte {
+	s.advance()
+	switch s.char {
+	case 'n':
+		return '\n'
+	case '\\':
+		return '\\'
+	case 'r':
+		return '\r'
+	case 't':
+		return '\t'
+	case 'f':
+		return '\f'
+	case 'b':
+		return '\b'
+	case '"':
+		return '"'
+	case '\'':
+		return '\''
+	}
+	return '\\'
 }
 
 // readIdentifer reads while alphanumeric chars are under inspection.

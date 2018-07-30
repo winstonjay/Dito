@@ -30,7 +30,7 @@ let last   = def(it) -> it[len(it) - 1]
 let first  = def(it) -> it[0]
 let append = def(it, val) ->  it ++ [val]
 let copy   = def(it) -> [] ++ it
-# let pop    = def(it) -> TODO: implement slicing.
+let popped = def(it) -> it[0:len(it)-1]
 
 def map(fn, it) {
     let mut i = 0
@@ -193,4 +193,13 @@ def strtime(t) {
     let tm_min  = secs // 60 % 60
     let tm_sec  = secs % 60
     return join([tm_hour, tm_min, tm_sec], ":")
+}
+
+# ---------------------------------------------------------------------
+# Misc
+
+def assert(cond, msg) {
+    if not cond {
+        error("Bad assertion: " ++ msg)
+    }
 }

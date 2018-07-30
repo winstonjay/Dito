@@ -13,12 +13,31 @@ func evalIndexExpression(node *ast.IndexExpression, env *object.Environment) obj
 	}
 	key := Eval(node.Index, env)
 	if isError(key) {
-		return left
+		return key
 	}
 	if iter, ok := left.(object.Iterable); ok {
 		return iter.GetItem(key)
 	}
-	return object.NewError("Item is does not satisfy Iterable type.")
+	return object.NewError("Item is not Iterable")
+}
+
+func evalSliceExpression(node *ast.SliceExpression, env *object.Environment) object.Object {
+	left := Eval(node.Left, env)
+	if isError(left) {
+		return left
+	}
+	start := Eval(node.S, env)
+	if isError(start) {
+		return start
+	}
+	end := Eval(node.E, env)
+	if isError(end) {
+		return end
+	}
+	if iter, ok := left.(object.Iterable); ok {
+		return iter.Slice(start, end)
+	}
+	return object.NewError("Item is not Iterable")
 }
 
 func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environment) object.Object {

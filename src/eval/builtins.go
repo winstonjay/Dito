@@ -53,6 +53,14 @@ var Builtins = map[string]*object.Builtin{
 		ArgT:    []string{"Iter"},
 		ReturnT: "Array",
 	},
+	"error": &object.Builtin{
+		Name:    "error",
+		Fn:      objectError,
+		Info:    "create a new error message with a string.",
+		ArgC:    1,
+		ArgT:    []string{"String"},
+		ReturnT: "Error",
+	},
 	"type": &object.Builtin{
 		Name:    "type",
 		Fn:      objectType,
@@ -236,6 +244,16 @@ func objectPrint(args ...object.Object) object.Object {
 	}
 	io.WriteString(os.Stdout, "\n")
 	return object.NONE
+}
+
+func objectError(args ...object.Object) object.Object {
+	if len(args) != 1 {
+		return object.NewError(object.InvalidArgLenError, "error", 2, len(args))
+	}
+	if args[0].Type() != object.StringType {
+		return object.NewError("Argument to `error` not supported, got %s", args[0].Type())
+	}
+	return object.NewError(args[0].Inspect())
 }
 
 func objectRange(args ...object.Object) object.Object {

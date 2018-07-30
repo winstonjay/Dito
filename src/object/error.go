@@ -11,7 +11,7 @@ type Error struct{ Message string }
 func (e *Error) Type() TypeFlag { return ErrorType }
 
 // Inspect : return a string representation of the objects value.
-func (e *Error) Inspect() string { return "Evaluation " + ErrorType.String() + ": " + e.Message }
+func (e *Error) Inspect() string { return ErrorType.String() + ", " + e.Message }
 
 // NewError : return new initialised instance of the object.
 func NewError(format string, a ...interface{}) *Error {
