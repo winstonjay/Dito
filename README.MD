@@ -28,18 +28,6 @@ let target = 200
 print(coinSums(coins, target))
 ```
 
-Here is another example
-```
-def newton_sqrt(x, delta) {
-    let mut z = delta
-    for abs(x - z**2) > delta {
-        z -= (z**2 - x) / (2 * x)
-    }
-    return z
-}
-```
-
-
 ### Having a go...
 
 The most simple way to build with `go build` then use the executable or just `go run main.go`. You can try out the language either in a interactive shell with:
