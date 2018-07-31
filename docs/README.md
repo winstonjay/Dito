@@ -7,7 +7,7 @@ This is currently in progress. What is here is limited but should be reasonably 
 The following keywords are reserved and may not be used as identifiers.
 
 ```
-and     if      else        for         in          func
+and     if      else        for         in          def
 or      mut     return      not         import      let
 ```
 
@@ -23,18 +23,21 @@ The following character sequences represent operators (including assignment oper
 
 **Operator precedence**
 
+precedence levels dictate the order of operations in expression. Here they are ranked lowest (least binding) to highghest (most binding). Operators with the same precedence are executed left to right.
+
 ```
 1           if
 2           or and
 3           == != <= >= < >
 4           + - ^ | &
-0           * / % // << >>
-5           **
-6           not + -
-7           bracketed expressions and function calls.
+5           * / % // << >>
+6           **
+7           not + -
+8           bracketed expressions and function calls.
 ```
 
 **Arithmetic operators**
+
 ```
 +       ADD         int, float
 -       SUB         int, float
@@ -49,6 +52,7 @@ The following character sequences represent operators (including assignment oper
 |       BITOR       int
 ^       BITXOR      int
 ```
+
 **Prefix operators**
 
 ```
@@ -74,6 +78,7 @@ and     AND         bool
 
 ```
 ++      CAT         array
+in      IN          array
 ```
 
 ```
