@@ -18,7 +18,7 @@ The following character sequences represent operators (including assignment oper
 ```
 +   -   *   /   //  %   **  <<  >>  &   |   ^
 ==  !=  <   >   <=  >=  ++  ->  (   )   [   ]
-{   }   ;   ,   =   +=  -=  /=  %=
+{   }   ;   ,   =   +=  -=  /=  %=  "
 ```
 
 **Operator precedence**
@@ -32,7 +32,7 @@ The following character sequences represent operators (including assignment oper
 |4|`+` `-` `^` `|` `&`|
 |0|`*` `/` `%` `//` `<<` `>>`|
 |5|`**`|
-|6|`+` `-` `not`. prefix expressions|
+|6|`not` `+` `-` prefix expressions|
 |7|bracketed expressions and function calls. |
 
 **Arithmetic operators**
