@@ -14,7 +14,7 @@ be made given a set of coins. This can be found in full in the exampls dir descr
 import std
 
 def coinSums(coins, target) {
-    let sack = zeros(target+1)
+    let sack = array(target+1)
     sack[0] = 1
     for coin in coins {
         for i in range(coin, target+1) {
@@ -23,8 +23,6 @@ def coinSums(coins, target) {
     }
     return sack[target]
 }
-
-let zeros = def(t) -> map(def(_) -> 0, range(0, t))
 
 let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
 let target = 200
