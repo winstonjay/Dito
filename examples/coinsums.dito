@@ -14,7 +14,7 @@ def main() {
 
 def coinSums(coins, target) {
     # intialise a array of zeros to the size of the target
-    let sack = zeros(target + 1)
+    let sack = array(target + 1)
     # set the start to get the sum chains going.
     sack[0] = 1
     for coin in coins {
@@ -26,8 +26,5 @@ def coinSums(coins, target) {
     }
     return sack[target]
 }
-
-# helper function to generate an n sized array of zeros.
-let zeros = def(n) -> map(def(_) -> 0, range(0, n))
 
 main()

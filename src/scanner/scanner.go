@@ -45,7 +45,7 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	// the odd awkward check in the parser, the way it handles comments stops
 	// trailing comments.
 
-	if s.newline && (s.char == '\n' || s.char == '\r') {
+	if s.newline && s.char == '\n' {
 		s.newline = false
 		s.advanceLine()
 		return token.NEWLINE, token.NEWLINE.String(), s.lineno - 1
@@ -54,10 +54,6 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 	s.newline = true
 
 	s.skipWhitespace()
-	for s.char == '#' {
-		s.skipComment()
-		s.skipWhitespace()
-	}
 
 	// ------------------------------------------------------------------------
 
@@ -169,7 +165,7 @@ func (s *Scanner) readString() (token.Token, string, int) {
 			break
 		}
 		if s.char == '\n' || s.char == 0 {
-			return token.UNEXPECTED_EOF, b.String(), s.lineno
+			return token.UNEXPECTEDEOF, b.String(), s.lineno
 		}
 		if s.char == '\\' {
 			b.WriteByte(s.escapeString())
@@ -183,25 +179,28 @@ func (s *Scanner) readString() (token.Token, string, int) {
 
 func (s *Scanner) escapeString() byte {
 	s.advance()
+	var val byte
 	switch s.char {
 	case 'n':
-		return '\n'
+		val = '\n'
 	case '\\':
-		return '\\'
+		val = '\\'
 	case 'r':
-		return '\r'
+		val = '\r'
 	case 't':
-		return '\t'
+		val = '\t'
 	case 'f':
-		return '\f'
+		val = '\f'
 	case 'b':
-		return '\b'
+		val = '\b'
 	case '"':
-		return '"'
+		val = '"'
 	case '\'':
-		return '\''
+		val = '\''
+	default:
+		val = '\\'
 	}
-	return '\\'
+	return val
 }
 
 // readIdentifer reads while alphanumeric chars are under inspection.
@@ -264,6 +263,25 @@ func (s *Scanner) readNumber() (token.Token, string, int) {
 	}
 }
 
+// skipWhitespace all skips whitespace and comments whilst keeping track
+// of line numbers.
+func (s *Scanner) skipWhitespace() {
+	for {
+		switch s.char {
+		case ' ', '\r', '\t':
+			s.advance()
+		case '\n':
+			s.advanceLine()
+		case '#':
+			for s.char != '\n' && s.char != 0 {
+				s.advance()
+			}
+		default:
+			return
+		}
+	}
+}
+
 func (s *Scanner) advance() {
 	if s.peekPos >= len(s.input) {
 		s.char = 0
@@ -287,25 +305,6 @@ func (s *Scanner) peek() byte {
 		return 0
 	}
 	return s.input[s.peekPos]
-}
-
-func (s *Scanner) skipWhitespace() {
-	for isSpace(s.char) {
-		if s.char == '\n' || s.char == '\r' {
-			s.advanceLine()
-		} else {
-			s.advance()
-		}
-	}
-}
-
-func (s *Scanner) skipComment() {
-	for s.char != 0 && !(s.char == '\n' || s.char == '\r') {
-		s.advance()
-	}
-	if s.char != 0 {
-		s.advanceLine()
-	}
 }
 
 func isDigit(char byte) bool {

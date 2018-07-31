@@ -35,5 +35,5 @@ func (b *Bool) ConvertType(which TypeFlag) Object {
 		}
 		return NewFloat(0.0)
 	}
-	return NewError("Argument to %s not supported, got %s", b.Type(), which)
+	return NewError("Argument to %s not supported, got %s", which, b.Type())
 }

@@ -18,9 +18,9 @@ let E       =  2.718281828459045
 # MIN_INT 64bit: -9223372036854775808
 # MAX_INT 64bit:  9223372036854775807
 
-let MIN_INT = (1 << 63)
+let MinInt = (1 << 63)
 
-let MAX_INT = (1 << 63) - 1
+let MaxInt = (1 << 63) - 1
 
 
 # ---------------------------------------------------------------------
@@ -151,28 +151,67 @@ let fact    = def(a)     -> prod(range(1, a + 1))
 
 # ---------------------------------------------------------------------
 # random :
-# Builds on top of the built in deftion `rand`.
+# Builds on top of the built in deftion `random`.
+#
+# refs
+# https://github.com/python/cpython/blob/master/Lib/random.py
 
 # return random int where result <= a
-let randint = def(a) -> int(rand() * a)
+let randInt = def(a) -> int(random() * a)
 
 # return a random choice from a iterable object.
-let choice  = def(it) -> it[int(rand() * len(it))]
+let choice  = def(it) -> it[int(random() * len(it))]
 
 # generate a random number between a and b.
-let uniform = def(a, b) -> (a + ((abs(a) if a<0 else 0) + b) * rand())
+let uniform = def(a, b) -> a + (b-a) * random()
 
-def shuffle(it) {
+def shuffled(it) {
+    # created a new shuffled version of a given array.
+    let arr = copy(it)
+    shuffle(arr)
+    return arr
+}
+
+def _shuffle(it) {
+    # for a given array shuffle its elements inplace
     let maxIndex = len(it) - 1
     for i in range(0, maxIndex) {
         swap(it, i, randint(maxIndex))
     }
 }
 
-def shuffled(it) {
-    let arr = copy(it)
-    shuffle(arr)
-    return arr
+def sample(population, k) {
+    # return k random elements from a given population.
+
+    # we cant return more elements than we have. If the number is the same
+    # just shuffle and return the population.
+    let n = len(population)
+    assert(k <= n or k < 0,
+            "k must be less than the population size and greater than zero")
+    if k == n {
+        return shuffled(population)
+    }
+    # we dont have any hash like datastructures so we will create
+    # an array of zeros the same size as the population with each
+    # matching index denoting wheter it has been picked from the
+    # population. If a index is picked set selected index to 1.
+    let selected = array(n)
+
+    # initialize needed varibles.
+    let mut j = 0
+    let mut result = array(k)
+
+    # loop through k times and incrementally fill our samples indexes
+    # with unique indexes from our population.
+    for i in range(0, k) {
+        j = randInt(n)
+        for selected[j] != 0 {
+            j = randInt(n)
+        }
+        result[i] = population[j]
+        selected[j] = 1
+    }
+    return result
 }
 
 # ---------------------------------------------------------------------

@@ -30,7 +30,7 @@ func (c *Char) ConvertType(which TypeFlag) Object {
 	case BoolType:
 		return NewBool(c.Value != 0)
 	default:
-		return NewError("Argument to %s not supported, got %s", c.Type(), which)
+		return NewError("Argument to %s not supported, got %s", which, c.Type())
 	}
 }
 

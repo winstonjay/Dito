@@ -22,4 +22,4 @@ def sineFormatter(width, marker) {
     return fmtLine
 }
 
-main(100, .175, 40, sineFormatter(30, "*"))
+main(20, .175, 40, sineFormatter(30, "*"))

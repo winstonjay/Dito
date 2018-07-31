@@ -29,7 +29,7 @@ func (f *Float) ConvertType(which TypeFlag) Object {
 	case BoolType:
 		return NewBool(f.Value != 0)
 	default:
-		return NewError("Argument to %s not supported, got %s", f.Type(), which)
+		return NewError("Argument to %s not supported, got %s", which, f.Type())
 	}
 }
 

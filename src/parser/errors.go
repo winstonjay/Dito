@@ -8,17 +8,7 @@ import (
 )
 
 // TODO: fix issues with column positions, tracebacks etc
-// TODO: Maybe make error its own type of object.
-// TODO: Work on traceback aethetics.
-
-// ParseError : store error message
-type ParseError struct {
-	message   string // what's the problem?
-	column    int    // what line it is on?
-	lineno    int    // where does the problem start on this line?
-	lineTrace string // what does this line look like?
-}
-
+// TODO: Work on traceback style.
 // Example error output or the aim for what the output aspires to be.
 // print all error messages then the last traceback.
 //     Parse Error: Expected next token is ':='. got '9' instead.
@@ -28,16 +18,20 @@ type ParseError struct {
 // 	       x := pasta * 2 / 3 =
 //                            ^ your problem right there.
 
+// ParseError : store error message
+type ParseError struct {
+	message   string // what's the problem?
+	column    int    // what line it is on?
+	lineno    int    // where does the problem start on this line?
+	lineTrace string // what does this line look like?
+}
+
 func (pe *ParseError) String() string {
 	return fmt.Sprintf(
 		"Traceback line %d column %d:\n%*s%s\n%*s%s\n%s\n",
 		pe.lineno, pe.column, 4, " ", pe.lineTrace, 4+pe.column, " ", "^ Is your problem here?",
 		pe.message)
 }
-
-/*
-#### main Parser methods for working with errors.
-*/
 
 func (p *Parser) newError(message string) *ParseError {
 	linecontent := strings.TrimRight(p.scanner.TraceLine(), "\n\t ")

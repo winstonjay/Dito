@@ -45,7 +45,7 @@ func (a *Array) ConvertType(which TypeFlag) Object {
 	if which == ArrayType {
 		return a
 	}
-	return NewError("Argument to %s not supported, got %s", a.Type(), which)
+	return NewError("Argument to %s not supported, got %s", which, a.Type())
 }
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

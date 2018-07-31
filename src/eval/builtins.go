@@ -125,8 +125,8 @@ var Builtins = map[string]*object.Builtin{
 		ArgT:    []string{"Int", "Int"},
 		ReturnT: "Array",
 	},
-	"rand": &object.Builtin{
-		Name:    "rand",
+	"random": &object.Builtin{
+		Name:    "random",
 		Fn:      objectRand,
 		Info:    "Generate a random Float between 0-1.",
 		ArgC:    0,
@@ -282,7 +282,7 @@ func objectRange(args ...object.Object) object.Object {
 
 func objectRand(args ...object.Object) object.Object {
 	if len(args) != 0 {
-		return object.NewError(object.InvalidArgLenError, "rand", 0, len(args))
+		return object.NewError(object.InvalidArgLenError, "random", 0, len(args))
 	}
 	return object.NewFloat(rand.Float64())
 }

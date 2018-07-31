@@ -22,7 +22,7 @@ func main() {
 		filepath := args[0]
 		file, err := ioutil.ReadFile(filepath)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 		}
 		execFile(string(file), os.Stdout)
 		return

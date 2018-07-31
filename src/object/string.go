@@ -43,7 +43,7 @@ func (s *String) ConvertType(which TypeFlag) Object {
 	case BoolType:
 		return NewBool(s.Value != "")
 	}
-	return NewError("Argument to %s not supported, got %s", s.Type(), which)
+	return NewError("Argument to %s not supported, got %s", which, s.Type())
 }
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

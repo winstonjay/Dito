@@ -30,10 +30,21 @@ func (i *Int) ConvertType(which TypeFlag) Object {
 		return NewString(i.Inspect())
 	case BoolType:
 		return NewBool(i.Value != 0)
+	case ArrayType:
+		elements := make([]Object, i.Value)
+		for j := 0; j < i.Value; j++ {
+			elements[j] = ZERO
+		}
+		return NewArray(elements, i.Value)
 	default:
-		return NewError("Argument to %s not supported, got %s", i.Type(), which)
+		return NewError("Argument to %s not supported, got %s", which, i.Type())
 	}
 }
+
+var (
+	// ZERO : is the number zero
+	ZERO = NewInt(0)
+)
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 // Methods needed to satisfy the Numeric interface:

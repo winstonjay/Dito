@@ -23,7 +23,7 @@ let fun = false != true
 x /= fun << 1
 {"f\nn": hypot}`
 	// ^^^^^ DO NOT CHANGE OR YOU HAVE TO WORK OUT THE WHOLE TEST AGAIN
-	// if you have to. extend the current string.
+	// if you have to, extend the current string.
 	// TODO (ALREADY BROKE cols NEEDS FIXING, there are some alignment
 	// problemns with the coloum positions seen in trackbacks.
 	tests := []struct {
@@ -171,8 +171,8 @@ x /= fun << 1
 		tok, literal, lineno := scanner.NextToken()
 
 		if tok != tt.token {
-			t.Fatalf("test[%d] - Invalid Token. expected=%q, got=%q",
-				i, tt.token.String(), tok.String())
+			t.Fatalf("test[%d] - Invalid Token line=%d. expected=%q, got=%q.",
+				i, lineno, tt.token.String(), tok.String())
 		}
 		if literal != tt.literal {
 			t.Fatalf("test[%d] - Invalid Literal. expected=%q, got=%q",
