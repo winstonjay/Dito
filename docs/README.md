@@ -23,62 +23,58 @@ The following character sequences represent operators (including assignment oper
 
 **Operator precedence**
 
-|precedence|operators|
-|---|---|
-|0|non operators / default.|
-|1|`if`|
-|2|`or` `and`|
-|3|`==` `!=` `<=` `>=` `<` `>`|
-|4|`+` `-` `^` `|` `&`|
-|0|`*` `/` `%` `//` `<<` `>>`|
-|5|`**`|
-|6|`not` `+` `-` prefix expressions|
-|7|bracketed expressions and function calls. |
+```
+1           if
+2           or and
+3           == != <= >= < >
+4           + - ^ | &
+0           * / % // << >>
+5           **
+6           not + -
+7           bracketed expressions and function calls.
+```
 
 **Arithmetic operators**
-
-|op|token name|applicable types|
-|---|---|---|
-|`+`|ADD|int, float|
-|`-`|SUB|int, float|
-|`*`|MUL|int, float|
-|`/`|DIV|int, float|
-|`//`|IDIV|int|
-|`%`|MOD|int|
-|`**`|POW|int, float|
-|`<<`|LSHIFT|int|
-|`>>`|RSHIFT|int|
-|`&`|BITAND|int|
-|`|`|BITOR|int|
-|`^`|BITXOR|int|
-
+```
++       ADD         int, float
+-       SUB         int, float
+*       MUL         int, float
+/       DIV         int, float
+//      IDIV        int
+%       MOD         int
+**      POW         int, float
+<<      LSHIFT      int
+>>      RSHIFT      int
+&       BITAND      int
+|       BITOR       int
+^       BITXOR      int
+```
 **Prefix operators**
 
-|op|token name|applicable types|
-|---|---|---|
-|`+`|ADD|int, float|
-|`-`|SUB|int, float|
-|`not`|NOT|int, float, bool|
-
+```
++       ADD         int, float
+-       SUB         int, float
+not     NOT         int, float, bool
+```
 
 **Comparison operators**
 
-|op|token name|applicable types|
-|---|---|---|
-|`==`|EQUALS|int, float, string, bool|
-|`!=`|NEQUALS|int, float, string, bool|
-|`<`|LTHAN|int, float, bool|
-|`>`|GTHAN|int, float, bool|
-|`<=`|LEQUALS|int, float, bool|
-|`>=`|GEQUALS|int, float, bool|
-|`or`|OR|bool|
-|`and`|AND|bool|
+```
+==      EQUALS      int, float, string, bool
+!=      NEQUALS     int, float, string, bool
+<       LTHAN       int, float, bool
+>       GTHAN       int, float, bool
+<=      LEQUALS     int, float, bool
+>=      GEQUALS     int, float, bool
+or      OR          bool
+and     AND         bool
+```
 
 **Array operators**
 
-|op|token name|applicable types|
-|---|---|---|
-|++|CAT|array|
+```
+++      CAT         array
+```
 
 ```
 dito: let arr = [1, 4, 9, 25, 36]
@@ -93,15 +89,14 @@ dito: arr
 
 **Assignment operators**
 
-|op|token name|applicable types|
-|---|---|---|
-|`=`|EQUAL|any|
-|`+=`|ADDEQUAL|int, float|
-|`-=`|SUBEQUAL|int, float|
-|`*=`|MULEQUAL|int, float|
-|`/=`|DIVEQUAL|int, float|
-|`%=`|MODEQUAL|int|
-
+```
+=       EQUAL       any
++=      ADDEQUAL    int, float
+-=      SUBEQUAL    int, float
+*=      MULEQUAL    int, float
+/=      DIVEQUAL    int, float
+%=      MODEQUAL    int
+```
 
 ## The rest
 
