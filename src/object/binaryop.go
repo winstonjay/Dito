@@ -212,6 +212,32 @@ func init() {
 		},
 
 		{
+			name: "&",
+			fn: map[TypeFlag]binaryFn{
+				IntType: func(env *Environment, a, b Object) Object {
+					return NewInt(a.(*Int).Value & b.(*Int).Value)
+				},
+			},
+		},
+		{
+			name: "|",
+			fn: map[TypeFlag]binaryFn{
+				IntType: func(env *Environment, a, b Object) Object {
+					return NewInt(a.(*Int).Value | b.(*Int).Value)
+				},
+			},
+		},
+
+		{
+			name: "^",
+			fn: map[TypeFlag]binaryFn{
+				IntType: func(env *Environment, a, b Object) Object {
+					return NewInt(a.(*Int).Value ^ b.(*Int).Value)
+				},
+			},
+		},
+
+		{
 			name: "<",
 			fn: map[TypeFlag]binaryFn{
 				CharType: func(env *Environment, a, b Object) Object {

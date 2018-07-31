@@ -11,8 +11,6 @@ Heres example of dynamic programming used to find the total number of ways a tar
 be made given a set of coins. This can be found in full in the exampls dir described.
 
 ```swift
-import std
-
 def coinSums(coins, target) {
     let sack = array(target+1)
     sack[0] = 1
@@ -28,6 +26,17 @@ let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
 let target = 200
 
 print(coinSums(coins, target))
+```
+
+Here is another example
+```
+def newton_sqrt(x, delta) {
+    let mut z = delta
+    for abs(x - z**2) > delta {
+        z -= (z**2 - x) / (2 * x)
+    }
+    return z
+}
 ```
 
 

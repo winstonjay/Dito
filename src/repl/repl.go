@@ -13,7 +13,7 @@ import (
 
 // command prompt constants
 const (
-	PROMPT = "(dito)> "
+	PROMPT = "dito: "
 	QUIT   = "QQ"
 )
 

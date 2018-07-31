@@ -96,6 +96,12 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		tok = token.LBRACKET
 	case ']':
 		tok = token.RBRACKET
+	case '|':
+		tok = token.BITOR
+	case '&':
+		tok = token.BITAND
+	case '^':
+		tok = token.BITXOR
 	case '"':
 		return s.readString()
 	case ':':

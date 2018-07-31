@@ -212,8 +212,8 @@ const (
 	CONDITONS       // if
 	CONNECTIVE      // or and
 	COMPARISON      // == != <= >= < >
-	ADDSUB          // + -
-	TERM            // * / % //
+	ADDSUB          // + - ^ | &
+	TERM            // * / % // << >>
 	EXPONENT        // **
 	PREFIX          // unary operators; eg. + - ! not
 	CALL            // Bracketed expressions, function calls; eg. foobar()
@@ -234,9 +234,9 @@ func (t Token) Precedence() uint {
 		return CONNECTIVE
 	case EQUALS, NEQUALS, IN, LEQUALS, GEQUALS, LTHAN, GTHAN:
 		return COMPARISON
-	case ADD, SUB, CAT, LSHIFT, RSHIFT:
+	case ADD, SUB, CAT, BITAND, BITOR, BITXOR:
 		return ADDSUB
-	case MOD, DIV, MUL, IDIV:
+	case MOD, DIV, MUL, IDIV, LSHIFT, RSHIFT:
 		return TERM
 	case POW:
 		return EXPONENT
