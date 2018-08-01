@@ -48,6 +48,6 @@ func execFile(file string, out io.Writer) {
 }
 
 func welcomeMsg(quit string) {
-	fmt.Printf("Dito Interactive Shell V0.01 on %s\n", runtime.GOOS)
+	fmt.Printf("\033[33mDito Interactive Shell V0.01\033[m on %s\n", runtime.GOOS)
 	fmt.Printf("Enter '%s' to quit. Help is coming soon...\n", quit)
 }
