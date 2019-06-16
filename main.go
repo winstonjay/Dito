@@ -33,7 +33,7 @@ func main() {
 
 func execFile(file string, out io.Writer) {
 	env := object.NewEnvironment()
-	l := scanner.Init(file)
+	l := scanner.Init(file + "\n\nmain()")
 	p := parser.New(l)
 	program := p.ParseProgram()
 	if len(p.Errors()) != 0 {
@@ -45,6 +45,8 @@ func execFile(file string, out io.Writer) {
 		io.WriteString(out, evaluated.Inspect())
 		io.WriteString(out, "\n")
 	}
+	// quick hack for automatic main calls.
+
 }
 
 func welcomeMsg(quit string) {

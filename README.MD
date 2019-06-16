@@ -11,6 +11,12 @@ Heres example of dynamic programming used to find the total number of ways a tar
 be made given a set of coins. This can be found in full in the exampls dir described.
 
 ```swift
+def main() {
+    let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
+    let target = 200
+    print(coinSums(coins, target))
+}
+
 def coinSums(coins, target) {
     let sack = array(target+1)
     sack[0] = 1
@@ -21,11 +27,6 @@ def coinSums(coins, target) {
     }
     return sack[target]
 }
-
-let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
-let target = 200
-
-print(coinSums(coins, target))
 ```
 
 ### Having a go...

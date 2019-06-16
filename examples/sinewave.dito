@@ -2,7 +2,11 @@
 # print a animated sine wave to the stdout.
 import std
 
-def main(n, step, pause, fmtLine) {
+def main() {
+    wave(20, .175, 40, sineFormatter(30, "*"))
+}
+
+def wave(n, step, pause, fmtLine) {
     let mut i = 0
     for i < n {
         print(fmtLine(i))
@@ -21,5 +25,3 @@ def sineFormatter(width, marker) {
     }
     return fmtLine
 }
-
-main(20, .175, 40, sineFormatter(30, "*"))

@@ -6,6 +6,9 @@
 # using `append` and `last`
 import std
 
+def main() {
+    print(collatzSequence(35))
+}
 
 def collatzSequence(start) {
     # define an array with our start item.
@@ -29,5 +32,3 @@ let collatz = def(n) -> (
     n           if n <= 1 else
     n // 2      if n % 2 == 0 else
     3 * n + 1)
-
-print(collatzSequence(35))

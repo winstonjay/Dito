@@ -2,13 +2,14 @@
 # F0 F1 F2  F3  F4  F5  F6  F7  F8  F9  F10 F11 F12 F13 F14 F15
 # 0 1   1   2   3   5   8   13  21  34  55  89  144 233 377 610
 
-# update as needed.
-let n = 25
+def main() {
+    # update as needed.
+    let n = 25
+    # result to std out.
+    print(fib(n))
+}
 
 # Calculate fibonacci numbers by recursion.
 let fib = def(n) -> (
     n if n < 2 else
     fib(n-1) + fib(n-2))
-
-# result to std out.
-print(fib(n))

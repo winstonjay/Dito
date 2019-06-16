@@ -3,17 +3,18 @@
 # https://github.com/python/cpython/tree/6f0eb93183519024cb360162bdd81b9faec97ba6/Tools/demo
 import std
 
-# Change n to the number of bottle of beer you want.
-let n = 10
+def main() {
+    # Change n to the number of bottle of beer you want.
+    let n = 10
+    for i in reversed(range(1, n+1)) {
+        print(bottle(i) ++ " on the wall,")
+        print(bottle(i) ++ ".")
+        print("Take one down, pass it around,")
+        print(bottle(i-1) ++ " on the wall.")
+    }
+}
 
 let bottle = def(n) -> (
     string(n) ++ " Bottles of beer" if n > 1 else
     "One Bottle of beer"            if n == 1 else
     "No more bottles of beer")
-
-for i in reversed(range(1, n+1)) {
-    print(bottle(i) ++ " on the wall,")
-    print(bottle(i) ++ ".")
-    print("Take one down, pass it around,")
-    print(bottle(i-1) ++ " on the wall.")
-}

@@ -5,12 +5,11 @@
 # make availble the `map` function.
 import std
 
-# main function is not required but is used here for structure.
-def main() {
-    let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
-    let target = 200
-    print(coinSums(coins, target))
-}
+# def main() {
+#     let coins  = [1, 2, 5, 10, 20, 50, 100, 200]
+#     let target = 200
+#     print(coinSums(coins, target))
+# }
 
 def coinSums(coins, target) {
     # intialise a array of zeros to the size of the target
@@ -26,5 +25,3 @@ def coinSums(coins, target) {
     }
     return sack[target]
 }
-
-main()

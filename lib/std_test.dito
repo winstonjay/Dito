@@ -1,41 +1,45 @@
 import std
 
+def main() {
+    runTests(mathTests, "math")
+}
+
+
 let mathTests = [
-    add(10, 10)     == 20,
-    sub(10, 5)      == 5,
-    div(25, 5)      == 5,
-    mul(30, 3)      == 90,
-    idiv(10, 3)     == 3,
-    mod(100, 2)     == 0,
-    even(4)         == true,
-    odd(2)          == false,
-    sqrt(25)        == 5,
-    # divmod(10, 3)   == [3, 1], cant compare arrays maybe TODO
-    hypot(3, 4)     == 5,
-    sum([1, 2, 3])  == 6,
-    avg([1, 2, 3])  == 2,
-    prod([1, 2, 3]) == 6,
-    pow(2, 3, 3)    == 2,
-    min(20, 1)      == 1,
-    max(20, 1)      == 20
+    [add(10, 10), 20],
+    [sub(10, 5), 5],
+    [div(25, 5), 5],
+    [mul(30, 3), 90],
+    [idiv(10, 3), 3],
+    [mod(100, 2), 0],
+    [even(4), true],
+    [odd(2), false],
+    [sqrt(25), 5],
+    [hypot(3, 4), 5],
+    [sum([1, 2, 3]), 6],
+    [avg([1, 2, 3]), 2],
+    [prod([1, 2, 3]), 6],
+    [pow(2, 3, 3), 2],
+    [min(20, 1), 1],
+    [max(20, 1), 20]
 ]
+
 
 def runTests(tests, name) {
     let mut i = 0
+
     print("running: " ++ name)
     if len(tests) == 1 {
         print("execution error", tests)
         return 1
     }
     for test in tests {
-        if not test {
+        if test[0] != test[1] {
             print("Failed test: " ++ string(i) ++ "/" ++ string(len(tests)))
+            print("\tgot=" ++ string(test[0]) ++ " want=" ++ string(test[1]))
             return 1
         }
         i += 1
     }
     print("all '" ++ name ++ "' tests passed")
 }
-
-
-runTests(mathTests, "math")
