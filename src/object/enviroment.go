@@ -29,8 +29,8 @@ func NewEnvironment() *Environment {
 	return &Environment{store: s, outer: nil}
 }
 
-// NewEnclosedEnviroment : Define a new enviroment scope within another.
-func NewEnclosedEnviroment(outer *Environment) *Environment {
+// NewEnclosedEnvironment : Define a new enviroment scope within another.
+func NewEnclosedEnvironment(outer *Environment) *Environment {
 	env := NewEnvironment()
 	env.outer = outer
 	return env

@@ -1,6 +1,8 @@
 
 
-all:
+build: clean test
+	go build -o dito -v
+untested:
 	go build -o dito -v
 test:
 	go test -v ./... --cover

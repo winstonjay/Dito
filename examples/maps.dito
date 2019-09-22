@@ -1,0 +1,15 @@
+
+let mut x = {
+    "a": 1,
+    "b": 2,
+    "c": 3,
+}
+
+def main() {
+    print("a" in x)
+    x["d"] = 4
+    print(x)
+    for key in x {
+        print(key, x[key])
+    }
+}

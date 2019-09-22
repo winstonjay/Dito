@@ -2,6 +2,7 @@ package object
 
 import (
 	"fmt"
+	"hash/fnv"
 )
 
 // Char :
@@ -13,7 +14,7 @@ func (c *Char) Type() TypeFlag { return CharType }
 // Inspect : return a string representation of the objects value.
 func (c *Char) Inspect() string { return fmt.Sprintf("'%c'", c.Value) }
 
-// NewChar : return new initialised instance of the object.
+// NewChar : return new initialized instance of the object.
 func NewChar(value byte) *Char { return &Char{Value: value} }
 
 // ConvertType : return the conversion into the specified type
@@ -39,3 +40,13 @@ func (c *Char) ConvertType(which TypeFlag) Object {
 
 // Abs : return the absolute value of an number
 func (c *Char) Abs() *Char { return c }
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Hashable interface:
+
+// Hash : hash value of char
+func (c *Char) Hash() HashKey {
+	h := fnv.New64a()
+	h.Write([]byte{c.Value})
+	return HashKey{Type: c.Type(), Value: h.Sum64()}
+}

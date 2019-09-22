@@ -14,8 +14,11 @@ type binaryOp struct {
 }
 
 func (op *binaryOp) whichType(t1, t2 TypeFlag) TypeFlag {
-	if t1 == StringType && t2 == StringType {
-		return StringType
+	if t1 == t2 {
+		return t1
+	}
+	if t2 == DictType {
+		return DictType
 	}
 	if t2 == ArrayType {
 		return ArrayType
@@ -49,11 +52,15 @@ func (op *binaryOp) EvalBinary(env *Environment, a, b Object) Object {
 		}
 		return fn(env, a, b)
 	}
+
+	//TODO: this needs cleaning up
+
 	which := op.whichType(a.Type(), b.Type())
+
 	if which == ErrorType {
 		return NewError("mis matched types: %s, %s", a.Type(), b.Type())
 	}
-	if which != ArrayType {
+	if which != ArrayType && which != DictType {
 		a = a.ConvertType(which)
 		b = b.ConvertType(which)
 		if a.Type() == ErrorType {
@@ -73,7 +80,7 @@ func (op *binaryOp) EvalBinary(env *Environment, a, b Object) Object {
 	return fn(env, a, b)
 }
 
-// BinaryOps : binary operations availible to the user.
+// BinaryOps : binary operations available to the user.
 var BinaryOps = make(map[string]*binaryOp)
 
 func init() {
@@ -349,6 +356,9 @@ func init() {
 					// TODO: set up recovery. this causes a panic when used wrong.
 					return a.(*Array).Concat(b.(*Array))
 				},
+				DictType: func(env *Environment, a, b Object) Object {
+					return a.(*Dict).Concat(b.(*Dict))
+				},
 			},
 		},
 
@@ -360,6 +370,9 @@ func init() {
 				},
 				ArrayType: func(env *Environment, a, b Object) Object {
 					return b.(*Array).Contains(a)
+				},
+				DictType: func(env *Environment, a, b Object) Object {
+					return b.(*Dict).Contains(a)
 				},
 			},
 		},

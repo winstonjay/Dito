@@ -18,7 +18,7 @@ func evalFunctionCall(fn ast.Expression, fnArgs []ast.Expression, env *object.En
 }
 
 func extendLambdaEnv(fn *object.Lambda, args []object.Object) (*object.Environment, *object.Error) {
-	env := object.NewEnclosedEnviroment(fn.Env)
+	env := object.NewEnclosedEnvironment(fn.Env)
 	if len(fn.Parameters) != len(args) {
 		return nil, object.NewError("Wrong number of function args. Want=%d, Got=%d. in %s",
 			len(fn.Parameters), len(args), fn.Inspect())
@@ -60,7 +60,7 @@ func unwrapReturnValue(obj object.Object) object.Object {
 }
 
 func extendFunctionEnv(fn *object.Function, args []object.Object) (*object.Environment, *object.Error) {
-	env := object.NewEnclosedEnviroment(fn.Env)
+	env := object.NewEnclosedEnvironment(fn.Env)
 	if len(fn.Parameters) != len(args) {
 		return nil, object.NewError("Wrong number of function args. Want=%d, Got=%d.",
 			len(fn.Parameters), len(args))

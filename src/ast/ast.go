@@ -400,7 +400,7 @@ func (al *ArrayLiteral) String() string {
 ######## Atoms
 */
 
-// Identifier : alphanumeric varible name.
+// Identifier : alphanumeric variable name.
 type Identifier struct {
 	Token token.Token // token.IDVAL
 	Value string

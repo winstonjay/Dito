@@ -14,7 +14,7 @@ func (i *Int) Type() TypeFlag { return IntType }
 // Inspect : return a string representation of the objects value.
 func (i *Int) Inspect() string { return fmt.Sprintf("%d", i.Value) }
 
-// NewInt : return new initialised instance of the object.
+// NewInt : return new initialized instance of the object.
 func NewInt(value int) *Int { return &Int{Value: value} }
 
 // ConvertType : return the conversion into the specified type
@@ -41,11 +41,6 @@ func (i *Int) ConvertType(which TypeFlag) Object {
 	}
 }
 
-var (
-	// ZERO : is the number zero
-	ZERO = NewInt(0)
-)
-
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 // Methods needed to satisfy the Numeric interface:
 
@@ -56,3 +51,16 @@ func (i *Int) Abs() Object {
 	}
 	return &Int{Value: -i.Value}
 }
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Hashable interface:
+
+// Hash : hash value of int
+func (i *Int) Hash() HashKey {
+	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
+}
+
+var (
+	// ZERO : is the number zero
+	ZERO = NewInt(0)
+)

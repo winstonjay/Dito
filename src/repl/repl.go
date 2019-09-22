@@ -13,8 +13,8 @@ import (
 
 // command prompt constants
 const (
-	PROMPT = "\033[36mdito:\033[m   "
-	QUIT   = "\033[31mQQ\033[m"
+	PROMPT = "\033[36mdito>\033[m "
+	QUIT   = "QQ"
 )
 
 // Black       0;30     Dark Gray     1;30

@@ -37,3 +37,15 @@ func (b *Bool) ConvertType(which TypeFlag) Object {
 	}
 	return NewError("Argument to %s not supported, got %s", which, b.Type())
 }
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Hashable interface:
+
+// Hash : hash value of bool
+func (b *Bool) Hash() HashKey {
+	var val uint64
+	if b.Value {
+		val = 1
+	}
+	return HashKey{Type: b.Type(), Value: val}
+}

@@ -27,7 +27,7 @@ func (b *Builtin) Inspect() string {
 		b.Name, strings.Join(b.ArgT, ", "), b.ReturnT)
 }
 
-// NewBuiltin : return new initialised instance of the object.
+// NewBuiltin : return new initialized instance of the object.
 // func NewBuiltin(fn BuiltinFunction) *Builtin {
 // 	return &Builtin{Fn: fn, argC: }
 // }

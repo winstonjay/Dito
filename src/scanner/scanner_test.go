@@ -182,7 +182,7 @@ x /= fun << 1
 			t.Fatalf("test[%d](%s) - Invalid line index. expected=%d, got=%d",
 				i, tt.literal, tt.line, lineno)
 		}
-		// messed up column set up. cba to fix and sort a new test right now.
+		// TODO: messed up column set up. cba to fix and sort a new test right now.
 		// if scanner.column != tt.column+1 {
 		// 	t.Fatalf("test[%d] - Invalid column index. line:\n%s<-\n expected=%d, got=%d",
 		// 		i, scanner.TraceLine(), tt.column+1, scanner.column)
@@ -190,8 +190,8 @@ x /= fun << 1
 	}
 }
 
-// NEWLINE needs a redesign around comments and newlines. Currently the final line dosent
-// return a newline causing problems for the parser. The whole set up is pretty bad tbh
+// NEWLINE needs a redesign around comments and newlines. Currently the final line doesn't
+// return a newline causing problems for the parser.
 func TestNewLines(t *testing.T) {
 	tests := []struct {
 		token   token.Token
@@ -223,15 +223,11 @@ let hey = 200
 let x = 0xff >= 5000
 
 
-# we only want NEWLINE to be seen just
+# we only want 1 NEWLINE to be seen just
 # after content and then ignore the rest.
 
 
 "bye"`)
-	// let j = 100 # trailing comments are not working for some reason.
-
-	// # after content. like "x + y\n
-	// "bye"`)
 	for i, tt := range tests {
 		tok, literal, lineno := scanner.NextToken()
 		if tok != tt.token {

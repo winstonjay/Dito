@@ -33,7 +33,7 @@ func evalReAssign(node *ast.ReAssignStatement, env *object.Environment) object.O
 		return nil
 	}
 
-	// TODO: This is just using regular binary ops instead of inplace operations.
+	// TODO: This is just using regular binary ops instead of in place operations.
 	// would it be quick to do this otherwise.
 	left := v.Unpack()
 	opString := node.Token.String()

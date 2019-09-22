@@ -327,5 +327,110 @@ func testBooleanLiteral(t *testing.T, exp ast.Expression, testval bool) bool {
 		return false
 	}
 	return true
+}
 
+func TestDictLiteralsStringKeys(t *testing.T) {
+	input := `{"one": 1, "two": 2, "three": 3}`
+
+	scanner := scanner.Init(input)
+	parser := New(scanner)
+	program := parser.ParseProgram()
+	if errors := parser.Errors(); len(errors) != 0 {
+		t.Errorf("parser has %d errors", len(errors))
+		for _, err := range errors {
+			t.Errorf("parser error: %q", err.message)
+		}
+		t.FailNow()
+	}
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	dict, ok := stmt.Expression.(*ast.DictLiteral)
+	if !ok {
+		t.Fatalf("expression is not ast.DictLiteral. got=%T", stmt.Expression)
+	}
+
+	if len(dict.Items) != 3 {
+		t.Errorf("dict.pairs has wrong length, got=%d. want=%d", len(dict.Items), 3)
+	}
+
+	expected := map[string]int{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+	for key, value := range dict.Items {
+		lit, ok := key.(*ast.StringLiteral)
+		if !ok {
+			t.Errorf("key is not ast.StringLiteral. got=%T", key)
+		}
+		testIntegerLiteral(t, value, expected[lit.String()])
+	}
+}
+
+func TestDictLiteralsStringKeysWithNewlines(t *testing.T) {
+	input := `
+{
+	"one": 1,
+	"two": 2,
+	"three": 3,
+}`
+
+	scanner := scanner.Init(input)
+	parser := New(scanner)
+	program := parser.ParseProgram()
+	if errors := parser.Errors(); len(errors) != 0 {
+		t.Errorf("parser has %d errors", len(errors))
+		for _, err := range errors {
+			t.Errorf("parser error: %q", err.message)
+		}
+		t.FailNow()
+	}
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	dict, ok := stmt.Expression.(*ast.DictLiteral)
+	if !ok {
+		t.Fatalf("expression is not ast.DictLiteral. got=%T", stmt.Expression)
+	}
+
+	if len(dict.Items) != 3 {
+		t.Errorf("dict.pairs has wrong length, got=%d. want=%d", len(dict.Items), 3)
+	}
+
+	expected := map[string]int{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+	for key, value := range dict.Items {
+		lit, ok := key.(*ast.StringLiteral)
+		if !ok {
+			t.Errorf("key is not ast.StringLiteral. got=%T", key)
+		}
+		testIntegerLiteral(t, value, expected[lit.String()])
+	}
+}
+
+func TestDictLiteralsEmpty(t *testing.T) {
+	input := `{}`
+
+	scanner := scanner.Init(input)
+	parser := New(scanner)
+	program := parser.ParseProgram()
+	checkParserErrors(t, parser)
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	dict, ok := stmt.Expression.(*ast.DictLiteral)
+	if !ok {
+		t.Fatalf("expression is not ast.DictLiteral. got=%T", stmt.Expression)
+	}
+	if len(dict.Items) != 0 {
+		t.Errorf("dict.pairs has wrong length, got=%d. want=%d", len(dict.Items), 3)
+	}
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	if errors := p.Errors(); len(errors) != 0 {
+		t.Errorf("parser has %d errors", len(errors))
+		for _, err := range errors {
+			t.Errorf("parser error: %q", err.message)
+		}
+		t.FailNow()
+	}
 }

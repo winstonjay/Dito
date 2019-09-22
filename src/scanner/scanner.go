@@ -6,8 +6,8 @@ parser will call till it reaches an token.EOF.
 package scanner
 
 // TODO: fix issues with column positions, tracebacks etc.
-// TODO: the line handling is pretty crap. trailing comments dont work
-// 		 and the general setup jsut dosent feel right.
+// TODO: the line handling is pretty crap. trailing comments don't work
+// 		 and the general setup just doesn't feel right.
 
 import (
 	"bytes"
@@ -26,8 +26,8 @@ type Scanner struct {
 	newline bool   // if or not to collect newline tokens.
 }
 
-// Init return an intialised lexical scanner. Values not
-// initalised are set to go's default type values :
+// Init return an intialized lexical scanner. Values not
+// initalized are set to go's default type values :
 // 0 for all integers, false for bool.
 func Init(input string) *Scanner {
 	input += " " // add a buffer space at the end.
@@ -59,7 +59,7 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 
 	// Run through all the possible operators and delimeters that are
 	// included in dito's grammar, if not default to check for
-	// identifers and numbers. If we still havent found anything
+	// identifers and numbers. If we still haven't found anything
 	// set tok to token.ILLEGAL.
 	switch s.char {
 	case '=': // = ==
@@ -102,10 +102,10 @@ func (s *Scanner) NextToken() (tok token.Token, literal string, line int) {
 		tok = token.BITAND
 	case '^':
 		tok = token.BITXOR
-	case '"':
-		return s.readString()
 	case ':':
 		tok = token.COLON
+	case '"':
+		return s.readString()
 	case '.':
 		if isDigit(s.peek()) {
 			return s.readNumber()
@@ -231,7 +231,7 @@ func (s *Scanner) readNumber() (token.Token, string, int) {
 		s.advance()
 	}
 	// Step 2: Once we have the significand, now find the numbers type.
-	// The rule is if it has a decimal point or uses scientfic notation
+	// The rule is if it has a decimal point or uses scientific notation
 	// its a float. If it is hex or just a plain integer return a int.
 	switch {
 	// all hexadecimals start strictly with a 0x or a 0X.

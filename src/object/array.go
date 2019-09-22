@@ -4,8 +4,11 @@ import (
 	"bytes"
 )
 
-// Array : array object. TODO: Need to decide if arrays will allow mixed items.
-// I dont like this tbh so maybe enforce a type system.
+// TODO: Need to decide if arrays will allow mixed items.
+// I don't like this tbh so maybe enforce a type system.
+
+// Array : Homogeneous array object, that can store objects of any type.
+// Array conforms to the iterable interface.
 type Array struct {
 	Elements []Object
 	Len      int

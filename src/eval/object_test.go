@@ -45,7 +45,7 @@ func TestIntExpr(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		evaluated := testExec(t, tt.input)
+		evaluated := testEval(t, tt.input)
 		testInt(t, evaluated, tt.expected)
 	}
 }
@@ -60,7 +60,7 @@ func TestEvalIfElseExpression(t *testing.T) {
 		{"35 / 2 if 35 % 2 == 0 else 35 * 3 + 1", 106},
 	}
 	for _, tt := range tests {
-		evaluated := testExec(t, tt.input)
+		evaluated := testEval(t, tt.input)
 		testInt(t, evaluated, tt.expected)
 	}
 }
@@ -79,7 +79,7 @@ func testInt(t *testing.T, obj object.Object, expected int) bool {
 	return true
 }
 
-func testExec(t *testing.T, input string) object.Object {
+func testEval(t *testing.T, input string) object.Object {
 	l := scanner.Init(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
@@ -98,4 +98,50 @@ func checkParserErrors(t *testing.T, p *parser.Parser) {
 		t.Errorf("parser error: %q", msg)
 	}
 	t.FailNow()
+}
+
+func TestDictEvaluation(t *testing.T) {
+	input := `
+let a = 2
+{
+	"one": 10 - 9,
+	"two": a,
+	"thr" ++ "ee": 3,
+	4: 4,
+	true: 5,
+	false: 6,
+}
+`
+	evaluated := testEval(t, input)
+	result, ok := evaluated.(*object.Dict)
+	if !ok {
+		t.Fatalf("eval didn't produce a dict. got=%T", evaluated)
+	}
+
+	expected := map[object.HashKey]int{
+		(&object.String{Value: "one"}).Hash():   1,
+		(&object.String{Value: "two"}).Hash():   2,
+		(&object.String{Value: "three"}).Hash(): 3,
+		(&object.Int{Value: 4}).Hash():          4,
+		(object.TRUE).Hash():                    5,
+		(object.FALSE).Hash():                   6,
+	}
+
+	if len(result.Items) != len(expected) {
+		t.Fatalf("dict has the wrong number of items. got=%d, want=%d",
+			len(result.Items), len(expected))
+	}
+	if result.Len != len(expected) {
+		t.Fatalf("dict has the wrong recorded number of items. got=%d, want=%d",
+			len(result.Items), len(expected))
+	}
+
+	for expectedKey, expectedValue := range expected {
+		item, ok := result.Items[expectedKey]
+		if !ok {
+			t.Errorf("no item for given key")
+		}
+		testInt(t, item.Value, expectedValue)
+	}
+
 }

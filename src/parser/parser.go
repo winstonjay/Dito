@@ -64,6 +64,7 @@ func New(s *scanner.Scanner) *Parser {
 		token.LBRACKET: p.arrayLiteral,
 		token.LPAREN:   p.groupedExpression,
 		token.STRING:   p.stringLiteral,
+		token.LBRACE:   p.dictLiteral,
 	}
 
 	p.infixParseFns = map[token.Token]infixParseFn{
@@ -144,7 +145,7 @@ func (p *Parser) stmtEnd() bool {
 	return false
 }
 
-// ParseProgram creates ast of the inputed text incrementally working with the
+// ParseProgram creates ast of the input text incrementally working with the
 // scanner.
 // 	Program: list of statements
 // 	stmtend: newline | semicolon | EOF
@@ -164,9 +165,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	return program
 }
 
-/*
-#### Statements.
-*/
+// Statements.
 
 // statement:
 //     assignmentStatement
@@ -556,7 +555,7 @@ func (p *Parser) indexExpression(item ast.Expression) ast.Expression {
 
 // sliceExpression
 // 		identifier '[' expression ':' expression ']'
-// hmmmm... this should probally be more independent from index expression.
+// should probally be more independent from index expression.
 // but its not for now just to avoid back-tracking.
 func (p *Parser) sliceExpression(left, start ast.Expression) ast.Expression {
 	p.nextToken()
@@ -576,6 +575,38 @@ func (p *Parser) sliceExpression(left, start ast.Expression) ast.Expression {
 /*
 #### Atoms / Type Literals
 */
+
+// dictLiteral :
+func (p *Parser) dictLiteral() ast.Expression {
+	dict := &ast.DictLiteral{
+		Token: p.currentToken,
+		Items: make(map[ast.Expression]ast.Expression),
+	}
+	if p.peekTokenIs(token.NEWLINE) {
+		p.nextToken()
+	}
+
+	for !p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
+		key := p.expression(token.LOWEST)
+		if !p.expectPeek(token.COLON) {
+			return nil
+		}
+		p.nextToken()
+		value := p.expression(token.LOWEST)
+		dict.Items[key] = value
+		if !p.peekTokenIs(token.RBRACE) && !p.expectPeek(token.COMMA) {
+			return nil
+		}
+		if p.peekTokenIs(token.NEWLINE) {
+			p.nextToken()
+		}
+	}
+	if !p.expectPeek(token.RBRACE) {
+		return nil
+	}
+	return dict
+}
 
 // arrayLiteral: '[' expressionList ']'
 func (p *Parser) arrayLiteral() ast.Expression {

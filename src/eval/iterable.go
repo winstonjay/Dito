@@ -55,7 +55,7 @@ func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environ
 	}
 	iter, ok := maybeIter.(object.Iterable)
 	if !ok {
-		return object.NewError("Index assignement error: wrong type")
+		return object.NewError("Index assignment error: wrong type")
 	}
 	if node.Token == token.ASSIGN {
 		iter.SetItem(key, right)
@@ -66,7 +66,7 @@ func evalIndexAssignment(node *ast.IndexAssignmentStatement, env *object.Environ
 	opString := node.Token.String()
 	op := object.BinaryOps[opString[:len(opString)-1]]
 	if op == nil {
-		return object.NewError("Unknown inplace binary op: '%s'", opString)
+		return object.NewError("Unknown in place binary op: '%s'", opString)
 	}
 	val := op.EvalBinary(env, left, right)
 	if isError(val) {

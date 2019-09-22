@@ -1,6 +1,10 @@
 package object
 
 import (
+	"bytes"
+	"encoding/binary"
+	"fmt"
+	"hash/fnv"
 	"math"
 	"strconv"
 )
@@ -14,7 +18,7 @@ func (f *Float) Type() TypeFlag { return FloatType }
 // Inspect : return a string representation of the objects value.
 func (f *Float) Inspect() string { return strconv.FormatFloat(f.Value, 'f', -1, 64) }
 
-// NewFloat : return new initialised instance of the object.
+// NewFloat : return new initialized instance of the object.
 func NewFloat(value float64) *Float { return &Float{Value: value} }
 
 // ConvertType : return the conversion into the specified type
@@ -39,4 +43,23 @@ func (f *Float) ConvertType(which TypeFlag) Object {
 // Abs : return the absolute value of an number
 func (f *Float) Abs() Object {
 	return &Float{Value: math.Abs(f.Value)}
+}
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Hashable interface:
+
+// Hash : hash value of float
+func (f *Float) Hash() HashKey {
+	h := fnv.New64a()
+	h.Write(float64ToByte(f.Value))
+	return HashKey{Type: f.Type(), Value: h.Sum64()}
+}
+
+func float64ToByte(f float64) []byte {
+	var buf bytes.Buffer
+	err := binary.Write(&buf, binary.BigEndian, f)
+	if err != nil {
+		fmt.Println("binary.Write failed:", err)
+	}
+	return buf.Bytes()
 }

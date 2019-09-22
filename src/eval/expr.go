@@ -58,9 +58,9 @@ func evalIfElseExpression(node *ast.IfElseExpression, env *object.Environment) o
 	return Eval(node.Alternative, env)
 }
 
-func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Object {
+func evalExpressions(expr []ast.Expression, env *object.Environment) []object.Object {
 	var result []object.Object
-	for _, e := range exps {
+	for _, e := range expr {
 		evaluated := Eval(e, env)
 		if isError(evaluated) {
 			return []object.Object{evaluated}
@@ -68,6 +68,14 @@ func evalExpressions(exps []ast.Expression, env *object.Environment) []object.Ob
 		result = append(result, evaluated)
 	}
 	return result
+}
+
+func evalDictExpression(dl *ast.DictLiteral, env *object.Environment) object.Object {
+	d := object.NewDict()
+	for key, value := range dl.Items {
+		d.SetItem(Eval(key, env), Eval(value, env))
+	}
+	return d
 }
 
 func isTrue(obj object.Object) bool {

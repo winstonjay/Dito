@@ -2,6 +2,7 @@ package object
 
 import (
 	"fmt"
+	"hash/fnv"
 	"strconv"
 	"strings"
 )
@@ -17,7 +18,7 @@ func (s *String) Type() TypeFlag { return StringType }
 // Inspect : return a string representation of the objects value.
 func (s *String) Inspect() string { return s.Value }
 
-// NewString : return new initialised instance of the object.
+// NewString : return new initialized instance of the object.
 func NewString(value string) *String { return &String{Value: value} }
 
 // ConvertType : return the conversion into the specified type
@@ -137,4 +138,14 @@ func (s *String) Iter() <-chan Object {
 		close(ch)
 	}()
 	return ch
+}
+
+// ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+// Methods needed to satisfy the Hashable interface:
+
+// Hash : hash value of string
+func (s *String) Hash() HashKey {
+	h := fnv.New64a()
+	h.Write([]byte(s.Value))
+	return HashKey{Type: s.Type(), Value: h.Sum64()}
 }

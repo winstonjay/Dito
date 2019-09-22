@@ -112,7 +112,7 @@ var Builtins = map[string]*object.Builtin{
 	"print": &object.Builtin{
 		Name:    "print",
 		Fn:      objectPrint,
-		Info:    "Print a varible number of arguments to the std out.",
+		Info:    "Print a variable number of arguments to the std out.",
 		ArgC:    -1,
 		ArgT:    []string{"Any..."},
 		ReturnT: "None",

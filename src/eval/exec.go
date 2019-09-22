@@ -69,9 +69,13 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return object.NewFloat(node.Value)
 	case *ast.BooleanLiteral:
 		return object.NewBool(node.Value)
+
+	// Composite:
 	case *ast.ArrayLiteral:
 		elements := evalExpressions(node.Elements, env)
 		return object.NewArray(elements, -1)
+	case *ast.DictLiteral:
+		return evalDictExpression(node, env)
 	}
 	return nil
 }
