@@ -1,0 +1,11 @@
+
+
+def main() {
+    let fp = open("cats.txt", "w")
+    write(fp, "Hello World")
+    close(fp)
+    write(STDOUT, "Hello feed\n")
+    write(STDOUT, "Hello again\n")
+    write(STDERR, "Hello ERROR\n")
+    write(STDOUT, read(STDIN) ++ " from stdin\n")
+}

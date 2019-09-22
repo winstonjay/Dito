@@ -1,42 +1,53 @@
 package object
 
-// Varible : symbol table entry, keeps track whether varible is mutable or not.
-type Varible struct {
+// Variable : symbol table entry, keeps track whether varible is mutable or not.
+type Variable struct {
 	value   Object
 	mutable bool
 }
 
 // IsMutable : can it be changed
-func (v *Varible) IsMutable() bool {
+func (v *Variable) IsMutable() bool {
 	return v.mutable
 }
 
 // Unpack : can it be changed
-func (v *Varible) Unpack() Object {
+func (v *Variable) Unpack() Object {
 	return v.value
 }
 
-// Environment : Holds the enviroment varibles created by the user. Pretty much
+// Environment : Holds the environment variables created by the user. Pretty much
 // a symbol table.
 type Environment struct {
-	store map[string]Varible
+	store map[string]Variable
 	outer *Environment
 }
 
-// NewEnvironment : Define a new enviroment scope.
+// InitialEnvironment : Define the initial environment scope. with system variables etc.
+func InitialEnvironment() *Environment {
+	return &Environment{
+		store: map[string]Variable{
+			"STDIN":  Variable{value: STDIN, mutable: false},
+			"STDOUT": Variable{value: STDOUT, mutable: false},
+			"STDERR": Variable{value: STDERR, mutable: false},
+		},
+	}
+}
+
+// NewEnvironment : Define a new environment scope.
 func NewEnvironment() *Environment {
-	s := make(map[string]Varible)
+	s := make(map[string]Variable)
 	return &Environment{store: s, outer: nil}
 }
 
-// NewEnclosedEnvironment : Define a new enviroment scope within another.
+// NewEnclosedEnvironment : Define a new environment scope within another.
 func NewEnclosedEnvironment(outer *Environment) *Environment {
 	env := NewEnvironment()
 	env.outer = outer
 	return env
 }
 
-// Get : get a varible inside the current scope
+// Get : get a variable inside the current scope
 func (e *Environment) Get(name string) (Object, bool) {
 	v, ok := e.store[name]
 	if !ok && e.outer != nil {
@@ -46,7 +57,7 @@ func (e *Environment) Get(name string) (Object, bool) {
 }
 
 // GetVar :
-func (e *Environment) GetVar(name string) (Varible, bool) {
+func (e *Environment) GetVar(name string) (Variable, bool) {
 	v, ok := e.store[name]
 	if !ok && e.outer != nil {
 		v, ok = e.outer.GetVar(name)
@@ -54,13 +65,13 @@ func (e *Environment) GetVar(name string) (Varible, bool) {
 	return v, ok
 }
 
-// Set : set a varible inside the current scope.
+// Set : set a variable inside the current scope.
 func (e *Environment) Set(name string, val Object, mut bool) Object {
-	e.store[name] = Varible{value: val, mutable: mut}
+	e.store[name] = Variable{value: val, mutable: mut}
 	return val
 }
 
-// need to think about the enforment of constants.
+// need to think about the enforcement of constants.
 func (e *Environment) existsAndMutable(name string) (bool, bool) {
 	v, ok := e.store[name]
 	if !ok && e.outer != nil {

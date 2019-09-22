@@ -19,11 +19,12 @@ const (
 	BultinType
 	FunctionType
 	DictType
+	FileType
 )
 
 func (t TypeFlag) String() string { return typeName[t] }
 
 var typeName = [...]string{
 	"Char", "Int", "Float", "Bool", "String", "Array",
-	"None", "Error", "Return", "Lambda", "Builtin", "Function", "Dict",
+	"None", "Error", "Return", "Lambda", "Builtin", "Function", "Dict", "File",
 }

@@ -32,7 +32,7 @@ func main() {
 }
 
 func execFile(file string, out io.Writer) {
-	env := object.NewEnvironment()
+	env := object.InitialEnvironment()
 	l := scanner.Init(file + "\n\nmain()")
 	p := parser.New(l)
 	program := p.ParseProgram()

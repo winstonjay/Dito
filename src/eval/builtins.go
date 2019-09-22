@@ -149,10 +149,100 @@ var Builtins = map[string]*object.Builtin{
 		ArgT:    []string{"Atom"},
 		ReturnT: "None",
 	},
+	"open": &object.Builtin{
+		Name:    "fopen",
+		Fn:      fileOpen,
+		Info:    "Open and return a file object",
+		ArgC:    1,
+		ArgT:    []string{"String"},
+		ReturnT: "None",
+	},
+	"close": &object.Builtin{
+		Name:    "close",
+		Fn:      fileClose,
+		Info:    "close a file object",
+		ArgC:    1,
+		ArgT:    []string{"File"},
+		ReturnT: "None",
+	},
+	"read": &object.Builtin{
+		Name:    "read",
+		Fn:      fileRead,
+		Info:    "close a file object",
+		ArgC:    1,
+		ArgT:    []string{"File"},
+		ReturnT: "String",
+	},
+	"write": &object.Builtin{
+		Name:    "write",
+		Fn:      fileWrite,
+		Info:    "close a file object",
+		ArgC:    2,
+		ArgT:    []string{"File"},
+		ReturnT: "String",
+	},
+}
+
+func fileOpen(args ...object.Object) object.Object {
+	if n := len(args); n != 2 {
+		return object.NewError(object.InvalidArgLenError, "open", 2, n)
+	}
+	path, ok := args[0].(*object.String)
+	if !ok {
+		return object.NewError("Argument '%s' to func 'open' is invalid", args[0].Inspect())
+	}
+	mode, ok := args[1].(*object.String)
+	if !ok {
+		return object.NewError("Argument '%s' to func 'open' is invalid", args[1].Inspect())
+	}
+	switch mode.Value {
+	case "w":
+		return object.FILE.Create(path.Value)
+	case "r":
+		return object.FILE.Open(path.Value)
+	default:
+		return object.NewError("Argument '%s' to func 'fopen' is invalid. unknown file mode", args[1].Inspect())
+	}
+}
+
+func fileRead(args ...object.Object) object.Object {
+	if n := len(args); n != 1 {
+		return object.NewError(object.InvalidArgLenError, "read", 2, n)
+	}
+	fp, ok := args[0].(*object.File)
+	if !ok {
+		return object.NewError("Invalid type to func 'read', want=File, got=%s", args[0].Type())
+	}
+	return fp.Read()
+}
+
+func fileClose(args ...object.Object) object.Object {
+	if n := len(args); n != 1 {
+		return object.NewError(object.InvalidArgLenError, "close", 2, n)
+	}
+	fp, ok := args[0].(*object.File)
+	if !ok {
+		return object.NewError("Invalid type to func 'close', want=File, got=%s", args[0].Type())
+	}
+	return fp.Close()
+}
+
+func fileWrite(args ...object.Object) object.Object {
+	if n := len(args); n != 2 {
+		return object.NewError(object.InvalidArgLenError, "write", 2, n)
+	}
+	fp, ok := args[0].(*object.File)
+	if !ok {
+		return object.NewError("Invalid type to func 'close', want=File, got=%s", args[0].Type())
+	}
+	str := args[1].ConvertType(object.StringType)
+	if str.Type() == object.ErrorType {
+		return str
+	}
+	return fp.Write(str.(*object.String).Value)
 }
 
 func typeSwitch(which object.TypeFlag) object.BuiltinFunction {
-
 	return func(args ...object.Object) object.Object {
 		n := len(args)
 		switch n {
